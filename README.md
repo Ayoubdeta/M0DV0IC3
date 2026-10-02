@@ -20,7 +20,7 @@ La interfaz sigue el logo: barra lateral, fondo morado oscuro, violeta para lo q
 
 Requisitos: Windows 10 (versión 2004 o posterior) u 11, de 64 bits.
 
-**¿Sale «Windows protegió su PC»?** Es el filtro SmartScreen. Sale con cualquier programa nuevo que aún no tiene firma digital o muchas descargas, aunque sea completamente seguro. Pulsa **Más información → Ejecutar de todas formas**; solo pasa la primera vez. La firma digital está en camino ([SIGNING.md](SIGNING.md)).
+**¿Sale «Windows protegió su PC»?** Es el filtro SmartScreen. Sale con cualquier programa nuevo que aún no tiene firma digital o muchas descargas, aunque sea completamente seguro. Pulsa **Más información → Ejecutar de todas formas**; solo pasa la primera vez. La firma digital está solicitada (ver [Code signing policy](#code-signing-policy)).
 
 Cada versión la compila GitHub Actions directamente desde este código fuente, sin pasar por ningún ordenador personal. Junto al ZIP se publican su huella SHA-256 y una atestación de procedencia, que prueba de qué repositorio y commit sale. Se puede verificar con `gh attestation verify M0DV0IC3-vX.Y.Z-win-x64.zip --repo Ayoubdeta/M0DV0IC3`.
 
@@ -147,6 +147,19 @@ micro (WASAPI) → RNNoise → puerta de ruido → voz (PSOLA + efectos) → + s
 | `src/M0DV0IC3.App` | Interfaz WPF (MVVM): barra lateral, barra de título propia, voces por grupos, editor de voz, soundboard, música por el micro, atajos globales y bandeja del sistema. El tema (`Themes/Theme.xaml`) no usa animaciones continuas: una sola animación infinita con brillo costaba un 10 % de un núcleo de CPU. |
 | `tools/M0DV0IC3.Cli` | Herramientas offline y de diagnóstico. |
 | `tests/M0DV0IC3.Tests` | Tono medido tras PSOLA y tras el autotune, latencia real frente a la reportada, cero asignaciones, rendimiento, deriva de reloj, RNNoise, soundboard. |
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+- Committers and reviewers: [Ayoub](https://github.com/Ayoubdeta)
+- Approvers: [Ayoub](https://github.com/Ayoubdeta)
+
+Only binaries built by this repository's [release workflow](.github/workflows/release.yml) from its own source code are signed, and every release is approved manually before signing.
+
+Privacy policy: This program will not transfer any information to other networked systems unless specifically requested by the user.
+
+*Estado: firma solicitada a SignPath Foundation. Hasta que la aprueben, las versiones se publican sin firmar ([SIGNING.md](SIGNING.md)).*
 
 ## Licencia
 

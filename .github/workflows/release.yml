@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write       # crear la release y subir la descarga
+  actions: read         # SignPath lee los datos del job y descarga la app sin firmar
   id-token: write       # atestación de procedencia (Sigstore)
   attestations: write
 
@@ -58,6 +59,8 @@ jobs:
           signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
           github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
           wait-for-completion: true
+          # Cada firma hay que aprobarla a mano en SignPath: hay hasta una hora para hacerlo.
+          wait-for-completion-timeout-in-seconds: 3600
           output-artifact-directory: publish/firmado
 
       - name: Usar la app firmada

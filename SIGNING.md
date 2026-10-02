@@ -18,36 +18,25 @@ Windows avisa con **«Windows protegió su PC»** (SmartScreen) al abrir un prog
 | La página de descarga describe lo que hace | ✅ README y notas de cada versión |
 | **Autenticación en dos pasos** en GitHub y en SignPath para todo el equipo | ⬜ actívala en GitHub (*Settings → Password and authentication*) |
 | Roles definidos: *committers*, *reviewers* y *approvers* | ⬜ en la solicitud: Ayoub en los tres |
-| Sección **«Code signing policy»** en la web del proyecto | ⬜ cuando te aprueben (texto de abajo) |
+| Sección **«Code signing policy»** en la página principal y en las de descarga | ✅ [README](README.md#code-signing-policy) y notas de cada versión |
+| Cada versión se aprueba a mano antes de firmarla | ⬜ lo haces tú en SignPath (el workflow espera hasta una hora) |
 
 ### Pasos
 
-1. **Activa la autenticación en dos pasos** en tu cuenta de GitHub.
-2. **Solicita el alta** en <https://signpath.org/apply> con la dirección de este repositorio (`https://github.com/Ayoubdeta/M0DV0IC3`).
+1. **Activa la autenticación en dos pasos** en tu cuenta de GitHub (<https://github.com/settings/security>).
+2. **Solicita el alta** en <https://signpath.org/apply> con la dirección de este repositorio (`https://github.com/Ayoubdeta/M0DV0IC3`). La política de firma ya está en el [README](README.md#code-signing-policy).
 3. Cuando te aprueben, en SignPath:
-   - conecta este repositorio de GitHub como *trusted build system*;
+   - añade a tu organización el *Trusted Build System* predefinido **GitHub.com** y enlázalo con el proyecto;
+   - opcional: instala la *SignPath GitHub App* en este repositorio (permite políticas más estrictas);
    - crea la configuración de artefacto copiando [`.signpath/artifact-configuration.xml`](.signpath/artifact-configuration.xml);
-   - crea un usuario de CI y su **API token**.
+   - crea una política de firma (*signing policy*) que exija tu aprobación manual;
+   - crea un usuario de CI con permiso para enviar solicitudes de firma, y su **API token**.
 4. En GitHub, en *Settings → Secrets and variables → Actions*:
    - **Secreto** `SIGNPATH_API_TOKEN`: el token del paso anterior.
    - **Variables** `SIGNPATH_ORGANIZATION_ID`, `SIGNPATH_PROJECT_SLUG` y `SIGNPATH_SIGNING_POLICY_SLUG`: los datos de tu proyecto en SignPath.
-5. Añade al README la sección de abajo.
-6. Publica una versión nueva (`git tag v1.0.1` y `git push origin v1.0.1`). El workflow de releases detecta el secreto y firma `M0DV0IC3.exe` y las DLL propias antes de crear el ZIP. Tendrás que aprobar cada firma en SignPath.
+5. Publica una versión nueva (`git tag v1.0.1` y `git push origin v1.0.1`). El workflow de releases detecta el secreto y envía `M0DV0IC3.exe` y las DLL propias a SignPath. **Aprueba la solicitud en SignPath** (tienes una hora) y el ZIP saldrá firmado.
 
-### Texto para el README (cuando te aprueben)
-
-```markdown
-## Code signing policy
-
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
-
-- Committers and reviewers: [Ayoub](https://github.com/Ayoubdeta)
-- Approvers: [Ayoub](https://github.com/Ayoubdeta)
-
-Privacy policy: This program will not transfer any information to other networked systems unless specifically requested by the user.
-```
-
-Comprueba en la documentación de SignPath los nombres exactos de los slugs y si hay pasos nuevos.
+Cuando las versiones salgan firmadas, quita del README la línea de *Estado: firma solicitada*.
 
 ## Alternativas de pago
 

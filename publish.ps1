@@ -59,7 +59,8 @@ if (-not $NoPack) {
     if (Test-Path $zip) { Remove-Item $zip -Force }
     Compress-Archive -Path $appFolder -DestinationPath $zip -CompressionLevel Optimal
     $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-    Set-Content -Path "$zip.sha256" -Value "$hash  $(Split-Path $zip -Leaf)" -Encoding ascii
+    # Formato estándar (LF, sin BOM): así también lo acepta sha256sum -c en Linux y macOS.
+    [System.IO.File]::WriteAllText("$zip.sha256", "$hash  $(Split-Path $zip -Leaf)`n", [System.Text.Encoding]::ASCII)
 
     $files = (Get-ChildItem $appFolder -Recurse -File).Count
     Write-Host ("Carpeta: {0} ({1} archivos)" -f $appFolder, $files)

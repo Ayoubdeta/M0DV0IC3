@@ -42,6 +42,10 @@ La app no se conecta a internet, no pide permisos de administrador y solo usa tu
      - Si quieres quitar ruido, usa la supresión de ruido de M0DV0IC3.
    - **Juegos y otras apps:** elige CABLE Output en sus ajustes de micrófono.
 
+## En el móvil
+
+¿Quieres usar las voces en las llamadas del móvil (WhatsApp, Instagram, Azar…)? Se puede con un cable de audio, sin instalar nada en el móvil: **[Cómo conectarlo al móvil](docs/movil.md)**.
+
 ## Voces incluidas
 
 | Grupo | Voces |

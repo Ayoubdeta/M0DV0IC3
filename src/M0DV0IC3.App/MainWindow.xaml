@@ -1,0 +1,228 @@
+﻿<Window x:Class="M0DV0IC3.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
+        xmlns:views="clr-namespace:M0DV0IC3.App.Views"
+        xmlns:controls="clr-namespace:M0DV0IC3.App.Controls"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="M0DV0IC3" Icon="/Assets/app.ico"
+        Width="1260" Height="840" MinWidth="1040" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource AppBackgroundBrush}"
+        Foreground="{StaticResource TextBrush}">
+
+    <!-- Barra de título propia: la franja de arriba arrastra la ventana; los botones la minimizan, maximizan o cierran. -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="58" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0,0,0,1"
+                      UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
+    <Grid x:Name="Root">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="228" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ===== Barra lateral: logo, navegación y estado ===== -->
+        <Border Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="14,10,14,16">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Height="48" Margin="6,0,0,24">
+                    <Image Source="/Assets/logo.png" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                    <controls:GlitchText Text="M0DV0IC3" FontFamily="{StaticResource HeadingFont}" FontSize="22"
+                                         VerticalAlignment="Center" Margin="12,0,0,0" />
+                </StackPanel>
+
+                <Border DockPanel.Dock="Bottom" Style="{StaticResource LiveCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource LiveDot}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <TextBlock Text="{Binding LiveLabel}" Style="{StaticResource LiveLabel}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding LatencyText}" ToolTip="{Binding LatencyToolTip}" Foreground="{StaticResource MutedTextBrush}"
+                                   FontSize="12.5" Margin="20,6,0,0" />
+                        <TextBlock Text="{Binding UnderrunsText}" Foreground="{StaticResource WarningBrush}" FontSize="12" Margin="20,2,0,0"
+                                   Visibility="{Binding UnderrunsText, Converter={StaticResource NullToCollapsed}}"
+                                   ToolTip="Veces que el audio se ha quedado sin datos (se oye un chasquido). Si suben, aumenta el margen anti-cortes en Ajustes." />
+                        <TextBlock Foreground="{StaticResource LimeBrush}" FontSize="12" Margin="20,6,0,0" TextTrimming="CharacterEllipsis"
+                                   Visibility="{Binding Music.StreamingName, Converter={StaticResource NullToCollapsed}}">
+                            <Run Text="🎵" FontFamily="{StaticResource EmojiFont}" />
+                            <Run Text="{Binding Music.StreamingName, Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Foreground="{StaticResource AccentTextBrush}" FontSize="12" Margin="20,4,0,0"
+                                   Visibility="{Binding Voices.RandomEnabled, Converter={StaticResource BoolToVisible}}">
+                            <Run Text="🎲" FontFamily="{StaticResource EmojiFont}" />
+                            <Run Text="Voz aleatoria" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <ListBox x:Name="Nav" Style="{StaticResource NavList}" SelectedIndex="0">
+                    <ListBoxItem Tag="&#xE720;" Content="Voces" />
+                    <ListBoxItem Tag="&#xE767;" Content="Soundboard" />
+                    <ListBoxItem Tag="&#xEC4F;" Content="Música" />
+                    <ListBoxItem Tag="&#xE765;" Content="Atajos" />
+                    <ListBoxItem Tag="&#xE713;" Content="Ajustes" />
+                    <ListBoxItem Tag="&#xE897;" Content="Ayuda" />
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- ===== Zona principal ===== -->
+        <DockPanel Grid.Column="1">
+            <!-- Título de la página y botones de la ventana (en la franja de arrastre) -->
+            <Grid DockPanel.Dock="Top" Height="58">
+                <controls:GlitchText Text="{Binding SelectedItem.Content, ElementName=Nav}" FontFamily="{StaticResource HeadingFont}"
+                                     FontSize="27" VerticalAlignment="Center" Margin="26,4,0,0" HorizontalAlignment="Left" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="OnMinimizeClick" ToolTip="Minimizar" AutomationProperties.Name="Minimizar" />
+                    <Button x:Name="MaximizeButton" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="OnMaximizeClick" ToolTip="Maximizar" AutomationProperties.Name="Maximizar" />
+                    <Button Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;" Click="OnCloseClick" ToolTip="Cerrar" AutomationProperties.Name="Cerrar" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Cabecera: dispositivos, estado y el interruptor de la voz -->
+            <Border DockPanel.Dock="Top" Style="{StaticResource GlassPanel}" Margin="24,0,24,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <UniformGrid Columns="3" VerticalAlignment="Center">
+                        <StackPanel Margin="0,0,12,0">
+                            <TextBlock Text="MICRÓFONO" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding InputDevices}" SelectedItem="{Binding SelectedInput}"
+                                      DisplayMemberPath="Display" ToolTip="Tu micrófono real" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,12,0">
+                            <TextBlock Text="SALIDA · MICRÓFONO VIRTUAL" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding OutputDevices}" SelectedItem="{Binding SelectedOutput}"
+                                      DisplayMemberPath="Display"
+                                      ToolTip="Adónde va tu voz modificada. Debe ser «CABLE Input (VB-Audio Virtual Cable)»; en Discord eliges «CABLE Output» como micrófono." />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,12,0">
+                            <TextBlock Text="AURICULARES · ESCUCHARME" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding MonitorDevices}" SelectedItem="{Binding SelectedMonitor}"
+                                      DisplayMemberPath="Display"
+                                      ToolTip="Opcional: tus auriculares, para oírte con la voz cambiada y oír los sonidos del soundboard." />
+                        </StackPanel>
+                    </UniformGrid>
+
+                    <ToggleButton Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource VoiceToggle}" Margin="14,0,4,0" AutomationProperties.Name="Voz activada"
+                                  VerticalAlignment="Center" IsChecked="{Binding VoiceEnabled}"
+                                  ToolTip="Activa o desactiva el cambio de voz (Ctrl+Alt+V por defecto)">
+                        <TextBlock TextTrimming="CharacterEllipsis">
+                            <Run Text="{Binding Voices.Selected.Icon, Mode=OneWay}" FontFamily="{StaticResource EmojiFont}" />
+                            <Run Text="{Binding Voices.Selected.Name, Mode=OneWay}" />
+                        </TextBlock>
+                    </ToggleButton>
+
+                    <StackPanel Grid.Row="1" Margin="2,12,0,0">
+                        <WrapPanel>
+                            <TextBlock Text="{Binding StatusText}" Style="{StaticResource StatusText}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            <Button Content="Cómo instalar VB-Cable" Margin="12,0,0,0" Padding="10,3" FontSize="12"
+                                    Command="{Binding ShowCableHelpCommand}"
+                                    Visibility="{Binding CableInstalled, Converter={StaticResource BoolToCollapsed}}" />
+                        </WrapPanel>
+                        <Border Style="{StaticResource WarningBox}" Margin="0,8,0,0" HorizontalAlignment="Left"
+                                Visibility="{Binding OutputWarning, Converter={StaticResource NullToCollapsed}}">
+                            <TextBlock Text="{Binding OutputWarning}" TextWrapping="Wrap" Foreground="{StaticResource WarningBrush}" />
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Barra inferior: medidores, opciones rápidas y puerta de ruido -->
+            <Border DockPanel.Dock="Bottom" Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource HairlineBrush}"
+                    BorderThickness="0,1,0,0" Padding="24,12,24,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid VerticalAlignment="Center" Margin="0,0,26,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="ENTRADA" Style="{StaticResource FieldLabel}" Margin="0" VerticalAlignment="Center" />
+                        <controls:LevelMeter Grid.Column="1" Level="{Binding InputLevel}" VerticalAlignment="Center"
+                                             ToolTip="Nivel de tu micrófono (de -60 a 0 dB)" />
+                        <TextBlock Grid.Row="1" Text="SALIDA" Style="{StaticResource FieldLabel}" Margin="0,12,0,0" VerticalAlignment="Center" />
+                        <controls:LevelMeter Grid.Row="1" Grid.Column="1" Level="{Binding OutputLevel}" VerticalAlignment="Center" Margin="0,12,0,0"
+                                             ToolTip="Nivel de lo que recibe el micrófono virtual (voz, sonidos y música)" />
+                    </Grid>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <WrapPanel>
+                            <ToggleButton Style="{StaticResource DangerChip}" Tag="&#xE74F;" Content="Silenciar" IsChecked="{Binding Muted}"
+                                          ToolTip="Corta tu voz, los sonidos y la música hacia Discord y los auriculares, al instante (Ctrl+Alt+X por defecto). Úsalo también si oyes acople." />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE7F6;" Content="Escucharme" IsChecked="{Binding MonitorVoice}"
+                                          IsEnabled="{Binding HasMonitor}" ToolTipService.ShowOnDisabled="True"
+                                          ToolTip="Oír tu voz modificada en los auriculares. Primero elige tus auriculares arriba." />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE767;" Content="Sonidos en mis auriculares" IsChecked="{Binding MonitorSounds}"
+                                          IsEnabled="{Binding HasMonitor}" ToolTipService.ShowOnDisabled="True"
+                                          ToolTip="Oír también los sonidos del soundboard en tus auriculares." />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE9E9;" Content="Supresión de ruido" IsChecked="{Binding NoiseSuppression}"
+                                          IsEnabled="{Binding NoiseSuppressionAvailable}" ToolTipService.ShowOnDisabled="True"
+                                          ToolTip="{Binding NoiseSuppressionToolTip}" />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xEC4F;" Content="Música por el micro" IsChecked="{Binding Music.IsStreaming}"
+                                          IsEnabled="{Binding Music.IsSupported}" ToolTipService.ShowOnDisabled="True"
+                                          ToolTip="Transmite lo que suena en Spotify (u otra app que elijas en Música) mezclado con tu voz (Ctrl+Alt+P por defecto)." />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE8B1;" Content="Voz aleatoria" IsChecked="{Binding Voices.RandomEnabled}"
+                                          ToolTip="Va cambiando sola de voz cada pocos segundos (Ctrl+Alt+R por defecto). El intervalo se elige en Voces." />
+                        </WrapPanel>
+                        <Grid Margin="0,2,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="PUERTA DE RUIDO" Style="{StaticResource FieldLabel}" Margin="0,0,12,0" VerticalAlignment="Center"
+                                       ToolTip="Silencia el micro cuando no hablas. Súbela hasta que deje de entrar el ruido de fondo." />
+                            <Slider Grid.Column="1" Minimum="-90" Maximum="-20" TickFrequency="1" IsSnapToTickEnabled="True"
+                                    SmallChange="1" LargeChange="5" Value="{Binding GateThresholdDb}" VerticalAlignment="Center"
+                                    ToolTip="Del todo a la izquierda = apagada" />
+                            <TextBlock Grid.Column="2" Text="{Binding GateText}" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                            <TextBlock Grid.Column="3" Text="{Binding GateWarning}" Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" Margin="4,0,0,0" TextTrimming="CharacterEllipsis"
+                                       Visibility="{Binding GateWarning, Converter={StaticResource NullToCollapsed}}"
+                                       ToolTip="La puerta de ruido solo deja pasar el sonido más fuerte que su umbral, y tu micro no llega. Muévela a la izquierda hasta que la barra «Salida» se mueva al hablar, o déjala en «apagada»." />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Contenido: la página elegida, o el asistente de VB-Cable si falta -->
+            <Grid Margin="24,16,24,12">
+                <views:CableSetupView Visibility="{Binding ShowCableSetup, Converter={StaticResource BoolToVisible}}" />
+                <!-- Todas las páginas siguen vivas (no pierden su estado); solo se ve la elegida en la barra lateral. -->
+                <Grid Visibility="{Binding ShowCableSetup, Converter={StaticResource BoolToCollapsed}}">
+                    <views:VoicesView DataContext="{Binding Voices}"
+                                      Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=0}" />
+                    <views:SoundboardView DataContext="{Binding Soundboard}"
+                                          Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=1}" />
+                    <views:MusicView DataContext="{Binding Music}"
+                                     Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=2}" />
+                    <views:HotkeysView DataContext="{Binding Hotkeys}"
+                                       Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=3}" />
+                    <views:SettingsView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=4}" />
+                    <views:HelpView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=5}" />
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,19 @@
+<UserControl x:Class="M0DV0IC3.App.Controls.GlitchText"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root" Focusable="False" IsTabStop="False">
+    <!-- Como el micro del logo: una copia lima desplazada a la izquierda, una violeta a la derecha y el texto encima. -->
+    <Grid>
+        <TextBlock Text="{Binding Text, ElementName=Root}" Foreground="{StaticResource LimeBrush}" Opacity="0.9">
+            <TextBlock.RenderTransform>
+                <TranslateTransform x:Name="LimeShift" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
+        <TextBlock Text="{Binding Text, ElementName=Root}" Foreground="{StaticResource VioletBrush}" Opacity="0.95">
+            <TextBlock.RenderTransform>
+                <TranslateTransform x:Name="VioletShift" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
+        <TextBlock Text="{Binding Text, ElementName=Root}" Foreground="{Binding Foreground, ElementName=Root}" />
+    </Grid>
+</UserControl>

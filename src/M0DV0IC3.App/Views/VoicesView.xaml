@@ -1,0 +1,125 @@
+<UserControl x:Class="M0DV0IC3.App.Views.VoicesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
+             xmlns:views="clr-namespace:M0DV0IC3.App.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:VoicesViewModel}">
+    <UserControl.Resources>
+        <!-- Tarjeta: el icono y el borde toman el color de su grupo -->
+        <DataTemplate x:Key="VoiceCardTemplate" DataType="{x:Type vm:VoiceCardViewModel}">
+            <Button Style="{StaticResource VoiceCardButton}" AutomationProperties.Name="{Binding Name}"
+                    Tag="{Binding Category, Converter={StaticResource CategoryAccent}}"
+                    Command="{Binding DataContext.ActivateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    CommandParameter="{Binding}">
+                <Button.ToolTip>
+                    <TextBlock>
+                        <Run Text="Usar la voz" />
+                        <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold" />
+                    </TextBlock>
+                </Button.ToolTip>
+                <StackPanel>
+                    <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource EmojiFont}" FontSize="38" HorizontalAlignment="Center"
+                               Foreground="{Binding Category, Converter={StaticResource CategoryAccent}}" />
+                    <TextBlock Text="{Binding Name}" FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" Margin="0,8,0,0" />
+                    <Border CornerRadius="8" Background="#1FB478FF" Padding="7,1" HorizontalAlignment="Center" Margin="0,5,0,0"
+                            Visibility="{Binding HotkeyHint, Converter={StaticResource NullToCollapsed}}">
+                        <TextBlock Text="{Binding HotkeyHint}" FontSize="10.5" Foreground="{StaticResource MutedTextBrush}" />
+                    </Border>
+                </StackPanel>
+            </Button>
+        </DataTemplate>
+
+        <ItemsPanelTemplate x:Key="WrapPanelTemplate">
+            <WrapPanel />
+        </ItemsPanelTemplate>
+
+        <!-- Cabecera de un grupo: barra con su color, título y subtítulo -->
+        <DataTemplate x:Key="GroupTemplate" DataType="{x:Type vm:VoiceGroupViewModel}">
+            <StackPanel Margin="0,0,0,14">
+                <StackPanel Orientation="Horizontal" Margin="8,4,0,2">
+                    <Border Width="4" Height="20" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"
+                            Background="{Binding Category, Converter={StaticResource CategoryAccent}}" />
+                    <TextBlock Text="{Binding Title}" FontFamily="{StaticResource HeadingFont}" FontSize="17" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Subtitle}" Style="{StaticResource MutedText}" FontSize="12.5" Margin="12,1,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource VoiceCardTemplate}"
+                              ItemsPanel="{StaticResource WrapPanelTemplate}" Focusable="False" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel>
+            <WrapPanel DockPanel.Dock="Top" Margin="2,0,6,8">
+                <Button Style="{StaticResource PrimaryButton}" Command="{Binding NewVoiceCommand}" Margin="0,0,8,8" AutomationProperties.Name="Nueva voz">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Nueva voz" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding EditCommand}" Margin="0,0,8,8" ToolTip="Editar la voz personalizada seleccionada" AutomationProperties.Name="Editar">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE70F;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Editar" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding DuplicateCommand}" Margin="0,0,8,8" ToolTip="Crear una copia editable de la voz seleccionada" AutomationProperties.Name="Duplicar">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE8C8;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Duplicar" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding DeleteCommand}" Margin="0,0,20,8" ToolTip="Borrar la voz personalizada seleccionada" AutomationProperties.Name="Borrar">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Borrar" />
+                    </StackPanel>
+                </Button>
+                <ToggleButton Style="{StaticResource Chip}" Tag="&#xE8B1;" IsChecked="{Binding RandomEnabled}" Margin="0,0,6,8" AutomationProperties.Name="Voz aleatoria"
+                              VerticalAlignment="Center"
+                              ToolTip="Voz aleatoria: va cambiando sola de voz mientras hablas (Ctrl+Alt+R por defecto). Se salta la voz invertida.">
+                    <TextBlock Text="Voz aleatoria" />
+                </ToggleButton>
+                <ComboBox ItemsSource="{Binding RandomIntervals}" DisplayMemberPath="Label" SelectedValuePath="Seconds"
+                          SelectedValue="{Binding RandomSeconds}" Width="150" Margin="0,0,0,8" VerticalAlignment="Center"
+                          ToolTip="Cada cuánto cambia la voz aleatoria" />
+            </WrapPanel>
+            <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" FontSize="12.5" Margin="4,0,6,10"
+                       Text="Haz clic en una voz para usarla. Las voces incluidas no se pueden editar: duplícalas para crear tu versión." />
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="0,0,6,12">
+                    <ItemsControl ItemsSource="{Binding Groups}" ItemTemplate="{StaticResource GroupTemplate}" Focusable="False" />
+
+                    <StackPanel Orientation="Horizontal" Margin="8,4,0,2">
+                        <Border Width="4" Height="20" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"
+                                Background="{StaticResource CustomAccentBrush}" />
+                        <TextBlock Text="Mis voces" FontFamily="{StaticResource HeadingFont}" FontSize="17" VerticalAlignment="Center" />
+                        <TextBlock Text="Las que has creado o duplicado" Style="{StaticResource MutedText}" FontSize="12.5" Margin="12,1,0,0"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Custom}" ItemTemplate="{StaticResource VoiceCardTemplate}"
+                                  ItemsPanel="{StaticResource WrapPanelTemplate}" Focusable="False" />
+                    <TextBlock Style="{StaticResource MutedText}" Margin="8,6,0,0"
+                               Text="Todavía no tienes voces propias. Pulsa «Nueva voz», o elige una voz y pulsa «Duplicar»."
+                               Visibility="{Binding HasCustom, Converter={StaticResource BoolToCollapsed}}" />
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+
+        <Border Grid.Column="1" Width="440" Margin="14,0,0,0" Style="{StaticResource CardBorder}" Padding="18,14"
+                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisible}}">
+            <views:VoiceEditorView DataContext="{Binding Editor}" />
+        </Border>
+    </Grid>
+</UserControl>

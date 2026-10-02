@@ -1,0 +1,6 @@
+# Finales de línea normalizados en el repositorio; los archivos de Windows se descargan con CRLF.
+* text=auto
+*.ps1 text eol=crlf
+*.txt text eol=crlf
+*.png binary
+*.ico binary

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>M0DV0IC3.App</RootNamespace>
+    <AssemblyName>M0DV0IC3</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <!-- LibraryImport (atajos globales, barra de título oscura) genera código unsafe. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Información de versión del .exe (Propiedades → Detalles): un ejecutable sin ella parece más sospechoso. -->
+    <AssemblyTitle>M0DV0IC3 - modulador de voz en tiempo real</AssemblyTitle>
+    <Description>Modulador de voz en tiempo real para Windows: voces, autotune, soundboard y música por el micro.</Description>
+    <!-- Solo los recursos en español de WPF y del runtime: menos carpetas al publicar. -->
+    <SatelliteResourceLanguages>es</SatelliteResourceLanguages>
+    <!-- ThemeMode (tema Fluent de WPF) todavía es experimental. -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Generados desde branding\m0dv0ic3-icon-rounded-1024.png -->
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="H.NotifyIcon.Wpf" Version="2.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\M0DV0IC3.Audio\M0DV0IC3.Audio.csproj" />
+    <ProjectReference Include="..\M0DV0IC3.Dsp\M0DV0IC3.Dsp.csproj" />
+  </ItemGroup>
+
+</Project>

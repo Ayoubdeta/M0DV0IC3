@@ -1,0 +1,54 @@
+﻿<Application x:Class="M0DV0IC3.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ThemeMode="Dark"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Theme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--
+                Acento lima del logo para los controles Fluent (casillas, sliders, foco...) en lugar del color de Windows.
+                En modo oscuro Fluent rellena con AccentColorLight2, así que ese es el lima intenso.
+            -->
+            <Color x:Key="{x:Static SystemColors.AccentColorKey}">#8FDB2C</Color>
+            <Color x:Key="{x:Static SystemColors.AccentColorLight1Key}">#A3F53B</Color>
+            <Color x:Key="{x:Static SystemColors.AccentColorLight2Key}">#A3F53B</Color>
+            <Color x:Key="{x:Static SystemColors.AccentColorLight3Key}">#C6F98A</Color>
+            <Color x:Key="{x:Static SystemColors.AccentColorDark1Key}">#7CC223</Color>
+            <Color x:Key="{x:Static SystemColors.AccentColorDark2Key}">#66A01C</Color>
+            <Color x:Key="{x:Static SystemColors.AccentColorDark3Key}">#4F7D15</Color>
+
+            <!-- Fondos y bordes de los controles Fluent teñidos de lavanda, y desplegables con el morado del logo -->
+            <SolidColorBrush x:Key="ButtonBackground" Color="#1AB478FF" />
+            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#2EB478FF" />
+            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#12B478FF" />
+            <SolidColorBrush x:Key="ToggleButtonBackground" Color="#1AB478FF" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="#2EB478FF" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundPressed" Color="#12B478FF" />
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="#1AB478FF" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#2EB478FF" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#12B478FF" />
+            <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#FF1D1130" />
+            <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#59B478FF" />
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#33A145F5" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="#1AB478FF" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#2EB478FF" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF1A0F27" />
+            <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="#FFA145F5" />
+            <SolidColorBrush x:Key="AccentFillColorSelectedTextBackgroundBrush" Color="#FFA145F5" />
+            <SolidColorBrush x:Key="FlyoutBackground" Color="#FF1D1130" />
+            <SolidColorBrush x:Key="FlyoutBorderBrush" Color="#59B478FF" />
+            <SolidColorBrush x:Key="ContextMenuBackground" Color="#FF1D1130" />
+            <SolidColorBrush x:Key="ScrollBarThumbFill" Color="#73B478FF" />
+            <SolidColorBrush x:Key="ScrollBarTrackFillPointerOver" Color="#FF1D1130" />
+            <SolidColorBrush x:Key="SliderTrackFill" Color="#47B478FF" />
+            <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#5CB478FF" />
+            <SolidColorBrush x:Key="SliderOuterThumbBackground" Color="#FF2B1A40" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="#99B478FF" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" Color="#CCB478FF" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

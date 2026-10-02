@@ -1,0 +1,715 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="clr-namespace:M0DV0IC3.App.Converters">
+
+    <!--
+        Estilo "neón glitch" sacado del logo: fondo morado casi negro con un brillo arriba, violeta para lo que eliges,
+        lima para lo que está activo o en directo, y el efecto de copias desplazadas lima/violeta del micrófono.
+        Los controles estándar los pinta el tema Fluent (ThemeMode="Dark"); App.xaml lo tiñe con esta paleta.
+    -->
+
+    <!-- ===== Colores del logo ===== -->
+    <Color x:Key="InkDeepColor">#0E0817</Color>
+    <Color x:Key="InkColor">#120B1C</Color>
+    <Color x:Key="InkRaisedColor">#1A0F27</Color>
+    <Color x:Key="InkGlowColor">#2A1640</Color>
+    <Color x:Key="VioletColor">#A145F5</Color>
+    <Color x:Key="VioletBrightColor">#B86BFF</Color>
+    <Color x:Key="VioletDeepColor">#6E2BC2</Color>
+    <Color x:Key="LimeColor">#A3F53B</Color>
+    <Color x:Key="LavenderColor">#B478FF</Color>
+    <Color x:Key="TextColor">#F4EFFF</Color>
+
+    <SolidColorBrush x:Key="InkDeepBrush" Color="{StaticResource InkDeepColor}" />
+    <SolidColorBrush x:Key="InkBrush" Color="{StaticResource InkColor}" />
+    <SolidColorBrush x:Key="InkRaisedBrush" Color="{StaticResource InkRaisedColor}" />
+    <SolidColorBrush x:Key="VioletBrush" Color="{StaticResource VioletColor}" />
+    <SolidColorBrush x:Key="VioletBrightBrush" Color="{StaticResource VioletBrightColor}" />
+    <SolidColorBrush x:Key="LimeBrush" Color="{StaticResource LimeColor}" />
+    <SolidColorBrush x:Key="LimeSoftBrush" Color="#24A3F53B" />
+    <SolidColorBrush x:Key="LavenderBrush" Color="{StaticResource LavenderColor}" />
+    <SolidColorBrush x:Key="HairlineBrush" Color="#26B478FF" />
+    <SolidColorBrush x:Key="HairlineStrongBrush" Color="#4DB478FF" />
+    <SolidColorBrush x:Key="HoverFillBrush" Color="#1FB478FF" />
+
+    <!-- Acento de cada grupo de voces (VoiceCategory → "{Categoría}AccentBrush") -->
+    <SolidColorBrush x:Key="AutotuneAccentBrush" Color="#A3F53B" />
+    <SolidColorBrush x:Key="CharactersAccentBrush" Color="#B86BFF" />
+    <SolidColorBrush x:Key="EffectsAccentBrush" Color="#FF5FD7" />
+    <SolidColorBrush x:Key="AmbienceAccentBrush" Color="#45DCF5" />
+    <SolidColorBrush x:Key="CustomAccentBrush" Color="#F4EFFF" />
+
+    <!-- Nombres de siempre, que usan todas las vistas -->
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource VioletColor}" />
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="{StaticResource VioletBrightColor}" />
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="{StaticResource VioletDeepColor}" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#33A145F5" />
+    <SolidColorBrush x:Key="AccentTextBrush" Color="#CDA4FF" />
+    <SolidColorBrush x:Key="PanelBrush" Color="#F0140C20" />
+    <SolidColorBrush x:Key="CardBrush" Color="#E61A0F27" />
+    <SolidColorBrush x:Key="CardHoverBrush" Color="#F0241536" />
+    <SolidColorBrush x:Key="CardBorderBrush" Color="#2EB478FF" />
+    <SolidColorBrush x:Key="ToggleOffBrush" Color="#1E1230" />
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}" />
+    <SolidColorBrush x:Key="MutedTextBrush" Color="#A79BC0" />
+    <SolidColorBrush x:Key="FaintTextBrush" Color="#6F6386" />
+    <SolidColorBrush x:Key="OkBrush" Color="{StaticResource LimeColor}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="#FFC266" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#FF6B8E" />
+    <SolidColorBrush x:Key="WarningBackgroundBrush" Color="#24FFC266" />
+    <SolidColorBrush x:Key="InfoBackgroundBrush" Color="#26A145F5" />
+
+    <!-- Fondo: el brillo morado del centro del logo, arriba a la izquierda -->
+    <RadialGradientBrush x:Key="AppBackgroundBrush" Center="0.35,0" GradientOrigin="0.35,0" RadiusX="1" RadiusY="0.9">
+        <GradientStop Color="#2A1640" Offset="0" />
+        <GradientStop Color="#150D21" Offset="0.55" />
+        <GradientStop Color="#0F0918" Offset="1" />
+    </RadialGradientBrush>
+    <LinearGradientBrush x:Key="SidebarBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#120B1C" Offset="0" />
+        <GradientStop Color="#0C0714" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="VioletGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#B15CFF" Offset="0" />
+        <GradientStop Color="#7A2FD3" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="VioletGradientHoverBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#C27BFF" Offset="0" />
+        <GradientStop Color="#8C3DE6" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="NavSelectedBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#E0A145F5" Offset="0" />
+        <GradientStop Color="#596E2BC2" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CardGradientBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F2241539" Offset="0" />
+        <GradientStop Color="#F21A0F28" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CardHoverGradientBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FA321C4F" Offset="0" />
+        <GradientStop Color="#FA221436" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CardSelectedGradientBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF46237A" Offset="0" />
+        <GradientStop Color="#FF261440" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OnAirGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#3DA3F53B" Offset="0" />
+        <GradientStop Color="#14A3F53B" Offset="1" />
+    </LinearGradientBrush>
+
+    <FontFamily x:Key="EmojiFont">Segoe UI Emoji</FontFamily>
+    <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
+    <FontFamily x:Key="HeadingFont">Bahnschrift SemiBold, Segoe UI Semibold</FontFamily>
+
+    <conv:BoolToVisibilityConverter x:Key="BoolToVisible" />
+    <conv:BoolToVisibilityConverter x:Key="BoolToCollapsed" Invert="True" />
+    <conv:NullToVisibilityConverter x:Key="NullToCollapsed" />
+    <conv:NullToVisibilityConverter x:Key="NullToVisible" Invert="True" />
+    <conv:InverseBoolConverter x:Key="InverseBool" />
+    <conv:CategoryAccentConverter x:Key="CategoryAccent" />
+    <conv:IndexToVisibilityConverter x:Key="IndexToVisible" />
+
+    <!-- ===== Textos ===== -->
+    <Style x:Key="SectionHeader" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HeadingFont}" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Margin" Value="0,2,0,8" />
+    </Style>
+
+    <Style x:Key="SubHeader" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HeadingFont}" />
+        <Setter Property="FontSize" Value="13.5" />
+        <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}" />
+        <Setter Property="Margin" Value="0,16,0,5" />
+    </Style>
+
+    <Style x:Key="MutedText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="BodyText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="21" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+
+    <!-- Etiqueta pequeña encima de un campo ("MICRÓFONO") -->
+    <Style x:Key="FieldLabel" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="2,0,0,5" />
+    </Style>
+
+    <!-- ===== Contenedores ===== -->
+    <Style x:Key="CardBorder" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="20,16" />
+    </Style>
+
+    <!-- Panel translúcido de la cabecera (dispositivos y voz) -->
+    <Style x:Key="GlassPanel" TargetType="Border">
+        <Setter Property="Background" Value="#B31A0F27" />
+        <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="Padding" Value="18,14" />
+    </Style>
+
+    <Style x:Key="InfoBox" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource InfoBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="3,0,0,0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+
+    <Style x:Key="WarningBox" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource WarningBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
+        <Setter Property="BorderThickness" Value="3,0,0,0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12,8" />
+    </Style>
+
+    <!-- Tarjeta de estado de la barra lateral -->
+    <Style x:Key="LiveCard" TargetType="Border">
+        <Setter Property="Background" Value="#CC1A0F27" />
+        <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="14,12" />
+    </Style>
+
+    <!--
+        Punto de estado: lima en directo, ámbar con avisos, rojo con errores. Sin animación a propósito: una animación
+        infinita obliga a WPF a redibujar la ventana sin parar (con el brillo, un tercio de un núcleo de CPU).
+    -->
+    <Style x:Key="LiveDot" TargetType="Ellipse">
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Height" Value="10" />
+        <Setter Property="Fill" Value="{StaticResource FaintTextBrush}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Ok">
+                <Setter Property="Fill" Value="{StaticResource LimeBrush}" />
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect Color="{StaticResource LimeColor}" BlurRadius="12" ShadowDepth="0" Opacity="0.9" />
+                    </Setter.Value>
+                </Setter>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Warning">
+                <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Error">
+                <Setter Property="Fill" Value="{StaticResource ErrorBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="LiveLabel" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HeadingFont}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Ok">
+                <Setter Property="Foreground" Value="{StaticResource LimeBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Warning">
+                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Error">
+                <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ===== Botones ===== -->
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Background" Value="{StaticResource VioletGradientBrush}" />
+        <Setter Property="Padding" Value="18,8" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}"
+                            BorderBrush="#33FFFFFF" BorderThickness="1">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource VioletGradientHoverBrush}" />
+                            <Setter TargetName="Bd" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{StaticResource VioletColor}" BlurRadius="16" ShadowDepth="0" Opacity="0.7" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentPressedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Botón pequeño con un icono de Segoe MDL2 Assets -->
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverFillBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Botones de la ventana (minimizar, maximizar, cerrar) dentro de la barra de título propia -->
+    <Style x:Key="CaptionButton" TargetType="Button">
+        <Setter Property="Width" Value="46" />
+        <Setter Property="Height" Value="34" />
+        <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#1FFFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#14FFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CaptionCloseButton" TargetType="Button" BasedOn="{StaticResource CaptionButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#E81123" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#B80F1F" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Navegación lateral (ListBox) ===== -->
+    <Style x:Key="NavItem" TargetType="ListBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="Height" Value="46" />
+        <Setter Property="Margin" Value="0,0,0,6" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Grid>
+                        <Border x:Name="Bd" CornerRadius="12" Background="Transparent" BorderBrush="Transparent" BorderThickness="1">
+                            <Grid Margin="16,0,10,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="32" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="Icon" Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="16"
+                                           VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}" />
+                                <ContentPresenter Grid.Column="1" VerticalAlignment="Center"
+                                                  TextElement.FontSize="14.5" TextElement.FontWeight="SemiBold" />
+                            </Grid>
+                        </Border>
+                        <Border x:Name="Indicator" Width="4" Height="22" CornerRadius="2" Background="{StaticResource LimeBrush}"
+                                HorizontalAlignment="Left" Margin="-2,0,0,0" Opacity="0">
+                            <Border.Effect>
+                                <DropShadowEffect Color="{StaticResource LimeColor}" BlurRadius="10" ShadowDepth="0" Opacity="0.9" />
+                            </Border.Effect>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverFillBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource NavSelectedBrush}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#59C27BFF" />
+                            <Setter TargetName="Icon" Property="Foreground" Value="{StaticResource LimeBrush}" />
+                            <Setter TargetName="Indicator" Property="Opacity" Value="1" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter TargetName="Bd" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{StaticResource VioletColor}" BlurRadius="18" ShadowDepth="0" Opacity="0.45" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="NavList" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource NavItem}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBox">
+                    <ItemsPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Chips de la barra inferior (opciones que se encienden y apagan) ===== -->
+    <!-- El icono (Segoe MDL2 Assets) va en Tag. Encendido = lima. -->
+    <Style x:Key="Chip" TargetType="ToggleButton">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="Margin" Value="0,0,8,8" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="Bd" CornerRadius="15" Background="#1AB478FF" BorderBrush="{StaticResource HairlineStrongBrush}"
+                            BorderThickness="1" Padding="12,6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="13"
+                                       VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{TemplateBinding Foreground}" />
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource LavenderBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource LimeSoftBrush}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource LimeBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource LimeBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- "Silenciar": encendido es un aviso, en rojo -->
+    <Style x:Key="DangerChip" TargetType="ToggleButton" BasedOn="{StaticResource Chip}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="Bd" CornerRadius="15" Background="#1AB478FF" BorderBrush="{StaticResource HairlineStrongBrush}"
+                            BorderThickness="1" Padding="12,6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="13"
+                                       VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{TemplateBinding Foreground}" />
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource LavenderBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#33FF6B8E" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource ErrorBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Tarjeta de voz ===== -->
+    <!--
+        El acento de su grupo llega en Tag (lo pone la tarjeta). Al pasar el ratón se eleva y se enciende el borde;
+        la elegida lleva el efecto glitch del logo: copias del borde desplazadas en lima y violeta, y un brillo.
+    -->
+    <Style x:Key="VoiceCardButton" TargetType="Button">
+        <Setter Property="Width" Value="128" />
+        <Setter Property="Height" Value="130" />
+        <Setter Property="Margin" Value="7" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Tag" Value="{StaticResource VioletBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Grid.RenderTransform>
+                            <TranslateTransform x:Name="Lift" />
+                        </Grid.RenderTransform>
+                        <Border x:Name="GlitchLime" CornerRadius="16" BorderThickness="2" BorderBrush="{StaticResource LimeBrush}"
+                                Opacity="0" IsHitTestVisible="False">
+                            <Border.RenderTransform>
+                                <TranslateTransform X="-4" Y="-3" />
+                            </Border.RenderTransform>
+                        </Border>
+                        <Border x:Name="GlitchViolet" CornerRadius="16" BorderThickness="2" BorderBrush="{StaticResource VioletBrush}"
+                                Opacity="0" IsHitTestVisible="False">
+                            <Border.RenderTransform>
+                                <TranslateTransform X="4" Y="3" />
+                            </Border.RenderTransform>
+                        </Border>
+                        <Border x:Name="Card" CornerRadius="16" Background="{StaticResource CardGradientBrush}"
+                                BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1" RenderTransformOrigin="0.5,0.5">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="8" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Card" Property="Background" Value="{StaticResource CardHoverGradientBrush}" />
+                            <Setter TargetName="Card" Property="BorderBrush" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter TargetName="GlitchLime" Property="Opacity" Value="0.35" />
+                            <Setter TargetName="GlitchViolet" Property="Opacity" Value="0.35" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Lift" Storyboard.TargetProperty="Y" To="-3" Duration="0:0:0.12" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Lift" Storyboard.TargetProperty="Y" To="0" Duration="0:0:0.15" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Card" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.96" ScaleY="0.96" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource LavenderBrush}" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                            <Setter TargetName="Card" Property="Background" Value="{StaticResource CardSelectedGradientBrush}" />
+                            <Setter TargetName="Card" Property="BorderBrush" Value="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter TargetName="Card" Property="BorderThickness" Value="2" />
+                            <Setter TargetName="GlitchLime" Property="Opacity" Value="0.95" />
+                            <Setter TargetName="GlitchViolet" Property="Opacity" Value="0.95" />
+                            <Setter TargetName="Card" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{StaticResource VioletColor}" BlurRadius="24" ShadowDepth="0" Opacity="0.6" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Card" Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Botón de sonido del soundboard: la misma tarjeta, más ancha y baja -->
+    <Style x:Key="SoundTileButton" TargetType="Button" BasedOn="{StaticResource VoiceCardButton}">
+        <Setter Property="Width" Value="160" />
+        <Setter Property="Height" Value="94" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <!-- ===== Interruptor grande "VOZ ON / OFF" (el contenido es la voz elegida) ===== -->
+    <Style x:Key="VoiceToggle" TargetType="ToggleButton">
+        <Setter Property="Width" Value="206" />
+        <Setter Property="Height" Value="66" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <Border x:Name="GlitchLime" CornerRadius="18" BorderThickness="2" BorderBrush="{StaticResource LimeBrush}"
+                                Opacity="0" IsHitTestVisible="False">
+                            <Border.RenderTransform>
+                                <TranslateTransform X="-4" Y="-3" />
+                            </Border.RenderTransform>
+                        </Border>
+                        <Border x:Name="GlitchViolet" CornerRadius="18" BorderThickness="2" BorderBrush="{StaticResource VioletBrush}"
+                                Opacity="0" IsHitTestVisible="False">
+                            <Border.RenderTransform>
+                                <TranslateTransform X="4" Y="3" />
+                            </Border.RenderTransform>
+                        </Border>
+                        <Border x:Name="Bd" CornerRadius="18" Background="{StaticResource ToggleOffBrush}"
+                                BorderBrush="{StaticResource HairlineStrongBrush}" BorderThickness="1">
+                            <Grid Margin="16,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Ellipse x:Name="Dot" Width="12" Height="12" Fill="{StaticResource FaintTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="Title" Text="VOZ OFF" FontFamily="{StaticResource HeadingFont}" FontSize="19" />
+                                    <ContentPresenter TextElement.FontSize="12.5" TextElement.Foreground="#D9CCF0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource LavenderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource VioletGradientBrush}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#66FFFFFF" />
+                            <Setter TargetName="Title" Property="Text" Value="VOZ ON" />
+                            <Setter TargetName="Dot" Property="Fill" Value="{StaticResource LimeBrush}" />
+                            <Setter TargetName="Dot" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{StaticResource LimeColor}" BlurRadius="12" ShadowDepth="0" Opacity="1" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="GlitchLime" Property="Opacity" Value="1" />
+                            <Setter TargetName="GlitchViolet" Property="Opacity" Value="1" />
+                            <Setter TargetName="Bd" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{StaticResource VioletColor}" BlurRadius="26" ShadowDepth="0" Opacity="0.75" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Interruptor "en el aire" (Música por el micro): encendido brilla en lima -->
+    <Style x:Key="OnAirToggle" TargetType="ToggleButton">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource HeadingFont}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Padding" Value="22,12" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <Border x:Name="GlitchLime" CornerRadius="16" BorderThickness="2" BorderBrush="{StaticResource LimeBrush}"
+                                Opacity="0" IsHitTestVisible="False">
+                            <Border.RenderTransform>
+                                <TranslateTransform X="-4" Y="-3" />
+                            </Border.RenderTransform>
+                        </Border>
+                        <Border x:Name="GlitchViolet" CornerRadius="16" BorderThickness="2" BorderBrush="{StaticResource VioletBrush}"
+                                Opacity="0" IsHitTestVisible="False">
+                            <Border.RenderTransform>
+                                <TranslateTransform X="4" Y="3" />
+                            </Border.RenderTransform>
+                        </Border>
+                        <Border x:Name="Bd" CornerRadius="16" Background="{StaticResource ToggleOffBrush}" Padding="{TemplateBinding Padding}"
+                                BorderBrush="{StaticResource HairlineStrongBrush}" BorderThickness="1">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource LavenderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource OnAirGradientBrush}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource LimeBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource LimeBrush}" />
+                            <Setter TargetName="GlitchLime" Property="Opacity" Value="0.9" />
+                            <Setter TargetName="GlitchViolet" Property="Opacity" Value="0.9" />
+                            <Setter TargetName="Bd" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{StaticResource LimeColor}" BlurRadius="22" ShadowDepth="0" Opacity="0.55" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Texto de estado coloreado según StatusKind -->
+    <Style x:Key="StatusText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Ok">
+                <Setter Property="Foreground" Value="{StaticResource OkBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Warning">
+                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding StatusKind}" Value="Error">
+                <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

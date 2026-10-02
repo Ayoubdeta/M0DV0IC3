@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/M0DV0IC3.App/M0DV0IC3.App.csproj" />
+    <Project Path="src/M0DV0IC3.Audio/M0DV0IC3.Audio.csproj" />
+    <Project Path="src/M0DV0IC3.Dsp/M0DV0IC3.Dsp.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/M0DV0IC3.Tests/M0DV0IC3.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/M0DV0IC3.Cli/M0DV0IC3.Cli.csproj" />
+  </Folder>
+</Solution>

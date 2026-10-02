@@ -1,0 +1,31 @@
+﻿M0DV0IC3 - modulador de voz en tiempo real para Windows
+=========================================================
+
+Cómo empezar
+------------
+1. Deja esta carpeta donde quieras (por ejemplo, en Documentos) y abre M0DV0IC3.exe.
+   No hace falta instalar .NET ni nada más: todo lo que necesita está en esta carpeta.
+2. Para usar tu voz en Discord, juegos o llamadas, instala VB-Audio Virtual Cable (gratis):
+   https://vb-audio.com/Cable/
+   La app te guía: elige tu micrófono y, como salida, "CABLE Input". En Discord, elige
+   "CABLE Output" como micrófono.
+
+Si Windows muestra "Windows protegió su PC"
+-------------------------------------------
+Es el filtro SmartScreen. Sale con cualquier programa nuevo que todavía no tiene firma digital
+ni muchas descargas, aunque sea completamente seguro. Para abrirlo:
+  pulsa "Más información" y luego "Ejecutar de todas formas".
+Solo pasa la primera vez.
+
+Si quieres comprobar que tu descarga es la original, compara su huella SHA-256 (está en la
+página de la versión en GitHub) con la que da PowerShell:
+  Get-FileHash .\M0DV0IC3-v*-win-x64.zip
+
+Qué hace y qué no
+-----------------
+- Solo usa tu micrófono y, si activas "Música por el micro", el sonido de la app que elijas.
+- No se conecta a internet. No pide ser administrador.
+- Tus ajustes, voces y sonidos se guardan en %AppData%\M0DV0IC3.
+
+Código fuente, ayuda y novedades: https://github.com/Ayoubdeta/M0DV0IC3
+Licencia MIT (LICENSE.txt). Software de terceros: THIRD-PARTY-NOTICES.txt

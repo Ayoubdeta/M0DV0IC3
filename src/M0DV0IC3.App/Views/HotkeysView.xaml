@@ -1,0 +1,71 @@
+<UserControl x:Class="M0DV0IC3.App.Views.HotkeysView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:HotkeysViewModel}">
+    <UserControl.Resources>
+        <DataTemplate x:Key="BindingRow" DataType="{x:Type vm:HotkeyBindingViewModel}">
+            <Border BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="0,0,0,1" Padding="4,7">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="Gesture" Grid.Column="1" Text="{Binding GestureText}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                    <Button Grid.Column="2" Content="Cambiar" Command="{Binding ChangeCommand}" Margin="8,0,0,0" MinWidth="84" />
+                    <Button Grid.Column="3" Content="Quitar" Command="{Binding ClearCommand}" Margin="6,0,0,0"
+                            IsEnabled="{Binding HasGesture}" />
+                    <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Text="{Binding Error}" Foreground="{StaticResource ErrorBrush}"
+                               TextWrapping="Wrap" Margin="0,4,0,0"
+                               Visibility="{Binding HasError, Converter={StaticResource BoolToVisible}}" />
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsCapturing}" Value="True">
+                    <Setter TargetName="Gesture" Property="Foreground" Value="{StaticResource AccentTextBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding HasGesture}" Value="False">
+                    <Setter TargetName="Gesture" Property="FontWeight" Value="Normal" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="6,0,12,16" MaxWidth="860" HorizontalAlignment="Left">
+            <TextBlock Text="Atajos de teclado globales" Style="{StaticResource SectionHeader}" />
+            <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,12"
+                       Text="Funcionan aunque M0DV0IC3 esté minimizado o estés dentro de un juego. Pulsa «Cambiar» y después la combinación que quieras: Esc cancela y Retroceso quita el atajo." />
+
+            <Border Style="{StaticResource InfoBox}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap" FontWeight="SemiBold"
+                               Text="Si un juego se ejecuta como administrador, abre M0DV0IC3 también como administrador para que los atajos funcionen." />
+                    <TextBlock Text="{Binding ElevationText}" Style="{StaticResource MutedText}" Margin="0,4,0,0" />
+                    <Button Content="Reiniciar como administrador" Command="{Binding RestartAsAdminCommand}" HorizontalAlignment="Left"
+                            Margin="0,8,0,0" Visibility="{Binding IsElevated, Converter={StaticResource BoolToCollapsed}}" />
+                </StackPanel>
+            </Border>
+
+            <ItemsControl ItemsSource="{Binding Actions}" ItemTemplate="{StaticResource BindingRow}" Focusable="False" />
+
+            <TextBlock Text="Sonidos del soundboard" Style="{StaticResource SectionHeader}" Margin="0,22,0,6" />
+            <ItemsControl ItemsSource="{Binding SoundBindings}" ItemTemplate="{StaticResource BindingRow}" Focusable="False" />
+            <TextBlock Style="{StaticResource MutedText}"
+                       Text="Cuando añadas sonidos en la pestaña Soundboard, aquí podrás asignarles un atajo."
+                       Visibility="{Binding HasSoundBindings, Converter={StaticResource BoolToCollapsed}}" />
+
+            <Button Content="Restablecer los atajos de serie" Command="{Binding ResetDefaultsCommand}" HorizontalAlignment="Left" Margin="0,18,0,0" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

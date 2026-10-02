@@ -1,0 +1,52 @@
+<UserControl x:Class="M0DV0IC3.App.Views.CableSetupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:MainViewModel}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Border Style="{StaticResource CardBorder}" MaxWidth="760" Margin="24,20" Padding="28,22" VerticalAlignment="Top">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="&#xE720;" FontFamily="{StaticResource IconFont}" FontSize="26" VerticalAlignment="Center"
+                               Foreground="{StaticResource AccentTextBrush}" Margin="0,0,14,0" />
+                    <TextBlock Text="Falta el micrófono virtual (VB-Cable)" FontSize="21" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Style="{StaticResource BodyText}">
+                    M0DV0IC3 manda tu voz modificada a un micrófono virtual gratuito: <Bold>VB-Audio Virtual Cable</Bold>.
+                    Discord, los juegos y cualquier aplicación lo ven como un micrófono más, llamado <Bold>CABLE Output</Bold>.
+                </TextBlock>
+                <TextBlock Style="{StaticResource BodyText}">
+                    No está instalado en este PC, así que el audio no se ha puesto en marcha: sin él, tu voz acabaría saliendo por los altavoces.
+                </TextBlock>
+
+                <Button Style="{StaticResource PrimaryButton}" Command="{Binding OpenCableDownloadCommand}" HorizontalAlignment="Left" Margin="0,6,0,16" AutomationProperties.Name="Descargar VB-Cable">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                        <TextBlock Text="Descargar VB-Cable (vb-audio.com)" />
+                    </StackPanel>
+                </Button>
+
+                <TextBlock Text="Cómo instalarlo" Style="{StaticResource SubHeader}" Margin="0,0,0,6" />
+                <TextBlock Style="{StaticResource BodyText}">1. En la web, descarga el ZIP <Bold>VBCABLE_Driver_Pack</Bold>.</TextBlock>
+                <TextBlock Style="{StaticResource BodyText}">2. Descomprímelo: clic derecho en el ZIP → <Bold>Extraer todo…</Bold></TextBlock>
+                <TextBlock Style="{StaticResource BodyText}">
+                    3. En la carpeta extraída, clic derecho en <Bold>VBCABLE_Setup_x64.exe</Bold> → <Bold>Ejecutar como administrador</Bold>, y pulsa <Bold>Install Driver</Bold>.
+                </TextBlock>
+                <TextBlock Style="{StaticResource BodyText}">4. Reinicia el PC si el instalador te lo pide.</TextBlock>
+                <TextBlock Style="{StaticResource BodyText}">5. Vuelve aquí y pulsa «Volver a comprobar».</TextBlock>
+
+                <WrapPanel Margin="0,10,0,0">
+                    <Button Content="Volver a comprobar" Command="{Binding RecheckCableCommand}" Margin="0,0,10,0" Padding="16,7" />
+                    <Button Content="Seguir sin VB-Cable" Command="{Binding DismissCableSetupCommand}" Padding="16,7"
+                            ToolTip="Para ver las voces y ajustes. El audio no arrancará hasta que elijas una salida arriba." />
+                </WrapPanel>
+                <TextBlock Text="{Binding CableCheckMessage}" Foreground="{StaticResource WarningBrush}" TextWrapping="Wrap" Margin="0,12,0,0"
+                           Visibility="{Binding CableCheckMessage, Converter={StaticResource NullToCollapsed}}" />
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</UserControl>

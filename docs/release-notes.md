@@ -21,4 +21,6 @@ Este ZIP lo ha compilado GitHub directamente desde el código fuente público de
 
 La app no se conecta a internet, no pide permisos de administrador y solo usa tu micrófono y, si lo activas, el sonido de la app que elijas para «Música por el micro».
 
-**Code signing policy:** [https://github.com/{REPO}#code-signing-policy](https://github.com/{REPO}#code-signing-policy)
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/). Equipo, proceso y privacidad: [Code signing policy](https://github.com/{REPO}#code-signing-policy).

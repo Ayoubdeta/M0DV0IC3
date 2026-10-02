@@ -10,7 +10,10 @@ Funciona en Windows 10 (versión 2004 o posterior) y Windows 11 de 64 bits. No h
 
 {FIRMA}
 
-Es el filtro SmartScreen de Windows. Sale con cualquier programa nuevo que aún no tiene firma digital o muchas descargas, aunque sea completamente seguro. Pulsa **Más información → Ejecutar de todas formas**. Solo pasa la primera vez.
+Es el filtro SmartScreen de Windows. Sale con cualquier programa nuevo que aún no tiene firma digital o muchas descargas, aunque sea completamente seguro.
+
+- **Para que no salga:** antes de descomprimir, clic derecho en el ZIP → **Propiedades** → marca **Desbloquear** → **Aceptar**.
+- **Si ya ha salido:** pulsa **Más información → Ejecutar de todas formas**. Solo pasa la primera vez.
 
 Este ZIP lo ha compilado GitHub directamente desde el código fuente público de este repositorio, sin pasar por ningún ordenador personal. Puedes comprobarlo:
 

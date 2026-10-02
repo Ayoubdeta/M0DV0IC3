@@ -15,7 +15,8 @@ Si Windows muestra "Windows protegió su PC"
 Es el filtro SmartScreen. Sale con cualquier programa nuevo que todavía no tiene firma digital
 ni muchas descargas, aunque sea completamente seguro. Para abrirlo:
   pulsa "Más información" y luego "Ejecutar de todas formas".
-Solo pasa la primera vez.
+Solo pasa la primera vez. Para que no salga ni esa vez: clic derecho en M0DV0IC3.exe ->
+Propiedades -> marca "Desbloquear" -> Aceptar.
 
 Si quieres comprobar que tu descarga es la original, compara su huella SHA-256 (está en la
 página de la versión en GitHub) con la que da PowerShell:

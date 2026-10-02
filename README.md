@@ -6,6 +6,8 @@
 [![Última versión](https://img.shields.io/github/v/release/Ayoubdeta/M0DV0IC3?label=descargar)](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-a145f5)](LICENSE)
 
+> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 30 voices (among them a hard-tune autotune), a random voice mode, a soundboard, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in Spanish.
+
 Modulador de voz en tiempo real para Windows: cambia tu voz al vuelo (autotune, grave, mujer, robot, helio, fantasma…) y la ofrece como micrófono a Discord, juegos y cualquier app de llamadas. Incluye voz aleatoria, música de Spotify (u otra app) por el micro, soundboard, supresión de ruido (RNNoise), atajos globales, botón de silencio y la opción de escucharte.
 
 La interfaz sigue el logo: barra lateral, fondo morado oscuro, violeta para lo que eliges, lima para lo que está activo y el efecto glitch (copias desplazadas lima y violeta) en los títulos, la voz elegida y el interruptor VOZ ON.
@@ -20,7 +22,9 @@ La interfaz sigue el logo: barra lateral, fondo morado oscuro, violeta para lo q
 
 Requisitos: Windows 10 (versión 2004 o posterior) u 11, de 64 bits.
 
-**¿Sale «Windows protegió su PC»?** Es el filtro SmartScreen. Sale con cualquier programa nuevo que aún no tiene firma digital o muchas descargas, aunque sea completamente seguro. Pulsa **Más información → Ejecutar de todas formas**; solo pasa la primera vez. La firma digital está solicitada (ver [Code signing policy](#code-signing-policy)).
+**¿Sale «Windows protegió su PC»?** Es el filtro SmartScreen. Sale con cualquier programa nuevo que aún no tiene firma digital o muchas descargas, aunque sea completamente seguro. La firma digital está solicitada (ver [Code signing policy](#code-signing-policy)). Mientras tanto:
+- **Para que no salga:** antes de descomprimir, clic derecho en el ZIP → **Propiedades** → marca **Desbloquear** → **Aceptar**.
+- **Si ya ha salido:** pulsa **Más información → Ejecutar de todas formas**. Solo pasa la primera vez.
 
 Cada versión la compila GitHub Actions directamente desde este código fuente, sin pasar por ningún ordenador personal. Junto al ZIP se publican su huella SHA-256 y una atestación de procedencia, que prueba de qué repositorio y commit sale. Se puede verificar con `gh attestation verify M0DV0IC3-vX.Y.Z-win-x64.zip --repo Ayoubdeta/M0DV0IC3`.
 

@@ -6,19 +6,46 @@ Windows avisa con **«Windows protegió su PC»** (SmartScreen) al abrir un prog
 
 [SignPath Foundation](https://signpath.org/) firma gratis proyectos de código abierto. El certificado está a nombre de la fundación y lo usan muchos proyectos, así que ya tiene reputación en SmartScreen.
 
-1. **Solicita el alta** en <https://signpath.org/> (sección *Apply*) con la dirección de este repositorio. Piden, entre otras cosas:
-   - una licencia de código abierto aprobada por la OSI (este proyecto es MIT);
-   - que las versiones se compilen a partir del código público en un sistema de integración continua (lo hace `.github/workflows/release.yml`);
-   - que el proyecto no contenga malware ni software no deseado.
-2. Cuando te aprueben, en SignPath:
+### Condiciones ([términos](https://signpath.org/terms))
+
+| Condición | En este proyecto |
+|---|---|
+| Licencia de código abierto aprobada por la OSI, sin doble licencia comercial, en todos los componentes | ✅ MIT, y todas las dependencias son open source ([THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)) |
+| Sin malware, sin programas no deseados y sin herramientas de hacking | ✅ |
+| Sin código propietario (las bibliotecas del sistema se permiten) | ✅ |
+| Mantenido activamente | ✅ |
+| Ya publicado en la forma que se quiere firmar | ✅ el ZIP de [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases) |
+| La página de descarga describe lo que hace | ✅ README y notas de cada versión |
+| **Autenticación en dos pasos** en GitHub y en SignPath para todo el equipo | ⬜ actívala en GitHub (*Settings → Password and authentication*) |
+| Roles definidos: *committers*, *reviewers* y *approvers* | ⬜ en la solicitud: Ayoub en los tres |
+| Sección **«Code signing policy»** en la web del proyecto | ⬜ cuando te aprueben (texto de abajo) |
+
+### Pasos
+
+1. **Activa la autenticación en dos pasos** en tu cuenta de GitHub.
+2. **Solicita el alta** en <https://signpath.org/apply> con la dirección de este repositorio (`https://github.com/Ayoubdeta/M0DV0IC3`).
+3. Cuando te aprueben, en SignPath:
    - conecta este repositorio de GitHub como *trusted build system*;
    - crea la configuración de artefacto copiando [`.signpath/artifact-configuration.xml`](.signpath/artifact-configuration.xml);
    - crea un usuario de CI y su **API token**.
-3. En GitHub, en *Settings → Secrets and variables → Actions*:
+4. En GitHub, en *Settings → Secrets and variables → Actions*:
    - **Secreto** `SIGNPATH_API_TOKEN`: el token del paso anterior.
    - **Variables** `SIGNPATH_ORGANIZATION_ID`, `SIGNPATH_PROJECT_SLUG` y `SIGNPATH_SIGNING_POLICY_SLUG`: los datos de tu proyecto en SignPath.
-4. Publica una versión nueva (`git tag v1.0.1` y `git push origin v1.0.1`). El workflow de releases detecta el secreto y firma `M0DV0IC3.exe` y las DLL propias antes de crear el ZIP.
-5. Añade al README la *code signing policy* que te pida SignPath. Suele ser un texto como «Free code signing provided by SignPath.io, certificate by SignPath Foundation», más quién aprueba las versiones.
+5. Añade al README la sección de abajo.
+6. Publica una versión nueva (`git tag v1.0.1` y `git push origin v1.0.1`). El workflow de releases detecta el secreto y firma `M0DV0IC3.exe` y las DLL propias antes de crear el ZIP. Tendrás que aprobar cada firma en SignPath.
+
+### Texto para el README (cuando te aprueben)
+
+```markdown
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+- Committers and reviewers: [Ayoub](https://github.com/Ayoubdeta)
+- Approvers: [Ayoub](https://github.com/Ayoubdeta)
+
+Privacy policy: This program will not transfer any information to other networked systems unless specifically requested by the user.
+```
 
 Comprueba en la documentación de SignPath los nombres exactos de los slugs y si hay pasos nuevos.
 

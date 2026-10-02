@@ -1,6 +1,5 @@
 # Publica una versión: al subir una etiqueta v* (por ejemplo, git tag v1.0.1 && git push origin v1.0.1) compila en
 # GitHub, pasa los tests, genera el ZIP con su SHA-256 y una atestación de procedencia, y crea la release.
-# Si existe el secreto SIGNPATH_API_TOKEN, además firma la app con SignPath antes de comprimirla (ver SIGNING.md).
 name: Release
 
 on:
@@ -14,7 +13,6 @@ on:
 
 permissions:
   contents: write       # crear la release y subir la descarga
-  actions: read         # SignPath lee los datos del job y descarga la app sin firmar
   id-token: write       # atestación de procedencia (Sigstore)
   attestations: write
 
@@ -23,7 +21,6 @@ jobs:
     runs-on: windows-latest
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
-      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -39,37 +36,6 @@ jobs:
       - name: Publicar la app
         shell: pwsh
         run: ./publish.ps1 -SkipTests -NoPack -Version $env:TAG.TrimStart('v')
-
-      # ---- Firma con SignPath: solo cuando están configurados el secreto y las variables (SIGNING.md) ----
-      - name: Subir la app sin firmar
-        id: unsigned
-        if: env.SIGNPATH_API_TOKEN != ''
-        uses: actions/upload-artifact@v7
-        with:
-          name: M0DV0IC3-sin-firmar
-          path: publish/M0DV0IC3/
-
-      - name: Firmar con SignPath
-        if: env.SIGNPATH_API_TOKEN != ''
-        uses: signpath/github-action-submit-signing-request@v2
-        with:
-          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
-          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
-          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
-          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
-          wait-for-completion: true
-          # Cada firma hay que aprobarla a mano en SignPath: hay hasta una hora para hacerlo.
-          wait-for-completion-timeout-in-seconds: 3600
-          output-artifact-directory: publish/firmado
-
-      - name: Usar la app firmada
-        if: env.SIGNPATH_API_TOKEN != ''
-        shell: pwsh
-        run: |
-          Remove-Item publish/M0DV0IC3 -Recurse -Force
-          Move-Item publish/firmado publish/M0DV0IC3
-      # ---------------------------------------------------------------------------------------------------
 
       - name: Comprimir
         shell: pwsh
@@ -88,9 +54,8 @@ jobs:
           $version = $env:TAG.TrimStart('v')
           $zip = Get-Item "publish/M0DV0IC3-v$version-win-x64.zip"
           $sha = (Get-Content "$($zip.FullName).sha256").Split(' ')[0]
-          $signed = if ($env:SIGNPATH_API_TOKEN) { 'Firmada digitalmente.' } else { 'Todavía sin firma digital: la primera vez Windows puede mostrar el aviso de SmartScreen (ver abajo).' }
           $notes = Get-Content docs/release-notes.md -Raw
           $notes = $notes.Replace('{VERSION}', $version).Replace('{ZIP}', $zip.Name).Replace('{SHA256}', $sha)
-          $notes = $notes.Replace('{FIRMA}', $signed).Replace('{REPO}', $env:GITHUB_REPOSITORY)
+          $notes = $notes.Replace('{REPO}', $env:GITHUB_REPOSITORY)
           Set-Content release-notes.md $notes -Encoding utf8
           gh release create $env:TAG $zip.FullName "$($zip.FullName).sha256" --title "M0DV0IC3 $env:TAG" --notes-file release-notes.md

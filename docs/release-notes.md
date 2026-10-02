@@ -8,9 +8,7 @@ Funciona en Windows 10 (versión 2004 o posterior) y Windows 11 de 64 bits. No h
 
 ## ¿Sale «Windows protegió su PC»?
 
-{FIRMA}
-
-Es el filtro SmartScreen de Windows. Sale con cualquier programa nuevo que aún no tiene firma digital o muchas descargas, aunque sea completamente seguro.
+Es el filtro SmartScreen de Windows. Sale con los programas que no tienen firma digital, como este, o que aún tienen pocas descargas, aunque sean completamente seguros.
 
 - **Para que no salga:** antes de descomprimir, clic derecho en el ZIP → **Propiedades** → marca **Desbloquear** → **Aceptar**.
 - **Si ya ha salido:** pulsa **Más información → Ejecutar de todas formas**. Solo pasa la primera vez.
@@ -23,7 +21,3 @@ Este ZIP lo ha compilado GitHub directamente desde el código fuente público de
   `gh attestation verify {ZIP} --repo {REPO}`
 
 La app no se conecta a internet, no pide permisos de administrador y solo usa tu micrófono y, si lo activas, el sonido de la app que elijas para «Música por el micro».
-
-## Code signing policy
-
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/). Equipo, proceso y privacidad: [Code signing policy](https://github.com/{REPO}#code-signing-policy).

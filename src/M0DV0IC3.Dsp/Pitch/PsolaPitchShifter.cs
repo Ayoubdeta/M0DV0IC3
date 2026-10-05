@@ -5,8 +5,11 @@ namespace M0DV0IC3.Dsp.Pitch;
 /// <summary>
 /// Cambio de tono TD-PSOLA en streaming, pensado para la mínima latencia.
 /// <list type="bullet">
-/// <item>YIN estima el periodo y se colocan marcas de análisis, una por periodo, alineadas al pico de cada pulso glotal.</item>
-/// <item>Las marcas de síntesis se separan P/ratio (o 1/robotHz en modo robot). En cada una se suma un grano
+/// <item>YIN estima el periodo y se colocan marcas de análisis, una por periodo: la primera de cada tramo sonoro en
+/// el pico del pulso glotal y las siguientes donde el ciclo más se parece al anterior, para que caigan siempre en
+/// el mismo punto del ciclo.</item>
+/// <item>Las marcas de síntesis se separan el periodo de cada ciclo / ratio (o 1/robotHz en modo robot), así se
+/// conserva la pequeña irregularidad natural entre ciclos. En cada una se suma un grano
 /// con ventana Hann tomado de la <b>marca de análisis válida más reciente</b>, es decir, la más nueva cuyo grano
 /// ya tenemos entero. Así el retardo es el mínimo posible: semiancho de síntesis + semiancho de análisis,
 /// unos 2 periodos de la voz y no 2 periodos del tono más grave admitido.</item>
@@ -180,17 +183,15 @@ public sealed class PsolaPitchShifter : IAudioEffect
         while (true)
         {
             long candidate = _lastMarkPos + step;
-            if (candidate + radius > lastAvailable) break;
+            // La alineación compara medio periodo a cada lado de la marca: hace falta ese margen de señal.
+            int reach = voiced ? radius + step / 2 : 0;
+            if (candidate + reach > lastAvailable) break;
 
             long pos = candidate;
             if (voiced)
             {
-                float best = float.MinValue;
-                for (long k = candidate - radius; k <= candidate + radius; k++)
-                {
-                    float v = _lowPassed[(int)(k & RingMask)];
-                    if (v > best) { best = v; pos = k; }
-                }
+                bool previousVoiced = _markCount > 0 && _markVoiced[(int)((_markCount - 1) & MarkMask)];
+                pos = previousVoiced ? AlignWithPrevious(candidate, radius, step) : PeakNear(candidate, radius);
                 pos = Math.Max(pos, _lastMarkPos + step / 2);
             }
 
@@ -204,6 +205,46 @@ public sealed class PsolaPitchShifter : IAudioEffect
             // El cursor nunca debe apuntar a una marca ya sobrescrita en el anillo.
             if (_markCount - _markCursor >= MarkCapacity) _markCursor = _markCount - MarkCapacity / 2;
         }
+    }
+
+    private long PeakNear(long candidate, int radius)
+    {
+        long pos = candidate;
+        float best = float.MinValue;
+        for (long k = candidate - radius; k <= candidate + radius; k++)
+        {
+            float v = _lowPassed[(int)(k & RingMask)];
+            if (v > best) { best = v; pos = k; }
+        }
+        return pos;
+    }
+
+    /// <summary>
+    /// Coloca la marca donde el ciclo se parece más al anterior (correlación normalizada de un periodo de
+    /// señal filtrada). Así todas las marcas caen en el mismo punto del ciclo aunque haya varios picos
+    /// parecidos, y la separación entre marcas es el periodo real de cada ciclo. Con picos a ojo, la marca
+    /// saltaba de un pico a otro: eso añadía jitter y la voz grave sonaba ronca y metálica.
+    /// </summary>
+    private long AlignWithPrevious(long candidate, int radius, int step)
+    {
+        long previous = _lastMarkPos;
+        int half = step / 2;
+        long pos = candidate;
+        double best = double.MinValue;
+        for (long k = candidate - radius; k <= candidate + radius; k++)
+        {
+            double cross = 0, energy = 1e-12;
+            for (int j = -half; j <= half; j += 2)
+            {
+                float a = _lowPassed[(int)((previous + j) & RingMask)];
+                float b = _lowPassed[(int)((k + j) & RingMask)];
+                cross += a * b;
+                energy += b * b;
+            }
+            double score = cross / Math.Sqrt(energy);
+            if (score > best) { best = score; pos = k; }
+        }
+        return pos;
     }
 
     private void PlaceGrains(long blockStart, long lastAvailable)
@@ -237,10 +278,16 @@ public sealed class PsolaPitchShifter : IAudioEffect
             if (voiced)
             {
                 double vibrato = _vibratoDepth > 0 ? DspMath.SemitonesToRatio(_vibratoDepth * _vibrato.Value) : 1.0;
-                double ratio = _pitchRatio;
-                if (_robotHz > 0) ratio = basePeriod * _robotHz / _sampleRate;
-                else if (_corrector.IsActive) ratio = _corrector.NextRatio(_sampleRate / basePeriod, _transposeSemitones, _previousHop);
-                hop = basePeriod / (ratio * vibrato);
+                if (_robotHz > 0) hop = _sampleRate / (_robotHz * vibrato);
+                else if (_corrector.IsActive)
+                    hop = basePeriod / (_corrector.NextRatio(_sampleRate / basePeriod, _transposeSemitones, _previousHop) * vibrato);
+                else
+                {
+                    // Cambio de tono normal: cada ciclo de salida dura lo que su ciclo de entrada / ratio, así se
+                    // conservan las pequeñas variaciones naturales de la voz. Con el periodo medio de YIN todos los
+                    // ciclos salían idénticos, y una voz sin esas variaciones suena a sintetizador.
+                    hop = LocalPeriod(mi, basePeriod) / (_pitchRatio * vibrato);
+                }
                 center = _markPos[mi];
                 // Con mucho solapamiento (subir tono) los granos se suman coherentemente: se compensa el nivel.
                 gain = (float)(1.0 / Math.Sqrt(Math.Max(1.0, synthHalf / hop)));
@@ -265,6 +312,15 @@ public sealed class PsolaPitchShifter : IAudioEffect
             _previousHop = hop;
             _vibrato.Advance(hop);
         }
+    }
+
+    /// <summary>Distancia a la marca anterior si las dos son sonoras y es creíble (±25 % del periodo medio).</summary>
+    private double LocalPeriod(int mark, double averagePeriod)
+    {
+        int previous = (mark - 1) & MarkMask;
+        if (!_markVoiced[previous]) return averagePeriod;
+        double local = _markPos[mark] - _markPos[previous];
+        return local > 0.8 * averagePeriod && local < 1.25 * averagePeriod ? local : averagePeriod;
     }
 
     private static double AnalysisHalf(float period, bool voiced, double formant)

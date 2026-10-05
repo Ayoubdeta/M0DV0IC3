@@ -57,6 +57,32 @@ public sealed class PitchTests(ITestOutputHelper output)
         Assert.True(voiced < analyses * 0.2, $"ruido detectado como sonoro en {voiced}/{analyses} análisis");
     }
 
+    // Cada milisegundo que tarda en detectar una vocal sale sin cambiar de tono y luego salta: en cada sílaba.
+    // Con la ventana antigua (la más vieja de la trama) tardaba 38-43 ms; ahora, 17-22 ms.
+    [Theory]
+    [InlineData(110)]
+    [InlineData(130)]
+    [InlineData(210)]
+    public void Yin_detects_vowel_onset_within_25_ms(double hz)
+    {
+        var yin = new YinPitchDetector(Rate, 65, 900);
+        foreach (float x in new float[Rate / 4]) yin.Push(x);
+        Assert.False(yin.IsVoiced);
+
+        var vowel = TestSignals.Vowel(hz, 0.2);
+        int detectedAt = -1;
+        for (int i = 0; i < vowel.Length && detectedAt < 0; i++)
+        {
+            yin.Push(vowel[i]);
+            if (yin.IsVoiced) detectedAt = i;
+        }
+
+        double ms = detectedAt * 1000.0 / Rate;
+        output.WriteLine($"{hz} Hz: vocal detectada a los {ms:F1} ms, f0 {Rate / yin.PeriodSamples:F1} Hz");
+        Assert.InRange(ms, 0, 25);
+        Assert.InRange(Rate / yin.PeriodSamples, hz * 0.97, hz * 1.03);
+    }
+
     [Theory]
     [InlineData(155, 12)]
     [InlineData(155, -5)]

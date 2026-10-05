@@ -204,7 +204,9 @@ public sealed class PerformanceTests(ITestOutputHelper output)
 #if DEBUG
     private const double LocalLimit = 0.30;
 #else
-    private const double LocalLimit = 0.08;
+    // Las más caras: el coro (tres PSOLA más) y una voz con tono objetivo + RNNoise, que rondan el 6-7 % y en un PC
+    // ocupado llegan al 9 %. Con un límite del 8 % la prueba fallaba al azar.
+    private const double LocalLimit = 0.12;
 #endif
 
     // En los servidores de integración continua (GitHub Actions pone CI=true) la CPU es compartida y las medidas

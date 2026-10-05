@@ -21,6 +21,7 @@
                     </WrapPanel>
                     <TextBlock Style="{StaticResource MutedText}" FontSize="12" Margin="0,10,0,0"
                                Text="La latencia de las voces con cambio de tono depende de lo grave que hables: ~11 ms con voz aguda, ~20 ms con voz media, ~27 ms con voz muy grave." />
+                    <TextBlock Text="{Binding LearnedPitchText}" TextWrapping="Wrap" Margin="0,10,0,0" FontWeight="SemiBold" />
                 </StackPanel>
             </Border>
 

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.Dsp.Effects;
 using M0DV0IC3.Dsp.Pitch;
 using M0DV0IC3.Dsp.Presets;
 
@@ -25,6 +26,13 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
         new(AutotuneScale.MinorPentatonic, "Pentatónica menor"),
     ];
 
+    private static readonly IReadOnlyList<EditorOption<TransmissionStyle>> TransmissionOptions =
+    [
+        new(TransmissionStyle.Off, "Apagada"),
+        new(TransmissionStyle.Walkie, "Walkie-talkie (chasquido y pitido de fin)"),
+        new(TransmissionStyle.Space, "Astronauta (pitidos de la NASA)"),
+    ];
+
     private const string DefaultIcon = "🎭";
 
     private readonly VoicePreset _original;
@@ -37,6 +45,8 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
     [ObservableProperty] private string _icon = DefaultIcon;
     [ObservableProperty] private double _pitch;
     [ObservableProperty] private double _formant = 1;
+    [ObservableProperty] private bool _targetPitchEnabled;
+    [ObservableProperty] private double _targetPitchHz = 200;
     [ObservableProperty] private bool _robotEnabled;
     [ObservableProperty] private double _robotHz = 110;
 
@@ -61,6 +71,18 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
     [ObservableProperty] private double _lowPassHz = 6000;
     [ObservableProperty] private double _presenceDb;
     [ObservableProperty] private double _highShelfDb;
+    [ObservableProperty] private double _lowShelfDb;
+    [ObservableProperty] private double _nasalDb;
+    [ObservableProperty] private double _compression;
+    [ObservableProperty] private double _harmonyMix;
+    [ObservableProperty] private double _vocoderMix;
+    [ObservableProperty] private double _vocoderHz = 110;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TransmissionEnabled))]
+    private TransmissionStyle _transmission;
+
+    [ObservableProperty] private double _transmissionNoise = 0.6;
     [ObservableProperty] private double _chorusMix;
     [ObservableProperty] private double _flangerMix;
     [ObservableProperty] private double _flangerHz = 0.25;
@@ -85,6 +107,10 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
     public IReadOnlyList<EditorOption<AutotuneScale>> Scales => ScaleOptions;
 
     public IReadOnlyList<string> Keys => AutotuneNames.Notes;
+
+    public IReadOnlyList<EditorOption<TransmissionStyle>> Transmissions => TransmissionOptions;
+
+    public bool TransmissionEnabled => Transmission != TransmissionStyle.Off;
 
     public bool AutotuneEnabled => AutotuneScale != AutotuneScale.Off;
 
@@ -135,6 +161,8 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
             Icon = p.Icon;
             Pitch = p.PitchSemitones;
             Formant = p.FormantRatio;
+            TargetPitchEnabled = p.TargetPitchHz > 0;
+            if (p.TargetPitchHz > 0) TargetPitchHz = Math.Clamp(p.TargetPitchHz, 50, 450);
             RobotEnabled = p.RobotHz > 0;
             if (p.RobotHz > 0) RobotHz = Math.Clamp(p.RobotHz, 60, 300);
             AutotuneScale = p.AutotuneScale;
@@ -155,6 +183,14 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
             if (p.LowPassHz > 0) LowPassHz = Math.Clamp(p.LowPassHz, 1000, 12000);
             PresenceDb = p.PresenceDb;
             HighShelfDb = p.HighShelfDb;
+            LowShelfDb = p.LowShelfDb;
+            NasalDb = p.NasalDb;
+            Compression = p.Compression;
+            HarmonyMix = p.HarmonyMix;
+            VocoderMix = p.VocoderMix;
+            VocoderHz = Math.Clamp(p.VocoderHz, 55, 220);
+            Transmission = p.Transmission;
+            TransmissionNoise = p.TransmissionNoise;
             ChorusMix = p.ChorusMix;
             FlangerMix = p.FlangerMix;
             FlangerHz = Math.Clamp(p.FlangerHz, 0.05, 2);
@@ -181,6 +217,7 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
             IsBuiltIn = false,
             PitchSemitones = Math.Round(Pitch * 2) / 2,
             FormantRatio = Math.Round(Formant, 2),
+            TargetPitchHz = TargetPitchEnabled ? Math.Round(TargetPitchHz / 5) * 5 : 0,
             RobotHz = RobotEnabled ? Math.Round(RobotHz) : 0,
             AutotuneScale = AutotuneScale,
             AutotuneKey = AutotuneKey,
@@ -198,6 +235,14 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
             LowPassHz = LowPassEnabled ? Math.Round(LowPassHz) : 0,
             PresenceDb = Math.Round(PresenceDb * 2) / 2,
             HighShelfDb = Math.Round(HighShelfDb * 2) / 2,
+            LowShelfDb = Math.Round(LowShelfDb * 2) / 2,
+            NasalDb = Math.Round(NasalDb * 2) / 2,
+            Compression = Math.Round(Compression, 2),
+            HarmonyMix = Math.Round(HarmonyMix, 2),
+            VocoderMix = Math.Round(VocoderMix, 2),
+            VocoderHz = Math.Round(VocoderHz),
+            Transmission = Transmission,
+            TransmissionNoise = Math.Round(TransmissionNoise, 2),
             ChorusMix = Math.Round(ChorusMix, 2),
             FlangerMix = Math.Round(FlangerMix, 2),
             FlangerHz = Math.Round(FlangerHz, 2),

@@ -51,6 +51,10 @@
                 <controls:ParamSlider Label="Formantes" Minimum="0.5" Maximum="2" Step="0.01" DefaultValue="1"
                                       Value="{Binding Formant}" Format="{}{0:0.00}×"
                                       Hint="El tamaño de la «garganta»: menos de 1 suena más grande u oscuro; más de 1, más pequeño o brillante." />
+                <CheckBox Content="Tono objetivo (se adapta a tu voz)" IsChecked="{Binding TargetPitchEnabled}" Margin="0,4,0,0" />
+                <controls:ParamSlider Label="Tono objetivo" Minimum="50" Maximum="450" Step="5" DefaultValue="200"
+                                      Value="{Binding TargetPitchHz}" Format="{}{0:0} Hz" IsEnabled="{Binding TargetPitchEnabled}"
+                                      Hint="Lleva tu tono medio hasta aquí, sea tu voz grave o aguda: ~215 Hz mujer, ~290 Hz niño, ~85 Hz voz grave. «Tono» dice si la voz sube (positivo) o baja (negativo), y se usa mientras la app aprende tu tono." />
                 <CheckBox Content="Robot (voz monótona)" IsChecked="{Binding RobotEnabled}" Margin="0,4,0,0" />
                 <controls:ParamSlider Label="Nota del robot" Minimum="60" Maximum="300" Step="1" DefaultValue="110"
                                       Value="{Binding RobotHz}" Format="{}{0:0} Hz" IsEnabled="{Binding RobotEnabled}"
@@ -118,6 +122,18 @@
                                       Value="{Binding RingMix}" Format="{}{0:P0}" OffText="apagado" />
                 <controls:ParamSlider Label="Distorsión" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
                                       Value="{Binding Distortion}" Format="{}{0:P0}" OffText="apagada" />
+                <controls:ParamSlider Label="Coro" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding HarmonyMix}" Format="{}{0:P0}" OffText="apagado"
+                                      Hint="Tu voz con tres copias: una octava abajo, una quinta y una octava arriba. Gasta como tres voces con cambio de tono." />
+                <controls:ParamSlider Label="Vocoder" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding VocoderMix}" Format="{}{0:P0}" OffText="apagado"
+                                      Hint="Tu voz toca un acorde de sintetizador: el robot musical de la música electrónica." />
+                <controls:ParamSlider Label="Vocoder (nota)" Minimum="55" Maximum="220" Step="1" DefaultValue="110"
+                                      Value="{Binding VocoderHz}" Format="{}{0:0} Hz"
+                                      Hint="Nota grave del acorde (110 Hz = La)." />
+                <controls:ParamSlider Label="Compresión" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding Compression}" Format="{}{0:P0}" OffText="apagada"
+                                      Hint="Iguala lo que dices flojo y fuerte, como en la radio." />
                 <controls:ParamSlider Label="Chorus" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
                                       Value="{Binding ChorusMix}" Format="{}{0:P0}" OffText="apagado"
                                       Hint="Tres copias de tu voz con pequeñas variaciones: suena a varias personas a la vez." />
@@ -145,6 +161,26 @@
                                       Hint="Realza o atenúa la zona de 1,8 kHz (voz más «delante»)." />
                 <controls:ParamSlider Label="Agudos" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
                                       Value="{Binding HighShelfDb}" Format="{}{0:+0.#;-0.#;0} dB" />
+                <controls:ParamSlider Label="Graves" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
+                                      Value="{Binding LowShelfDb}" Format="{}{0:+0.#;-0.#;0} dB"
+                                      Hint="Más pecho (positivo), como un locutor de radio, o menos (negativo)." />
+                <controls:ParamSlider Label="Nasal" Minimum="0" Maximum="12" Step="0.5" DefaultValue="0"
+                                      Value="{Binding NasalDb}" Format="{}{0:+0.#;-0.#;0} dB" OffText="apagado"
+                                      Hint="Realza una banda estrecha en 1,1 kHz: voz de duende o con la nariz tapada." />
+
+                <TextBlock Text="Transmisión" Style="{StaticResource SubHeader}" />
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="118" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Estilo" VerticalAlignment="Center" />
+                    <ComboBox Grid.Column="1" Margin="6,0,0,0" ItemsSource="{Binding Transmissions}" DisplayMemberPath="Name"
+                              SelectedValuePath="Value" SelectedValue="{Binding Transmission}"
+                              ToolTip="Ruido de radio mientras hablas y pitidos al empezar y al acabar. En silencio no suena nada." />
+                </Grid>
+                <controls:ParamSlider Label="Ruido y pitidos" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0.6"
+                                      Value="{Binding TransmissionNoise}" Format="{}{0:P0}" IsEnabled="{Binding TransmissionEnabled}" />
 
                 <TextBlock Text="Espacio" Style="{StaticResource SubHeader}" />
                 <controls:ParamSlider Label="Eco (retardo)" Minimum="0" Maximum="1000" Step="10" DefaultValue="250"

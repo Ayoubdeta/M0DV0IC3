@@ -1,3 +1,4 @@
+using M0DV0IC3.Dsp.Effects;
 using M0DV0IC3.Dsp.Pitch;
 
 namespace M0DV0IC3.Dsp.Presets;
@@ -6,6 +7,9 @@ namespace M0DV0IC3.Dsp.Presets;
 /// Voces incluidas de serie: primero personajes y después efectos y ambientes. Los valores son un punto de partida;
 /// <c>OutputGainDb</c> está ajustado con <c>m0dv0ic3-cli bench</c> (columna "Nivel") para que todas suenen al
 /// mismo volumen que la voz original (±0,5 dB RMS). La excepción es "Lejana", que suena 3 dB más baja a propósito.
+/// <para>Las voces de otra edad o de otro sexo tienen <see cref="VoicePreset.TargetPitchHz"/>: llevan tu tono medio a
+/// un tono de mujer, de niño… sea tu voz grave o aguda. Con un tono fijo (+5 semitonos), una voz de hombre grave
+/// (~100 Hz) se quedaba en ~135 Hz, que sigue sonando a hombre.</para>
 /// </summary>
 public static class BuiltInVoices
 {
@@ -14,24 +18,25 @@ public static class BuiltInVoices
         new()
         {
             Id = "grave", Name = "Grave", Icon = "🐻", IsBuiltIn = true,
-            PitchSemitones = -5, FormantRatio = 0.85, HighShelfDb = -2, OutputGainDb = 2,
+            PitchSemitones = -5, TargetPitchHz = 82, FormantRatio = 0.85, HighShelfDb = -2, OutputGainDb = 2.5,
         },
         new()
         {
             Id = "hombre", Name = "Hombre", Icon = "🧔", IsBuiltIn = true,
-            PitchSemitones = -4, FormantRatio = 0.88, OutputGainDb = 1.5,
+            PitchSemitones = -4, TargetPitchHz = 110, FormantRatio = 0.88, OutputGainDb = 1.5,
         },
         new()
         {
+            // Tono de mujer adulta (~215 Hz) desde cualquier voz y tracto vocal un 20 % más corto.
             Id = "mujer", Name = "Mujer", Icon = "👩", IsBuiltIn = true,
-            PitchSemitones = 5, FormantRatio = 1.18, HighPassHz = 120, HighShelfDb = 2, OutputGainDb = 1.5,
+            PitchSemitones = 5, TargetPitchHz = 215, FormantRatio = 1.2, Breathiness = 0.12, HighPassHz = 120, HighShelfDb = 2, OutputGainDb = 1.5,
         },
         new()
         {
-            // Muy femenina: tono de mujer adulta (~190-210 Hz desde una voz masculina), tracto vocal más corto
-            // sin llegar a sonar infantil, menos pecho, más brillo y voz con aire.
+            // Muy femenina: más aguda que "Mujer" (~245 Hz), tracto vocal más corto sin llegar a sonar infantil,
+            // menos pecho, más brillo y voz con aire.
             Id = "mujer2", Name = "Mujer 2", Icon = "💃", IsBuiltIn = true,
-            PitchSemitones = 8, FormantRatio = 1.2, Breathiness = 0.35,
+            PitchSemitones = 8, TargetPitchHz = 245, FormantRatio = 1.22, Breathiness = 0.35,
             HighPassHz = 160, PresenceDb = 1.5, HighShelfDb = 3, OutputGainDb = 1.5,
         },
         new()
@@ -48,7 +53,7 @@ public static class BuiltInVoices
         {
             // El mismo autotune exagerado con la voz de "Mujer 2": se sube 8 semitonos y después se afina.
             Id = "autotune-mujer", Name = "Autotune mujer", Icon = "🎶", IsBuiltIn = true,
-            PitchSemitones = 8, FormantRatio = 1.2, Breathiness = 0.2,
+            PitchSemitones = 8, TargetPitchHz = 230, FormantRatio = 1.2, Breathiness = 0.2,
             AutotuneScale = AutotuneScale.Minor, AutotuneKey = 9, AutotuneRetuneMs = 0, AutotuneExaggeration = 0.8,
             HighPassHz = 160, PresenceDb = 2, HighShelfDb = 3.5,
             EchoMs = 300, EchoFeedback = 0.25, EchoMix = 0.15, ReverbMix = 0.18, ReverbSize = 0.6, OutputGainDb = 2,
@@ -65,7 +70,7 @@ public static class BuiltInVoices
         new()
         {
             Id = "nino", Name = "Niño", Icon = "🧒", IsBuiltIn = true,
-            PitchSemitones = 6, FormantRatio = 1.25, HighPassHz = 150, HighShelfDb = 1.5, OutputGainDb = 1.5,
+            PitchSemitones = 6, TargetPitchHz = 290, FormantRatio = 1.25, HighPassHz = 150, HighShelfDb = 1.5, OutputGainDb = 1,
         },
         new()
         {
@@ -87,8 +92,8 @@ public static class BuiltInVoices
         new()
         {
             Id = "demonio", Name = "Demonio", Icon = "😈", IsBuiltIn = true,
-            PitchSemitones = -8, FormantRatio = 0.75, Distortion = 0.25, LowPassHz = 6000,
-            ReverbMix = 0.25, ReverbSize = 0.75, OutputGainDb = -3,
+            PitchSemitones = -8, TargetPitchHz = 58, FormantRatio = 0.75, Distortion = 0.25, LowPassHz = 6000,
+            ReverbMix = 0.25, ReverbSize = 0.75, OutputGainDb = -2,
         },
         new()
         {
@@ -109,6 +114,70 @@ public static class BuiltInVoices
             Id = "borracho", Name = "Borracho", Icon = "🥴", IsBuiltIn = true,
             PitchSemitones = -1, FormantRatio = 0.96, VibratoHz = 0.45, VibratoSemitones = 1.3,
             LowPassHz = 4000, ChorusMix = 0.2, ReverbMix = 0.1, ReverbSize = 0.4, OutputGainDb = 2,
+        },
+        new()
+        {
+            // Muy aguda (~420 Hz) y con una boca y una garganta diminutas, con un temblor ligero.
+            Id = "bebe", Name = "Bebé", Icon = "👶", IsBuiltIn = true,
+            PitchSemitones = 12, TargetPitchHz = 420, FormantRatio = 1.55, VibratoHz = 6.5, VibratoSemitones = 0.35,
+            HighPassHz = 250, HighShelfDb = 1, OutputGainDb = 0,
+        },
+        new()
+        {
+            // Voz temblorosa: vibrato irregular, el volumen tiembla (modulador a 5,5 Hz) y algo de aire y ronquera.
+            Id = "abuelo", Name = "Abuelo", Icon = "👴", IsBuiltIn = true,
+            TargetPitchHz = 125, FormantRatio = 0.95, VibratoHz = 6, VibratoSemitones = 0.45,
+            RingModHz = 5.5, RingModMix = 0.18, Breathiness = 0.15, Distortion = 0.06,
+            HighPassHz = 130, LowPassHz = 6500, OutputGainDb = -1.5,
+        },
+        new()
+        {
+            Id = "abuela", Name = "Abuela", Icon = "👵", IsBuiltIn = true,
+            PitchSemitones = 5, TargetPitchHz = 200, FormantRatio = 1.12, VibratoHz = 6.5, VibratoSemitones = 0.5,
+            RingModHz = 6, RingModMix = 0.18, Breathiness = 0.2, HighPassHz = 160, LowPassHz = 7000, OutputGainDb = 3.5,
+        },
+        new()
+        {
+            // Enorme: muy grave (~55 Hz), garganta un tercio más grande, graves realzados y una sala gigante.
+            Id = "gigante", Name = "Gigante", Icon = "👹", IsBuiltIn = true,
+            PitchSemitones = -10, TargetPitchHz = 55, FormantRatio = 0.68, LowShelfDb = 3, LowPassHz = 5000,
+            Compression = 0.4, ReverbMix = 0.35, ReverbSize = 0.95, OutputGainDb = -1.5,
+        },
+        new()
+        {
+            // Pequeñito y nasal: aguda, formantes muy altos y una campana estrecha en 1,1 kHz.
+            Id = "duende", Name = "Duende", Icon = "🧝", IsBuiltIn = true,
+            PitchSemitones = 9, TargetPitchHz = 290, FormantRatio = 1.45, NasalDb = 9, HighPassHz = 300, HighShelfDb = 1,
+            OutputGainDb = -2,
+        },
+        new()
+        {
+            // Aguda y dulce (~330 Hz), con aire y muy brillante.
+            Id = "anime", Name = "Chica anime", Icon = "🌸", IsBuiltIn = true,
+            PitchSemitones = 10, TargetPitchHz = 330, FormantRatio = 1.28, Breathiness = 0.15,
+            HighPassHz = 200, PresenceDb = 2, HighShelfDb = 4, OutputGainDb = -0.5,
+        },
+        new()
+        {
+            // Voz de anuncio: un poco más grave, mucho pecho (graves +5 dB), comprimida y con presencia.
+            Id = "locutor", Name = "Locutor de radio", Icon = "🗣", IsBuiltIn = true,
+            PitchSemitones = -2, TargetPitchHz = 90, FormantRatio = 0.94, LowShelfDb = 5, Compression = 0.8,
+            PresenceDb = 2.5, HighShelfDb = 1.5, Distortion = 0.08, HighPassHz = 60, OutputGainDb = 2.5,
+        },
+        new()
+        {
+            // Grave y metálica, como dentro de un casco: un comb de 2,6 ms hace de máscara.
+            Id = "villano", Name = "Villano espacial", Icon = "🦹", IsBuiltIn = true,
+            PitchSemitones = -7, TargetPitchHz = 72, FormantRatio = 0.8, Breathiness = 0.1,
+            CombMs = 2.6, CombFeedback = 0.55, CombMix = 0.35, Distortion = 0.15, Compression = 0.6,
+            LowShelfDb = 3, LowPassHz = 6500, ReverbMix = 0.12, ReverbSize = 0.4, OutputGainDb = 1,
+        },
+        new()
+        {
+            // Grave, ronca y rasgada: el modulador a 38 Hz hace el gruñido y la distorsión, la voz rota.
+            Id = "zombi", Name = "Zombi", Icon = "🧟", IsBuiltIn = true,
+            PitchSemitones = -6, TargetPitchHz = 80, FormantRatio = 0.85, VibratoHz = 0.8, VibratoSemitones = 0.4,
+            RingModHz = 38, RingModMix = 0.35, Distortion = 0.4, HighPassHz = 90, LowPassHz = 3500, OutputGainDb = -1,
         },
         new()
         {
@@ -152,6 +221,33 @@ public static class BuiltInVoices
         {
             Id = "distorsion", Name = "Distorsión", Icon = "🎸", IsBuiltIn = true,
             Distortion = 0.85, HighPassHz = 150, LowPassHz = 7000, PresenceDb = 3, OutputGainDb = -3.5,
+        },
+        new()
+        {
+            // Tu voz con copias una octava abajo, una quinta y una octava arriba, en una sala grande.
+            Id = "coro", Name = "Coro", Icon = "🎵", IsBuiltIn = true,
+            HarmonyMix = 0.8, ChorusMix = 0.3, ReverbMix = 0.25, ReverbSize = 0.8, OutputGainDb = 2,
+        },
+        new()
+        {
+            // El robot musical de la música electrónica: tu voz toca un acorde de La menor.
+            Id = "vocoder", Name = "Vocoder", Icon = "🎹", IsBuiltIn = true,
+            VocoderMix = 1, VocoderHz = 110, HighPassHz = 80, Compression = 0.3, OutputGainDb = -2.5,
+        },
+        new()
+        {
+            // Radio militar: banda estrecha, saturada, con ruido mientras hablas, chasquido al empezar y pitido al acabar.
+            Id = "walkie", Name = "Walkie-talkie", Icon = "📟", IsBuiltIn = true,
+            HighPassHz = 500, LowPassHz = 2800, Distortion = 0.45, PresenceDb = 3, Compression = 0.5,
+            Transmission = TransmissionStyle.Walkie, TransmissionNoise = 0.7, OutputGainDb = 0,
+        },
+        new()
+        {
+            // Dentro de un casco: apagada y con resonancia metálica, y los pitidos de la NASA al empezar y al acabar.
+            Id = "astronauta", Name = "Astronauta", Icon = "🛰", IsBuiltIn = true,
+            HighPassHz = 300, LowPassHz = 3600, CombMs = 1.6, CombFeedback = 0.4, CombMix = 0.3, PresenceDb = 2,
+            Distortion = 0.15, ReverbMix = 0.12, ReverbSize = 0.3, Transmission = TransmissionStyle.Space,
+            TransmissionNoise = 0.5, OutputGainDb = -2,
         },
         new()
         {

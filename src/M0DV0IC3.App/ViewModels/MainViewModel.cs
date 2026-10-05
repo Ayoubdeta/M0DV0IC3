@@ -64,6 +64,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string? _cableCheckMessage;
     [ObservableProperty] private string? _outputWarning;
     [ObservableProperty] private string _statusText = "Arrancando…";
+    [ObservableProperty] private string _learnedPitchText = "";
     [ObservableProperty] private StatusKind _statusKind = StatusKind.Neutral;
 
     /// <summary>Etiqueta corta de la tarjeta de estado de la barra lateral: EN VIVO, SILENCIADO, PARADO...</summary>
@@ -93,6 +94,8 @@ public sealed partial class MainViewModel : ObservableObject
 
         var pipeline = audio.Pipeline;
         pipeline.Voice.Range = s.VoiceRange;
+        if (s.LearnedPitchHz > 0) pipeline.Voice.Profile.Seed(s.LearnedPitchHz);
+        UpdateLearnedPitch();
         pipeline.MonitorVoice = s.MonitorVoice;
         pipeline.MonitorSounds = s.MonitorSounds;
         pipeline.NoiseSuppression = s.NoiseSuppression && pipeline.NoiseSuppressionAvailable;
@@ -314,6 +317,8 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Al salir: para timers, sonidos y atajos (el motor lo para AudioService).</summary>
     public void Shutdown()
     {
+        var profile = _audio.Pipeline.Voice.Profile;
+        if (profile.IsLearned) _settings.Current.LearnedPitchHz = Math.Round(profile.CenterHz, 1);
         _meterTimer.Stop();
         Soundboard.StopAll();
         Hotkeys.UnregisterAll();
@@ -564,8 +569,27 @@ public sealed partial class MainViewModel : ObservableObject
         {
             UpdateLatency();
             UpdateGateWarning();
+            UpdateLearnedPitch();
         }
     }
+
+    /// <summary>El tono medio que usan las voces con tono objetivo (Mujer, Niño, Grave…), en Ajustes.</summary>
+    private void UpdateLearnedPitch()
+    {
+        var profile = _audio.Pipeline.Voice.Profile;
+        LearnedPitchText = !profile.IsLearned
+            ? "Tu tono medio: todavía no lo sé. Habla un poco con una voz como Mujer, Grave o Niño y lo aprenderé."
+            : $"Tu tono medio: {profile.CenterHz:0} Hz ({DescribePitch(profile.CenterHz)}). Voces como Mujer, Niño o Grave lo usan para saber cuánto cambiar tu tono.";
+    }
+
+    private static string DescribePitch(double hz) => hz switch
+    {
+        < 105 => "voz de hombre grave",
+        < 150 => "voz de hombre",
+        < 190 => "voz aguda de hombre o grave de mujer",
+        < 260 => "voz de mujer",
+        _ => "voz muy aguda",
+    };
 
     /// <summary>Sube al instante y cae unos 24 dB/s, como un vúmetro.</summary>
     private static double Fall(double previousDb, float peak)

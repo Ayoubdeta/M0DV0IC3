@@ -22,6 +22,9 @@ public sealed class AppSettings
 
     public VoiceRange VoiceRange { get; set; } = VoiceRange.Medium;
 
+    /// <summary>Tono medio de tu voz aprendido en la sesión anterior (0 = aún no se sabe), para las voces con tono objetivo.</summary>
+    public double LearnedPitchHz { get; set; }
+
     public string? SelectedVoiceId { get; set; }
 
     public bool VoiceEnabled { get; set; }
@@ -72,6 +75,7 @@ public sealed class AppSettings
         SoundboardVolume = double.IsFinite(SoundboardVolume) ? Math.Clamp(SoundboardVolume, 0, 2) : 1;
         RandomVoiceSeconds = double.IsFinite(RandomVoiceSeconds) ? Math.Clamp(RandomVoiceSeconds, 0, 120) : 5;
         AppAudioVolumeDb = double.IsFinite(AppAudioVolumeDb) ? Math.Clamp(AppAudioVolumeDb, -40, 6) : -15;
+        LearnedPitchHz = double.IsFinite(LearnedPitchHz) && LearnedPitchHz is >= 40 and <= 1000 ? LearnedPitchHz : 0;
         foreach (var sound in Sounds)
         {
             sound.Name ??= "Sonido";

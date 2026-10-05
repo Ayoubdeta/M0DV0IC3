@@ -23,8 +23,11 @@ public sealed class VoiceProcessor : IAudioEffect
         _sampleRate = sampleRate;
         _fadeLength = sampleRate * 30 / 1000;
         _scratch = new float[maxBlockSize];
-        _current = _latestRequested = new VoiceChain(VoicePreset.Neutral, sampleRate, Range);
+        _current = _latestRequested = new VoiceChain(VoicePreset.Neutral, sampleRate, Range, Profile);
     }
+
+    /// <summary>Tono medio de la voz del usuario, compartido por todas las voces (no se pierde al cambiar de voz).</summary>
+    public PitchProfile Profile { get; } = new();
 
     /// <summary>Rango de voz con el que se crean las cadenas con PSOLA. Al cambiarlo, vuelve a llamar a <see cref="SetPreset"/>.</summary>
     public VoiceRange Range { get; set; } = VoiceRange.Medium;
@@ -43,7 +46,7 @@ public sealed class VoiceProcessor : IAudioEffect
         var latest = _latestRequested;
         if (liveEdit && latest.Range == Range && latest.TryUpdate(preset)) return;
 
-        var chain = new VoiceChain(preset, _sampleRate, Range);
+        var chain = new VoiceChain(preset, _sampleRate, Range, Profile);
         _latestRequested = chain;
         Volatile.Write(ref _incoming, chain);
     }

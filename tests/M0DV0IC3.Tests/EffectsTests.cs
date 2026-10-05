@@ -102,17 +102,18 @@ public sealed class EffectsTests(ITestOutputHelper output)
     [Fact]
     public void Mujer2_is_higher_and_brighter_than_mujer()
     {
-        var input = TestSignals.Vowel(120, 1.5, vibratoHz: 5);
+        var input = TestSignals.Vowel(120, 3.0, vibratoHz: 5);
         var mujer = TestSignals.ProcessInBlocks(new VoiceChain(BuiltInVoices.Find("mujer")!), input);
         var mujer2 = TestSignals.ProcessInBlocks(new VoiceChain(BuiltInVoices.Find("mujer2")!), input);
 
         // Rango de voz real: con los graves recortados y el aire, el formante de ~800 Hz engañaría a la autocorrelación.
-        double f0 = TestSignals.MeasureF0(TestSignals.Segment(mujer2, 0.6, 1.4), 80, 400);
-        double brightness1 = TestSignals.SpectralCentroid(TestSignals.Segment(mujer, 0.6, 1.4));
-        double brightness2 = TestSignals.SpectralCentroid(TestSignals.Segment(mujer2, 0.6, 1.4));
-        output.WriteLine($"mujer2: f0 {f0:F1} Hz (esperado {120 * DspMath.SemitonesToRatio(8):F1}), centroide {brightness1:F0} → {brightness2:F0} Hz");
+        double f1 = TestSignals.MeasureF0(TestSignals.Segment(mujer, 2.0, 2.9), 80, 400);
+        double f2 = TestSignals.MeasureF0(TestSignals.Segment(mujer2, 2.0, 2.9), 80, 400);
+        double brightness1 = TestSignals.SpectralCentroid(TestSignals.Segment(mujer, 2.0, 2.9));
+        double brightness2 = TestSignals.SpectralCentroid(TestSignals.Segment(mujer2, 2.0, 2.9));
+        output.WriteLine($"f0 {f1:F1} → {f2:F1} Hz, centroide {brightness1:F0} → {brightness2:F0} Hz");
 
-        Assert.InRange(f0, 120 * DspMath.SemitonesToRatio(8) * 0.97, 120 * DspMath.SemitonesToRatio(8) * 1.03);
+        Assert.True(f2 > f1 * 1.08);
         Assert.True(brightness2 > brightness1);
     }
 
@@ -250,7 +251,8 @@ public sealed class EffectsTests(ITestOutputHelper output)
         processor.SetPreset(mujer);
         processor.Process(new float[480]);
 
-        var edited = mujer with { Id = "custom", PitchSemitones = 7 };
+        // Sin tono objetivo, para comprobar el cambio fijo de semitonos.
+        var edited = mujer with { Id = "custom", TargetPitchHz = 0, PitchSemitones = 7 };
         processor.SetPreset(edited, liveEdit: true);
         Assert.Equal(7, processor.CurrentPreset.PitchSemitones);
 

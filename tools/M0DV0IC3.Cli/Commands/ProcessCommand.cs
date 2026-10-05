@@ -49,6 +49,11 @@ internal static class ProcessCommand
         Console.WriteLine($"Latencia de procesamiento: {pipeline.LatencySamples * 1000.0 / DspMath.SampleRate:0.0} ms ({pipeline.LatencySamples} muestras)" +
             $" · medida en la salida (inicios de sílaba): {(double.IsNaN(measured) ? "-" : $"{measured:0.0} ms")}");
         Console.WriteLine($"Pico de salida: {AudioFiles.Db(DspMath.Peak(cable))} dBFS (entrada {AudioFiles.Db(DspMath.Peak(input))} dBFS)");
+        if (voice.TargetPitchHz > 0)
+        {
+            var profile = pipeline.Voice.Profile;
+            Console.WriteLine($"Tono objetivo: {voice.TargetPitchHz:0} Hz · tu tono medio: {(profile.IsLearned ? $"{profile.CenterHz:0} Hz" : "sin aprender")}");
+        }
         Console.WriteLine($"Tiempo:    {timing.TotalMs:0.0} ms → {timing.TotalMs / (seconds * 10):0.00} % del tiempo real" +
             $" · bloque más lento {timing.MaxBlockMs:0.000} ms de {blockMs:0.0} ms (el primero, con JIT, {timing.FirstBlockMs:0.0} ms)");
         WarnIfUnhealthy(cable, "la salida");

@@ -19,7 +19,8 @@ public static class VoiceCategories
     public static VoiceCategory Of(string voiceId) => voiceId switch
     {
         "autotune" or "autotune-mujer" or "autotune-cantar" => VoiceCategory.Autotune,
-        "susurro" or "invertida" or "agua" or "espacial" or "radio" or "telefono" or "megafono" or "distorsion" => VoiceCategory.Effects,
+        "susurro" or "invertida" or "agua" or "espacial" or "radio" or "telefono" or "megafono" or "distorsion"
+            or "coro" or "vocoder" or "walkie" or "astronauta" => VoiceCategory.Effects,
         "lejana" or "cueva" or "reverb" or "delay" or "chorus" or "flanger" => VoiceCategory.Ambience,
         _ => VoiceCategory.Characters,
     };

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using M0DV0IC3.Dsp.Effects;
 using M0DV0IC3.Dsp.Pitch;
 
 namespace M0DV0IC3.Dsp.Presets;
@@ -17,6 +18,13 @@ public sealed record VoicePreset
 
     /// <summary>Cambio de tono en semitonos (-12..+12).</summary>
     public double PitchSemitones { get; init; }
+
+    /// <summary>
+    /// Tono objetivo en Hz (0 = apagado): la voz se lleva desde tu tono medio hasta este, sea tu voz grave o aguda.
+    /// <see cref="PitchSemitones"/> se usa hasta aprender tu tono medio y dice hacia dónde va la voz (si es positivo,
+    /// la voz siempre sube al menos 2 semitonos; si es negativo, siempre baja).
+    /// </summary>
+    public double TargetPitchHz { get; init; }
 
     /// <summary>Desplazamiento de formantes: menor que 1 = más grande u oscuro, mayor que 1 = más pequeño o brillante.</summary>
     public double FormantRatio { get; init; } = 1.0;
@@ -76,6 +84,30 @@ public sealed record VoicePreset
     /// <summary>Estantería de agudos en 3,5 kHz, en dB.</summary>
     public double HighShelfDb { get; init; }
 
+    /// <summary>Estantería de graves en 150 Hz, en dB (voz de locutor o de gigante).</summary>
+    public double LowShelfDb { get; init; }
+
+    /// <summary>Voz nasal: campana estrecha en 1,1 kHz, en dB.</summary>
+    public double NasalDb { get; init; }
+
+    /// <summary>Compresión 0..1: iguala lo que dices flojo y fuerte, como en la radio.</summary>
+    public double Compression { get; init; }
+
+    /// <summary>Coro 0..1: tu voz con copias una octava abajo, una quinta y una octava arriba.</summary>
+    public double HarmonyMix { get; init; }
+
+    /// <summary>Vocoder 0..1: tu voz da forma a un acorde de sintetizador (robot musical).</summary>
+    public double VocoderMix { get; init; }
+
+    /// <summary>Nota grave del acorde del vocoder, en Hz.</summary>
+    public double VocoderHz { get; init; } = 110;
+
+    /// <summary>Sonidos de radio alrededor de lo que dices: walkie-talkie o astronauta.</summary>
+    public TransmissionStyle Transmission { get; init; }
+
+    /// <summary>Volumen del ruido y los pitidos de la transmisión, 0..1.</summary>
+    public double TransmissionNoise { get; init; } = 0.6;
+
     public double ChorusMix { get; init; }
 
     public double FlangerMix { get; init; }
@@ -95,7 +127,12 @@ public sealed record VoicePreset
     /// <summary>Hace falta PSOLA (cambio de tono, formantes, robot o autotune), que añade algo de latencia.</summary>
     [JsonIgnore]
     public bool UsesPitch =>
-        Math.Abs(PitchSemitones) > 0.01 || Math.Abs(FormantRatio - 1.0) > 0.005 || RobotHz > 0 || AutotuneScale != AutotuneScale.Off;
+        Math.Abs(PitchSemitones) > 0.01 || Math.Abs(FormantRatio - 1.0) > 0.005 || RobotHz > 0 || AutotuneScale != AutotuneScale.Off
+        || TargetPitchHz > 0;
+
+    /// <summary>El coro usa tres PSOLA más: solo se crean si hacen falta.</summary>
+    [JsonIgnore]
+    public bool UsesHarmony => HarmonyMix > 0;
 
     /// <summary>La voz invertida necesita su propio buffer y añade un trozo entero de retardo.</summary>
     [JsonIgnore]

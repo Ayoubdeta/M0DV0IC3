@@ -42,6 +42,7 @@ public sealed class PsolaPitchShifter : IAudioEffect
     private readonly float[] _hann = new float[HannResolution + 2];
     private readonly YinPitchDetector _yin;
     private readonly PitchCorrector _corrector;
+    private readonly PitchProfile _profile;
     private readonly int _sampleRate;
     private readonly int _minPeriod;
     private readonly int _maxPeriod;
@@ -59,13 +60,18 @@ public sealed class PsolaPitchShifter : IAudioEffect
     private double _transposeSemitones;
     private double _formantRatio = 1.0;
     private double _robotHz;
+    private double _targetHz;
+    private double _minShift = -12;
+    private double _maxShift = 24;
+    private double _effectiveShift = double.NaN;
     private double _vibratoDepth;
     private WobbleLfo _vibrato;
     private double _previousHop;
 
-    public PsolaPitchShifter(int sampleRate, VoiceRange range = VoiceRange.Medium)
+    public PsolaPitchShifter(int sampleRate, VoiceRange range = VoiceRange.Medium, PitchProfile? profile = null)
     {
         _sampleRate = sampleRate;
+        _profile = profile ?? new PitchProfile();
         _minPeriod = (int)(sampleRate / range.MaxFrequency());
         _maxPeriod = (int)Math.Ceiling(sampleRate / range.MinFrequency());
         _yin = new YinPitchDetector(sampleRate, range.MinFrequency(), range.MaxFrequency());
@@ -91,11 +97,24 @@ public sealed class PsolaPitchShifter : IAudioEffect
 
     public int LatencySamples => (int)_latency;
 
+    /// <summary>Cambio de tono que se está aplicando ahora, en semitonos (con tono objetivo, el que se ha calculado).</summary>
+    public double EffectiveSemitones => double.IsNaN(_effectiveShift) ? _transposeSemitones : _effectiveShift;
+
+    public PitchProfile Profile => _profile;
+
     /// <summary>Cambia los parámetros. Se llama desde el hilo de audio y afecta a partir del siguiente grano.</summary>
     public void SetParameters(double pitchRatio, double formantRatio, double robotHz)
     {
         _pitchRatio = Math.Clamp(pitchRatio, 0.25, 4.0);
         _transposeSemitones = 12 * Math.Log2(_pitchRatio);
+        // Con tono objetivo, el signo del cambio fijo dice hacia dónde va la voz: una voz para subir nunca baja
+        // el tono (si ya hablas así de agudo, sube al menos 2 semitonos) y al revés.
+        (_minShift, _maxShift) = _transposeSemitones switch
+        {
+            > 0.01 => (2.0, 24.0),
+            < -0.01 => (-12.0, -2.0),
+            _ => (-12.0, 24.0),
+        };
         _formantRatio = Math.Clamp(formantRatio, 0.5, 2.0);
         _robotHz = robotHz > 0 ? Math.Clamp(robotHz, 40.0, 1000.0) : 0.0;
     }
@@ -108,6 +127,13 @@ public sealed class PsolaPitchShifter : IAudioEffect
         _corrector.Configure(scale, key, retuneMs, exaggeration);
 
     /// <summary>Vibrato (algo irregular) en el tono de salida: <paramref name="depthSemitones"/> de desviación máxima.</summary>
+    /// <summary>
+    /// Tono objetivo: en vez de un cambio fijo, el tono medio de la voz (<see cref="PitchProfile"/>) se lleva a
+    /// <paramref name="targetHz"/>, conservando la entonación. 0 lo apaga. Hasta aprender el tono medio se usa el
+    /// cambio fijo de <see cref="SetParameters"/>.
+    /// </summary>
+    public void SetTargetPitch(double targetHz) => _targetHz = targetHz > 0 ? Math.Clamp(targetHz, 40, 1000) : 0;
+
     public void SetVibrato(double rateHz, double depthSemitones)
     {
         _vibratoDepth = rateHz > 0 ? Math.Clamp(depthSemitones, 0, 3) : 0;
@@ -129,6 +155,7 @@ public sealed class PsolaPitchShifter : IAudioEffect
         _heldDelay = 0;
         _silentSamples = 0;
         _previousHop = 0;
+        _effectiveShift = double.NaN;
         _corrector.Reset();
         _vibrato.Reset();
     }
@@ -227,14 +254,21 @@ public sealed class PsolaPitchShifter : IAudioEffect
     /// </summary>
     private long AlignWithPrevious(long candidate, int radius, int step)
     {
+        // Primero cada 2 posiciones con una muestra de cada 4 (la señal está filtrada a 1,8 kHz: 12 kHz bastan) y
+        // luego se afina alrededor de la mejor. Cuesta la cuarta parte que probarlas todas, con el mismo resultado.
+        long pos = BestAlignment(candidate - radius, candidate + radius, 2, step / 2, 4);
+        return BestAlignment(pos - 1, pos + 1, 1, step / 2, 2);
+    }
+
+    private long BestAlignment(long from, long to, int stride, int half, int sampleStride)
+    {
         long previous = _lastMarkPos;
-        int half = step / 2;
-        long pos = candidate;
+        long pos = from;
         double best = double.MinValue;
-        for (long k = candidate - radius; k <= candidate + radius; k++)
+        for (long k = from; k <= to; k += stride)
         {
             double cross = 0, energy = 1e-12;
-            for (int j = -half; j <= half; j += 2)
+            for (int j = -half; j <= half; j += sampleStride)
             {
                 float a = _lowPassed[(int)((previous + j) & RingMask)];
                 float b = _lowPassed[(int)((k + j) & RingMask)];
@@ -278,15 +312,18 @@ public sealed class PsolaPitchShifter : IAudioEffect
             if (voiced)
             {
                 double vibrato = _vibratoDepth > 0 ? DspMath.SemitonesToRatio(_vibratoDepth * _vibrato.Value) : 1.0;
+                double inputHz = _sampleRate / basePeriod;
+                _profile.Add(inputHz, _previousHop / _sampleRate);
+                double shift = NextShift(_previousHop);
                 if (_robotHz > 0) hop = _sampleRate / (_robotHz * vibrato);
                 else if (_corrector.IsActive)
-                    hop = basePeriod / (_corrector.NextRatio(_sampleRate / basePeriod, _transposeSemitones, _previousHop) * vibrato);
+                    hop = basePeriod / (_corrector.NextRatio(inputHz, shift, _previousHop) * vibrato);
                 else
                 {
                     // Cambio de tono normal: cada ciclo de salida dura lo que su ciclo de entrada / ratio, así se
                     // conservan las pequeñas variaciones naturales de la voz. Con el periodo medio de YIN todos los
                     // ciclos salían idénticos, y una voz sin esas variaciones suena a sintetizador.
-                    hop = LocalPeriod(mi, basePeriod) / (_pitchRatio * vibrato);
+                    hop = LocalPeriod(mi, basePeriod) / (DspMath.SemitonesToRatio(shift) * vibrato);
                 }
                 center = _markPos[mi];
                 // Con mucho solapamiento (subir tono) los granos se suman coherentemente: se compensa el nivel.
@@ -312,6 +349,22 @@ public sealed class PsolaPitchShifter : IAudioEffect
             _previousHop = hop;
             _vibrato.Advance(hop);
         }
+    }
+
+    /// <summary>
+    /// Cambio de tono para el siguiente grano. Con tono objetivo sale del tono medio aprendido y cambia con
+    /// suavidad (~0,3 s), para que al aprenderlo o al moverse la media no haya saltos.
+    /// </summary>
+    private double NextShift(double elapsedSamples)
+    {
+        double target = _transposeSemitones;
+        if (_targetHz > 0 && _profile.IsLearned)
+            target = Math.Clamp(12 * Math.Log2(_targetHz / _profile.CenterHz), _minShift, _maxShift);
+
+        if (double.IsNaN(_effectiveShift)) _effectiveShift = target;
+        double seconds = elapsedSamples / _sampleRate;
+        _effectiveShift += seconds / (0.3 + seconds) * (target - _effectiveShift);
+        return _effectiveShift;
     }
 
     /// <summary>Distancia a la marca anterior si las dos son sonoras y es creíble (±25 % del periodo medio).</summary>

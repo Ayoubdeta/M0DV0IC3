@@ -6,7 +6,7 @@
 [![Última versión](https://img.shields.io/github/v/release/Ayoubdeta/M0DV0IC3?label=descargar)](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-a145f5)](LICENSE)
 
-> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 30 voices (among them a hard-tune autotune), a random voice mode, a soundboard, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in Spanish.
+> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 43 voices (among them a hard-tune autotune, and female, child or deep voices that adapt to your own pitch), a random voice mode, a soundboard, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in Spanish.
 
 Modulador de voz en tiempo real para Windows: cambia tu voz al vuelo (autotune, grave, mujer, robot, helio, fantasma…) y la ofrece como micrófono a Discord, juegos y cualquier app de llamadas. Incluye voz aleatoria, música de Spotify (u otra app) por el micro, soundboard, supresión de ruido (RNNoise), atajos globales, botón de silencio y la opción de escucharte.
 
@@ -53,13 +53,17 @@ La app no se conecta a internet, no pide permisos de administrador y solo usa tu
 | Grupo | Voces |
 |---|---|
 | Autotune | **Autotune**, **Autotune mujer**, **Autotune cantar** |
-| Personajes | Grave, Hombre, Mujer, Mujer 2, Niño, Pito / Ardilla, Helio, Robot, Demonio, Alien, Fantasma, Borracho |
-| Efectos | Susurro, Invertida (al revés), Bajo el agua, Espacial, Radio, Teléfono, Megáfono, Distorsión |
+| Personajes | Grave, Hombre, Mujer, Mujer 2, Niño, Pito / Ardilla, Helio, Robot, Demonio, Alien, Fantasma, Borracho, Bebé, Abuelo, Abuela, Gigante, Duende, Chica anime, Locutor de radio, Villano espacial, Zombi |
+| Efectos | Susurro, Invertida (al revés), Bajo el agua, Espacial, Radio, Teléfono, Megáfono, Distorsión, Coro, Vocoder, Walkie-talkie, Astronauta |
 | Ambientes | Lejana, Cueva / Eco, Reverb, Delay, Chorus, Flanger |
 
 Ctrl+Alt+1…9 eligen las nueve primeras voces de la lista, en este orden.
 
 Las voces incluidas no se editan: pulsa **Duplicar** y ajusta tu copia en el editor; los cambios se oyen al momento.
+
+**Voces que se adaptan a tu voz.** Mujer, Niño, Bebé, Chica anime, Grave, Gigante y las demás voces de otra edad o de otro sexo tienen un **tono objetivo** (por ejemplo, ~215 Hz para Mujer). La app aprende tu tono medio mientras hablas (lo ves en *Ajustes* y se guarda para la próxima vez) y calcula cuánto subir o bajar. Así suenan igual con una voz grave que con una aguda: con un cambio fijo de +5 semitonos, una voz de hombre grave (~90 Hz) se quedaba en ~120 Hz y seguía sonando a hombre.
+
+**Coro, Vocoder y Walkie-talkie.** El coro suma a tu voz copias una octava abajo, una quinta y una octava arriba. El vocoder convierte tu voz en un acorde de sintetizador. El walkie-talkie y el astronauta añaden ruido de radio mientras hablas y pitidos al empezar y al acabar; en silencio no suenan.
 
 **Autotune.** Es el autotune exagerado de los cantantes de reggaetón y trap:
 - La corrección es instantánea: la voz salta de nota en nota sin pasar por las intermedias, y el vibrato desaparece.

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -23,11 +23,6 @@
     <!-- Generados desde branding\m0dv0ic3-icon-rounded-1024.png -->
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\logo.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Sonidos incluidos en el soundboard (Kenney, CC0): van en la carpeta Sonidos junto al ejecutable. -->
-    <Content Include="Sonidos\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

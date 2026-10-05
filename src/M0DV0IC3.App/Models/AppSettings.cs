@@ -55,6 +55,9 @@ public sealed class AppSettings
 
     public List<SoundEntry> Sounds { get; set; } = [];
 
+    /// <summary>Versión del catálogo de sonidos incluidos que ya se añadió (<see cref="BuiltInSounds.Version"/>).</summary>
+    public int BuiltInSoundsVersion { get; set; }
+
     /// <summary>Acción → combinación ("Ctrl+Alt+V"). Una cadena vacía significa "sin atajo" (no se usa el de serie).</summary>
     public Dictionary<string, string> Hotkeys { get; set; } = [];
 
@@ -65,7 +68,7 @@ public sealed class AppSettings
         Sounds ??= [];
         Hotkeys ??= [];
         CustomVoices.RemoveAll(v => v is null);
-        Sounds.RemoveAll(s => s is null || string.IsNullOrWhiteSpace(s.Id) || string.IsNullOrWhiteSpace(s.FileName));
+        Sounds.RemoveAll(s => s is null || string.IsNullOrWhiteSpace(s.Id) || (string.IsNullOrWhiteSpace(s.FileName) && BuiltInSounds.Find(s.BuiltIn) is null));
         if (!Enum.IsDefined(VoiceRange)) VoiceRange = VoiceRange.Medium;
         SafetyMarginMs = double.IsFinite(SafetyMarginMs) ? Math.Clamp(SafetyMarginMs, 0.5, 20) : 2;
         GateThresholdDb = double.IsFinite(GateThresholdDb) ? Math.Clamp(GateThresholdDb, NoiseGate.DisabledThresholdDb, -20) : NoiseGate.DisabledThresholdDb;
@@ -80,15 +83,21 @@ public sealed class AppSettings
     }
 }
 
-/// <summary>Un sonido del soundboard. El archivo está copiado en %AppData%\M0DV0IC3\sounds.</summary>
+/// <summary>
+/// Un sonido del soundboard. Los del usuario están copiados en %AppData%\M0DV0IC3\sounds; los incluidos se leen
+/// de la carpeta Sonidos de la app.
+/// </summary>
 public sealed class SoundEntry
 {
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
     public string Name { get; set; } = "";
 
-    /// <summary>Nombre del archivo dentro de la carpeta sounds.</summary>
+    /// <summary>Nombre del archivo dentro de la carpeta sounds (vacío en los incluidos).</summary>
     public string FileName { get; set; } = "";
+
+    /// <summary>Sonido incluido: su <see cref="BuiltInSound.Path"/>. Quitarlo no borra el archivo.</summary>
+    public string? BuiltIn { get; set; }
 
     public double Volume { get; set; } = 1.0;
 

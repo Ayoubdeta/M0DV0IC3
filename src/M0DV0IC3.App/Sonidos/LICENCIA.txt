@@ -1,0 +1,16 @@
+Sonidos incluidos en M0DV0IC3
+=============================
+
+Todos son de Kenney (https://kenney.nl), con licencia Creative Commons Zero (CC0 1.0, dominio público):
+https://creativecommons.org/publicdomain/zero/1.0/
+Se pueden usar, modificar y distribuir sin pedir permiso. Kenney agradece que se le cite, aunque no es obligatorio.
+
+  radio/    Voiceover Pack (voz masculina: Jeffrey M. Smith)   https://kenney.nl/assets/voiceover-pack
+  locutor/  Voiceover Pack: Fighter                           https://kenney.nl/assets/voiceover-pack-fighter
+            mission-completed y mission-failed: Voiceover Pack (voz masculina)
+  efectos/  Music Jingles, Sci-Fi Sounds, Impact Sounds, Interface Sounds y Digital Audio
+            https://kenney.nl/assets/music-jingles  https://kenney.nl/assets/sci-fi-sounds
+            https://kenney.nl/assets/impact-sounds  https://kenney.nl/assets/interface-sounds
+            https://kenney.nl/assets/digital-audio
+
+Los archivos se han renombrado; el audio no se ha modificado.

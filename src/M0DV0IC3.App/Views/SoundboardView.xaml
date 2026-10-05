@@ -22,10 +22,17 @@
                         <TextBlock Text="Añadir sonido" />
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding StopAllCommand}" Margin="0,0,20,0" ToolTip="Parar todos los sonidos (Ctrl+Alt+S por defecto)" AutomationProperties.Name="Parar todo">
+                <Button Command="{Binding StopAllCommand}" Margin="0,0,8,0" ToolTip="Parar todos los sonidos (Ctrl+Alt+S por defecto)" AutomationProperties.Name="Parar todo">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE71A;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
                         <TextBlock Text="Parar todo" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding RestoreBuiltInSoundsCommand}" Margin="0,0,20,0" AutomationProperties.Name="Restaurar incluidos"
+                        ToolTip="Vuelve a añadir los sonidos incluidos que hayas quitado">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72C;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Restaurar incluidos" />
                     </StackPanel>
                 </Button>
                 <TextBlock Text="Volumen general" VerticalAlignment="Center" Margin="0,0,10,0" />
@@ -43,12 +50,28 @@
 
             <Grid>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding Sounds}" Margin="0,0,6,12" Focusable="False">
+                    <ItemsControl ItemsSource="{Binding SoundsView}" Margin="0,0,6,12" Focusable="False">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+                        <!-- Cabecera de cada grupo, como en Voces: barra con su color, título y subtítulo -->
+                        <ItemsControl.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="8,10,0,2">
+                                            <Border Width="4" Height="20" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"
+                                                    Background="{Binding Name.Accent, Converter={StaticResource CategoryAccent}}" />
+                                            <TextBlock Text="{Binding Name.Title}" FontFamily="{StaticResource HeadingFont}" FontSize="17" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Name.Subtitle}" Style="{StaticResource MutedText}" FontSize="12.5" Margin="12,1,0,0"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ItemsControl.GroupStyle>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:SoundItemViewModel}">
                                 <Grid Margin="6">

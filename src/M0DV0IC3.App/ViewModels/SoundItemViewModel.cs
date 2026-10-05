@@ -44,6 +44,10 @@ public sealed partial class SoundItemViewModel : ObservableObject
 
     public string Id => Entry.Id;
 
+    public bool IsBuiltIn => Entry.BuiltIn is not null;
+
+    public SoundGroup Group => BuiltInSounds.Find(Entry.BuiltIn)?.Group ?? BuiltInSounds.Mine;
+
     public HotkeyBindingViewModel Hotkey { get; }
 
     public bool IsReady => Clip is not null && !IsLoading;

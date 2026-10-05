@@ -10,6 +10,8 @@ M0DV0IC3 incluye en su descarga el siguiente software de terceros. Gracias a sus
 | RNNoise (rnnoise.dll, supresión de ruido) | BSD-3-Clause | © Xiph.Org Foundation, © Mozilla, © Jean-Marc Valin y otros | https://github.com/xiph/rnnoise |
 | CommunityToolkit.Mvvm | MIT | © .NET Foundation and Contributors | https://github.com/CommunityToolkit/dotnet |
 | H.NotifyIcon (H.NotifyIcon, H.NotifyIcon.Wpf, H.GeneratedIcons.System.Drawing) | MIT | © havendv | https://github.com/HavenDV/H.NotifyIcon |
+| NVorbis y NAudio.Vorbis (lectura de archivos OGG) | MIT | © Andrew Ward, © Mark Heath | https://github.com/NVorbis/NVorbis · https://github.com/naudio/Vorbis |
+| Sonidos incluidos en el soundboard (carpeta `Sonidos`) | CC0 1.0 (dominio público) | Kenney Vleugels (Kenney.nl); voz de la radio: Jeffrey M. Smith | https://kenney.nl · detalle en `Sonidos\LICENCIA.txt` |
 
 **VB-Audio Virtual Cable** no se incluye ni se redistribuye: es donationware de VB-Audio Software y cada usuario lo descarga e instala desde https://vb-audio.com/Cable/.
 

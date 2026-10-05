@@ -1,5 +1,6 @@
 using M0DV0IC3.Dsp;
 using NAudio.Wave;
+using NAudio.Vorbis;
 using NAudio.Wave.SampleProviders;
 
 namespace M0DV0IC3.Audio.Soundboard;
@@ -42,11 +43,25 @@ public static class SoundLoader
         return new SoundClip(id, name, samples.ToArray());
     }
 
-    /// <summary>WAV y AIFF con los lectores de NAudio; MP3, WMA, AAC, FLAC… con Media Foundation (el decodificador de Windows).</summary>
+    /// <summary>
+    /// WAV y AIFF con los lectores de NAudio, OGG Vorbis con NVorbis (Windows no lo decodifica) y MP3, WMA, AAC,
+    /// FLAC… con Media Foundation (el decodificador de Windows).
+    /// </summary>
     private static WaveStream Open(string path)
     {
         string extension = Path.GetExtension(path).ToLowerInvariant();
         if (extension is ".aiff" or ".aif") return new AiffFileReader(path);
+        if (extension == ".ogg")
+        {
+            try
+            {
+                return new VorbisWaveReader(path);
+            }
+            catch (Exception ex) when (ex is not IOException and not UnauthorizedAccessException)
+            {
+                // Un OGG que no es Vorbis (Opus, FLAC…): que lo intente Media Foundation.
+            }
+        }
         if (extension == ".wav")
         {
             var wav = new WaveFileReader(path);

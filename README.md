@@ -6,9 +6,9 @@
 [![Última versión](https://img.shields.io/github/v/release/Ayoubdeta/M0DV0IC3?label=descargar)](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-a145f5)](LICENSE)
 
-> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 30 voices (among them a hard-tune autotune), a random voice mode, a soundboard, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in Spanish.
+> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 30 voices (among them a hard-tune autotune), a random voice mode, a soundboard with 36 built-in sounds, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in Spanish.
 
-Modulador de voz en tiempo real para Windows: cambia tu voz al vuelo (autotune, grave, mujer, robot, helio, fantasma…) y la ofrece como micrófono a Discord, juegos y cualquier app de llamadas. Incluye voz aleatoria, música de Spotify (u otra app) por el micro, soundboard, supresión de ruido (RNNoise), atajos globales, botón de silencio y la opción de escucharte.
+Modulador de voz en tiempo real para Windows: cambia tu voz al vuelo (autotune, grave, mujer, robot, helio, fantasma…) y la ofrece como micrófono a Discord, juegos y cualquier app de llamadas. Incluye voz aleatoria, música de Spotify (u otra app) por el micro, soundboard con 36 sonidos incluidos, supresión de ruido (RNNoise), atajos globales, botón de silencio y la opción de escucharte.
 
 La interfaz sigue el logo: barra lateral, fondo morado oscuro, violeta para lo que eliges, lima para lo que está activo y el efecto glitch (copias desplazadas lima y violeta) en los títulos, la voz elegida y el interruptor VOZ ON.
 
@@ -84,6 +84,13 @@ En el editor puedes elegir:
 - Tú la sigues oyendo como siempre.
 - Si la app se cierra o se reinicia, se vuelve a enganchar sola.
 
+**Soundboard** (pestaña Soundboard): trae 36 sonidos incluidos, de [Kenney](https://kenney.nl) con licencia CC0 (dominio público):
+- **Radio:** órdenes en inglés como las del Counter (*Fire in the hole!*, *Go, go, go!*, *Cover me!*, *Reloading!*…).
+- **Locutor:** el de los juegos de lucha (*Round 1*, *Fight!*, *Flawless victory*, *Game over*…).
+- **Efectos:** melodías de victoria y derrota, saxo triste, explosión, láser, campanazo…
+
+Añade los tuyos con «Añadir sonido» o arrastrando archivos (WAV, MP3, OGG, FLAC…). Cada sonido puede tener su propio atajo de teclado. Si quitas uno de los incluidos, «Restaurar incluidos» lo recupera.
+
 ## Latencia
 
 Medida con el motor completo en el PC de desarrollo (`m0dv0ic3-cli engine`, auriculares USB Logitech):
@@ -156,7 +163,7 @@ micro (WASAPI) → RNNoise → puerta de ruido → voz (PSOLA + efectos) → + s
 | `src/M0DV0IC3.Audio` | WASAPI propio sobre NAudio 3: exclusivo, compartido de baja latencia o compartido con conversión automática. Hilos MMCSS "Pro Audio", ring buffers sin bloqueos con compensación de deriva de reloj, RNNoise por P/Invoke, mezclador del soundboard. **El hilo de audio no reserva memoria** (lo comprueba un test). |
 | `src/M0DV0IC3.App` | Interfaz WPF (MVVM): barra lateral, barra de título propia, voces por grupos, editor de voz, soundboard, música por el micro, atajos globales y bandeja del sistema. El tema (`Themes/Theme.xaml`) no usa animaciones continuas: una sola animación infinita con brillo costaba un 10 % de un núcleo de CPU. |
 | `tools/M0DV0IC3.Cli` | Herramientas offline y de diagnóstico. |
-| `tests/M0DV0IC3.Tests` | Tono medido tras PSOLA y tras el autotune, latencia real frente a la reportada, cero asignaciones, rendimiento, deriva de reloj, RNNoise, soundboard. |
+| `tests/M0DV0IC3.Tests` | Tono medido tras PSOLA y tras el autotune, latencia real frente a la reportada, cero asignaciones, rendimiento, deriva de reloj, RNNoise, soundboard y sonidos incluidos. |
 
 ## Licencia
 

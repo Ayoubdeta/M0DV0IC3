@@ -4,3 +4,4 @@
 *.txt text eol=crlf
 *.png binary
 *.ico binary
+*.ogg binary

@@ -90,7 +90,8 @@ public sealed class SpeechAndRecordingTests(ITestOutputHelper output)
     [Fact]
     public void The_recording_has_what_went_out_through_the_mic_and_becomes_an_mp3()
     {
-        string folder = Path.Combine(Path.GetTempPath(), "m0dv0ic3-tests", Guid.NewGuid().ToString("N"));
+        // Una sola carpeta, que se borra entera al acabar (antes quedaba la carpeta "m0dv0ic3-tests" de por medio).
+        string folder = Path.Combine(Path.GetTempPath(), $"m0dv0ic3-test-{Guid.NewGuid():N}");
         string wav = Path.Combine(folder, "grabacion.wav");
         try
         {

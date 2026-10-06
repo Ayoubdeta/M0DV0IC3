@@ -165,6 +165,13 @@ public sealed partial class VoicesViewModel : ObservableObject
     }
 
     /// <summary>Voz anterior o siguiente. Con el filtro de favoritas, solo entre las favoritas.</summary>
+    /// <summary>Elige una voz por su id (p. ej., "autotune-cantar" desde el karaoke) y enciende la voz.</summary>
+    public void ActivateById(string id)
+    {
+        var card = AllCards.FirstOrDefault(c => c.Id == id);
+        if (card is not null) Activate(card);
+    }
+
     public void ActivateRelative(int delta)
     {
         var cards = ShownCards().ToList();

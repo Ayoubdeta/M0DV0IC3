@@ -6,7 +6,7 @@
 [![Última versión](https://img.shields.io/github/v/release/Ayoubdeta/M0DV0IC3?label=descargar)](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)
 [![Licencia MIT](https://img.shields.io/badge/licencia-MIT-a145f5)](LICENSE)
 
-> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 64 voices (among them a hard-tune autotune, and female, child or deep voices that adapt to your own pitch), a random voice mode, a soundboard, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in Spanish.
+> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 64 voices, a karaoke mode for Spotify (vocal removal and synced lyrics) (among them a hard-tune autotune, and female, child or deep voices that adapt to your own pitch), a random voice mode, a soundboard, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in Spanish.
 
 Modulador de voz en tiempo real para Windows: cambia tu voz al vuelo (autotune, grave, mujer, robot, helio, fantasma…) y la ofrece como micrófono a Discord, juegos y cualquier app de llamadas. Incluye voz aleatoria, música de Spotify (u otra app) por el micro, soundboard, supresión de ruido (RNNoise), atajos globales, botón de silencio y la opción de escucharte.
 
@@ -30,7 +30,7 @@ Si un antivirus marca la descarga, es un falso positivo: [cómo avisar para que 
 
 Cada versión la compila GitHub Actions directamente desde este código fuente, sin pasar por ningún ordenador personal. Junto al ZIP se publican su huella SHA-256 y una atestación de procedencia, que prueba de qué repositorio y commit sale. Se puede verificar con `gh attestation verify M0DV0IC3-vX.Y.Z-win-x64.zip --repo Ayoubdeta/M0DV0IC3`.
 
-La app no se conecta a internet, no pide permisos de administrador y solo usa tu micrófono y, si lo activas, el sonido de la app que elijas para «Música por el micro».
+La app solo se conecta a internet en el modo karaoke, para buscar la letra en lrclib.net (envía el artista, el título y la duración de la canción). No pide permisos de administrador y solo usa tu micrófono y, si lo activas, el sonido de la app que elijas para «Música por el micro» o el karaoke.
 
 ## Puesta en marcha
 
@@ -89,6 +89,12 @@ En el editor puedes elegir:
 - Solo se captura esa app (process loopback de Windows 10 2004 o posterior): ni Discord ni el resto del sistema, así que nadie se oye a sí mismo.
 - Tú la sigues oyendo como siempre.
 - Si la app se cierra o se reinicia, se vuelve a enganchar sola.
+
+**Modo karaoke** (pestaña Karaoke, o Ctrl+Alt+K): pon una canción en Spotify y actívalo.
+- La app reconoce la canción (título, artista y por dónde va, con los controles multimedia de Windows) y busca su letra en [LRCLIB](https://lrclib.net). Si está sincronizada, la línea que toca se ilumina y la letra avanza sola; «Antes» y «Después» la ajustan si va desfasada.
+- La voz se quita con un filtro que atenúa lo que suena en el centro de la mezcla, solo en la zona de la voz: conserva el bajo, el bombo y los platillos. En algunas canciones quedan los coros o el eco de la voz.
+- La canción sin voz suena en tus cascos (elígelos en «AURICULARES · ESCUCHARME») y en Discord, junto con tu voz. Para que no la oigas dos veces, Spotify se baja al mínimo en Windows mientras tanto y recupera su volumen al apagarlo.
+- «Cantar con autotune» elige la voz Autotune cantar.
 
 **Soundboard** (pestaña Soundboard): arrastra tus sonidos (WAV, MP3, OGG, FLAC…) o pulsa «Añadir sonido». Con el engranaje de cada sonido le pones nombre, volumen, atajo y lo **recortas**: arrastra las marcas de inicio y fin sobre la forma de onda, o pulsa «Quitar silencios». El archivo original no se toca y «Sonido entero» lo deshace; «Exportar WAV…» guarda el trozo como archivo nuevo. El **+ del teclado numérico** para todos los sonidos que estén sonando.
 

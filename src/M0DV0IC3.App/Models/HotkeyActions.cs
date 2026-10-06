@@ -13,6 +13,7 @@ public static class HotkeyActions
     public const string NextVoice = "NextVoice";
     public const string ToggleRandomVoice = "ToggleRandomVoice";
     public const string ToggleAppAudio = "ToggleAppAudio";
+    public const string ToggleKaraoke = "ToggleKaraoke";
     public const string StopSounds = "StopSounds";
     public const string SoundPrefix = "Sound:";
 
@@ -47,6 +48,7 @@ public static class HotkeyActions
             new(NextVoice, "Voz siguiente", "Ctrl+Alt+Right"),
             new(ToggleRandomVoice, "Voz aleatoria (activar / desactivar)", "Ctrl+Alt+R"),
             new(ToggleAppAudio, "Música por el micro (activar / desactivar)", "Ctrl+Alt+P"),
+            new(ToggleKaraoke, "Modo karaoke (activar / desactivar)", "Ctrl+Alt+K"),
         };
         for (int n = 1; n <= 9; n++)
             list.Add(new(VoiceAction(n), $"Elegir la voz n.º {n} de la lista", $"Ctrl+Alt+{n}"));

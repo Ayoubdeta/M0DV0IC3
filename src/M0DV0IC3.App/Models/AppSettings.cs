@@ -47,6 +47,18 @@ public sealed class AppSettings
 
     public double AppAudioVolumeDb { get; set; } = -15;
 
+    /// <summary>Karaoke: cuánta voz se quita de la canción (0..1).</summary>
+    public double KaraokeVocalStrength { get; set; } = 1.0;
+
+    /// <summary>Karaoke: adelanto (positivo) o retraso de la letra, en segundos.</summary>
+    public double KaraokeLyricsOffset { get; set; }
+
+    /// <summary>
+    /// Volumen que tenía Spotify antes del karaoke, mientras está bajado (0 = no está bajado). Si la app se cierra de
+    /// golpe, al volver a abrirla se le devuelve: Windows guarda el volumen de cada app.
+    /// </summary>
+    public double KaraokeRestoreVolume { get; set; }
+
     public bool MinimizeToTray { get; set; } = true;
 
     public bool StartMinimized { get; set; }
@@ -94,6 +106,9 @@ public sealed class AppSettings
         SoundboardVolume = double.IsFinite(SoundboardVolume) ? Math.Clamp(SoundboardVolume, 0, 2) : 1;
         RandomVoiceSeconds = double.IsFinite(RandomVoiceSeconds) ? Math.Clamp(RandomVoiceSeconds, 0, 120) : 5;
         AppAudioVolumeDb = double.IsFinite(AppAudioVolumeDb) ? Math.Clamp(AppAudioVolumeDb, -40, 6) : -15;
+        KaraokeVocalStrength = double.IsFinite(KaraokeVocalStrength) ? Math.Clamp(KaraokeVocalStrength, 0, 1) : 1;
+        KaraokeLyricsOffset = double.IsFinite(KaraokeLyricsOffset) ? Math.Clamp(KaraokeLyricsOffset, -10, 10) : 0;
+        KaraokeRestoreVolume = double.IsFinite(KaraokeRestoreVolume) ? Math.Clamp(KaraokeRestoreVolume, 0, 1) : 0;
         LearnedPitchHz = double.IsFinite(LearnedPitchHz) && LearnedPitchHz is >= 40 and <= 1000 ? LearnedPitchHz : 0;
         foreach (var sound in Sounds)
         {

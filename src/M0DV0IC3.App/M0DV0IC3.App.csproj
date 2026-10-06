@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- 10.0.19041: la API de Windows que dice qué suena en Spotify (modo karaoke). La app ya pedía Windows 10 2004. -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <RootNamespace>M0DV0IC3.App</RootNamespace>
     <AssemblyName>M0DV0IC3</AssemblyName>
     <UseWPF>true</UseWPF>
@@ -23,6 +24,12 @@
     <!-- Generados desde branding\m0dv0ic3-icon-rounded-1024.png -->
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- La proyección de las API de Windows ocupa 25 MB y precompilada (ReadyToRun) 55 MB. La app solo usa los
+         controles multimedia (karaoke), así que se deja sin precompilar. -->
+    <PublishReadyToRunExclude Include="Microsoft.Windows.SDK.NET.dll" />
   </ItemGroup>
 
   <ItemGroup>

@@ -91,6 +91,7 @@ public sealed partial class MainViewModel : ObservableObject
         Voices = new VoicesViewModel(settings, Hotkeys);
         Soundboard = new SoundboardViewModel(settings, audio.Pipeline.Soundboard, Hotkeys);
         Music = new MusicViewModel(settings, audio);
+        Karaoke = new KaraokeViewModel(settings, audio, Music, Voices, () => HasMonitor);
 
         var pipeline = audio.Pipeline;
         pipeline.Voice.Range = s.VoiceRange;
@@ -131,6 +132,24 @@ public sealed partial class MainViewModel : ObservableObject
     public SoundboardViewModel Soundboard { get; }
 
     public MusicViewModel Music { get; }
+
+    public KaraokeViewModel Karaoke { get; }
+
+    /// <summary>Pestaña de la barra lateral que se ve (la del karaoke es la 3).</summary>
+    public int SelectedPage
+    {
+        get => _selectedPage;
+        set
+        {
+            if (_selectedPage == value) return;
+            _selectedPage = value;
+            OnPropertyChanged();
+            Karaoke.SetPageVisible(value == KaraokePage);
+        }
+    }
+
+    private const int KaraokePage = 3;
+    private int _selectedPage;
 
     public ObservableCollection<DeviceItem> InputDevices { get; } = [];
 
@@ -317,6 +336,7 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Al salir: para timers, sonidos y atajos (el motor lo para AudioService).</summary>
     public void Shutdown()
     {
+        Karaoke.Shutdown();
         var profile = _audio.Pipeline.Voice.Profile;
         if (profile.IsLearned) _settings.Current.LearnedPitchHz = Math.Round(profile.CenterHz, 1);
         _meterTimer.Stop();
@@ -669,6 +689,9 @@ public sealed partial class MainViewModel : ObservableObject
                 break;
             case HotkeyActions.ToggleAppAudio:
                 if (Music.IsSupported) Music.IsStreaming = !Music.IsStreaming;
+                break;
+            case HotkeyActions.ToggleKaraoke:
+                if (Karaoke.IsSupported) Karaoke.IsOn = !Karaoke.IsOn;
                 break;
             case HotkeyActions.StopSounds:
                 Soundboard.StopAll();

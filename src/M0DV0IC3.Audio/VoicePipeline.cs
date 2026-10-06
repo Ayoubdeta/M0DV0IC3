@@ -35,6 +35,7 @@ public sealed class VoicePipeline : IDisposable
     private volatile bool _muted;
     private volatile bool _monitorVoice;
     private volatile bool _monitorSounds = true;
+    private volatile bool _appAudioToMonitor;
     private bool _rnNoiseActive;
 
     public VoicePipeline(bool loadNoiseSuppression = true)
@@ -96,6 +97,13 @@ public sealed class VoicePipeline : IDisposable
     {
         get => Volatile.Read(ref _appAudioSource);
         set => Volatile.Write(ref _appAudioSource, value);
+    }
+
+    /// <summary>La música de la app también va a los auriculares (modo karaoke: la oyes para cantar encima).</summary>
+    public bool AppAudioToMonitor
+    {
+        get => _appAudioToMonitor;
+        set => _appAudioToMonitor = value;
     }
 
     /// <summary>Volumen de la música de la app (ganancia lineal, 0..4).</summary>
@@ -160,9 +168,9 @@ public sealed class VoicePipeline : IDisposable
         }
 
         var appSource = AppAudio;
+        var app = _appAudio.AsSpan(0, n);
         if (appSource is not null)
         {
-            var app = _appAudio.AsSpan(0, n);
             appSource.Render(app);
             float gain = _appAudioGain;
             for (int i = 0; i < n; i++) app[i] *= gain;
@@ -184,8 +192,9 @@ public sealed class VoicePipeline : IDisposable
 
         bool withVoice = _monitorVoice;
         bool withSounds = hasSounds && _monitorSounds;
+        bool withMusic = appSource is not null && _appAudioToMonitor;
         for (int i = 0; i < n; i++)
-            monitor[i] = (withVoice ? voice[i] : 0f) + (withSounds ? sounds[i] : 0f);
+            monitor[i] = (withVoice ? voice[i] : 0f) + (withSounds ? sounds[i] : 0f) + (withMusic ? app[i] : 0f);
         _monitorLimiter.Process(monitor);
     }
 }

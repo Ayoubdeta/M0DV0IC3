@@ -1,5 +1,6 @@
 using M0DV0IC3.Audio.Realtime;
 using M0DV0IC3.Dsp;
+using M0DV0IC3.Dsp.Effects;
 
 namespace M0DV0IC3.Audio.AppAudio;
 
@@ -18,7 +19,10 @@ public sealed class AppAudioStreamer : IDisposable
 
     private readonly VoicePipeline _pipeline;
     private readonly Lock _gate = new();
+    private readonly VocalRemover _remover = new();
     private AppAudioCapture? _capture;
+    private bool _removeVocals;
+    private float _gain = 1f;
 
     public AppAudioStreamer(VoicePipeline pipeline) => _pipeline = pipeline;
 
@@ -29,6 +33,41 @@ public sealed class AppAudioStreamer : IDisposable
     public AudioApp? Current { get; private set; }
 
     public bool IsRunning => Volatile.Read(ref _capture) is not null;
+
+    /// <summary>Modo karaoke: quita la voz de la canción (ver <see cref="VocalRemover"/>). Vale también para capturas futuras.</summary>
+    public bool RemoveVocals
+    {
+        get => _removeVocals;
+        set
+        {
+            lock (_gate)
+            {
+                _removeVocals = value;
+                if (_capture is { } capture) capture.RemoveVocals = value;
+            }
+        }
+    }
+
+    /// <summary>Cuánta voz se quita en el modo karaoke (0..1).</summary>
+    public float VocalRemovalStrength
+    {
+        get => _remover.Strength;
+        set => _remover.Strength = value;
+    }
+
+    /// <summary>Ganancia de la captura: compensa que el karaoke baja el volumen de Spotify en Windows.</summary>
+    public float CaptureGain
+    {
+        get => _gain;
+        set
+        {
+            lock (_gate)
+            {
+                _gain = value;
+                if (_capture is { } capture) capture.Gain = value;
+            }
+        }
+    }
 
     /// <summary>La captura ha fallado mientras sonaba (ya está parada). Se lanza en un hilo del pool.</summary>
     public event EventHandler<Exception>? Faulted;
@@ -41,7 +80,7 @@ public sealed class AppAudioStreamer : IDisposable
             StopCore();
             var ring = new SpscRingBuffer(RingCapacity);
             var reader = new DriftCompensatedReader(ring, (int)(SafetyMs * DspMath.SampleRate / 1000));
-            var capture = new AppAudioCapture(app.ProcessId, ring);
+            var capture = new AppAudioCapture(app.ProcessId, ring, _remover) { RemoveVocals = _removeVocals, Gain = _gain };
             capture.Faulted += OnCaptureFaulted;
             try
             {

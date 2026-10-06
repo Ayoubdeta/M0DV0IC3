@@ -78,6 +78,37 @@ public sealed partial class MusicViewModel : ObservableObject
 
     private bool CanToggle() => IsSupported && (SelectedApp is not null || IsStreaming);
 
+    /// <summary>
+    /// Transmite esta app (por su ejecutable, "Spotify"), aunque estuviera transmitiendo otra. Lo usa el karaoke.
+    /// Devuelve false si la app no está abierta o no se pudo capturar (el motivo queda en <see cref="Message"/>).
+    /// </summary>
+    public async Task<bool> StreamAppAsync(string exeName)
+    {
+        Refresh();
+        var app = Apps.FirstOrDefault(a => a.ExeName.Equals(exeName, StringComparison.OrdinalIgnoreCase));
+        if (app is null)
+        {
+            Message = $"{exeName} no está abierto.";
+            return false;
+        }
+        if (IsStreaming && string.Equals(_streamer.Current?.ExeName, exeName, StringComparison.OrdinalIgnoreCase)) return true;
+
+        _refreshing = true;
+        _syncing = true;
+        try
+        {
+            SelectedApp = app;
+            IsStreaming = true;
+        }
+        finally
+        {
+            _refreshing = false;
+            _syncing = false;
+        }
+        await StartAsync();
+        return _streamer.IsRunning;
+    }
+
     [RelayCommand]
     private void Refresh()
     {

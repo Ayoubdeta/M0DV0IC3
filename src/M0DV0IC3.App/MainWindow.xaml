@@ -59,10 +59,11 @@
                     </StackPanel>
                 </Border>
 
-                <ListBox x:Name="Nav" Style="{StaticResource NavList}" SelectedIndex="0">
+                <ListBox x:Name="Nav" Style="{StaticResource NavList}" SelectedIndex="{Binding SelectedPage}">
                     <ListBoxItem Tag="&#xE720;" Content="Voces" />
                     <ListBoxItem Tag="&#xE767;" Content="Soundboard" />
                     <ListBoxItem Tag="&#xEC4F;" Content="Música" />
+                    <ListBoxItem Tag="&#xE8D6;" Content="Karaoke" />
                     <ListBoxItem Tag="&#xE765;" Content="Atajos" />
                     <ListBoxItem Tag="&#xE713;" Content="Ajustes" />
                     <ListBoxItem Tag="&#xE897;" Content="Ayuda" />
@@ -217,10 +218,12 @@
                                           Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=1}" />
                     <views:MusicView DataContext="{Binding Music}"
                                      Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=2}" />
-                    <views:HotkeysView DataContext="{Binding Hotkeys}"
+                    <views:KaraokeView DataContext="{Binding Karaoke}"
                                        Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=3}" />
-                    <views:SettingsView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=4}" />
-                    <views:HelpView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=5}" />
+                    <views:HotkeysView DataContext="{Binding Hotkeys}"
+                                       Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=4}" />
+                    <views:SettingsView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=5}" />
+                    <views:HelpView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=6}" />
                 </Grid>
             </Grid>
         </DockPanel>

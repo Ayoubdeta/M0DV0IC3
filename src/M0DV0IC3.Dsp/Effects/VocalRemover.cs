@@ -33,9 +33,8 @@ public sealed class VocalRemover
     private readonly float[] _ready = new float[Hop];
     private readonly double[] _re = new double[FrameSize];
     private readonly double[] _im = new double[FrameSize];
-    private readonly double[] _powerLeft = new double[Bins];
-    private readonly double[] _powerRight = new double[Bins];
-    private readonly double[] _cross = new double[Bins];
+    private readonly double[] _powerMid = new double[Bins];
+    private readonly double[] _powerSide = new double[Bins];
     private readonly double[] _gain = new double[Bins];
     private int _filled = FrameSize - Hop;
     private float _strength = 1f;
@@ -88,9 +87,8 @@ public sealed class VocalRemover
         Array.Clear(_inRight);
         Array.Clear(_overlap);
         Array.Clear(_ready);
-        Array.Clear(_powerLeft);
-        Array.Clear(_powerRight);
-        Array.Clear(_cross);
+        Array.Clear(_powerMid);
+        Array.Clear(_powerSide);
         _filled = FrameSize - Hop;
     }
 
@@ -115,13 +113,13 @@ public sealed class VocalRemover
             // Potencias de la mezcla central M = (L + R) / 2 y de la lateral S = (L - R) / 2.
             double mRe = 0.5 * (lRe + rRe), mIm = 0.5 * (lIm + rIm);
             double sRe = 0.5 * (lRe - rRe), sIm = 0.5 * (lIm - rIm);
-            _powerLeft[k] = Smoothing * _powerLeft[k] + (1 - Smoothing) * (mRe * mRe + mIm * mIm);
-            _powerRight[k] = Smoothing * _powerRight[k] + (1 - Smoothing) * (sRe * sRe + sIm * sIm);
+            _powerMid[k] = Smoothing * _powerMid[k] + (1 - Smoothing) * (mRe * mRe + mIm * mIm);
+            _powerSide[k] = Smoothing * _powerSide[k] + (1 - Smoothing) * (sRe * sRe + sIm * sIm);
 
             // Lo que suena a un lado, o distinto en cada canal, pone la misma potencia en M que en S; lo que está en el
             // centro solo pone potencia en M. Así que lo que no es del centro es una parte S / M de M, y esa es la
             // ganancia (filtro de Wiener): la voz del centro desaparece y lo demás se queda.
-            double keep = Math.Min(1.0, _powerRight[k] / (_powerLeft[k] + 1e-20));
+            double keep = Math.Min(1.0, _powerSide[k] / (_powerMid[k] + 1e-20));
             _gain[k] = 1 - strength * _bandWeight[k] * (1 - keep);
 
             // De momento se guarda la mezcla mono (L + R) / 2 de esta frecuencia.
@@ -154,9 +152,8 @@ public sealed class VocalRemover
         Array.Copy(_inRight, Hop, _inRight, 0, FrameSize - Hop);
         for (int k = 0; k < Bins; k++)
         {
-            _powerLeft[k] = DspMath.FlushDenormal(_powerLeft[k]);
-            _powerRight[k] = DspMath.FlushDenormal(_powerRight[k]);
-            _cross[k] = DspMath.FlushDenormal(_cross[k]);
+            _powerMid[k] = DspMath.FlushDenormal(_powerMid[k]);
+            _powerSide[k] = DspMath.FlushDenormal(_powerSide[k]);
         }
     }
 }

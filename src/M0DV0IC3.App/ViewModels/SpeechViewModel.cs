@@ -249,7 +249,7 @@ public sealed partial class SpeechViewModel : ObservableObject
     private PhraseItemViewModel CreateItem(PhraseEntry entry)
     {
         HotkeyGesture? gesture = HotkeyGesture.TryParse(entry.Hotkey, out var parsed) ? parsed : null;
-        var binding = new HotkeyBindingViewModel(_hotkeys, HotkeyActions.PhraseAction(entry.Id), $"Frase: {Shorten(entry.Text)}", gesture);
+        var binding = new HotkeyBindingViewModel(_hotkeys, HotkeyActions.PhraseAction(entry.Id), Shorten(entry.Text), gesture);
         binding.GestureChanged += (_, _) =>
         {
             entry.Hotkey = binding.Gesture?.ToString();

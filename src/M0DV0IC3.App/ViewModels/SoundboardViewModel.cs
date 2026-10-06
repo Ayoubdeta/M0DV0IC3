@@ -175,7 +175,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
     private SoundItemViewModel CreateItem(SoundEntry entry)
     {
         HotkeyGesture? gesture = HotkeyGesture.TryParse(entry.Hotkey, out var parsed) ? parsed : null;
-        var binding = new HotkeyBindingViewModel(_hotkeys, HotkeyActions.SoundAction(entry.Id), $"Sonido: {entry.Name}", gesture);
+        var binding = new HotkeyBindingViewModel(_hotkeys, HotkeyActions.SoundAction(entry.Id), entry.Name, gesture);
         binding.GestureChanged += (_, _) =>
         {
             entry.Hotkey = binding.Gesture?.ToString();

@@ -171,6 +171,7 @@ public sealed partial class VoicesViewModel : ObservableObject
             _settings.Current.HoldVoiceId = value?.Id;
             _settings.ScheduleSave();
             OnPropertyChanged();
+            UpdateHoldDetail();
         }
     }
 
@@ -367,6 +368,8 @@ public sealed partial class VoicesViewModel : ObservableObject
         {
             card.Preset = preset;
             SaveCustomVoices();
+            // Si se ha cambiado el nombre, que se vea también en la pestaña Atajos.
+            UpdateHotkeyHints();
             PresetEdited?.Invoke(this, card);
         }, CloseEditor);
     }
@@ -379,14 +382,34 @@ public sealed partial class VoicesViewModel : ObservableObject
         _settings.ScheduleSave();
     }
 
+    /// <summary>
+    /// El atajo de cada una de las nueve primeras voces en su tarjeta, y el nombre de la voz en la fila «Voz N» de la
+    /// pestaña Atajos.
+    /// </summary>
     private void UpdateHotkeyHints()
     {
-        int index = 0;
-        foreach (var card in AllCards)
+        var cards = AllCards.ToList();
+        for (int index = 0; index < cards.Count; index++)
+            cards[index].HotkeyHint = index < 9 ? _hotkeys.Find(HotkeyActions.VoiceAction(index + 1))?.Gesture?.DisplayText : null;
+
+        for (int n = 1; n <= 9; n++)
         {
-            card.HotkeyHint = index < 9 ? _hotkeys.Find(HotkeyActions.VoiceAction(index + 1))?.Gesture?.DisplayText : null;
-            index++;
+            if (_hotkeys.Find(HotkeyActions.VoiceAction(n)) is not { } binding) continue;
+            var card = n <= cards.Count ? cards[n - 1] : null;
+            binding.VoiceIcon = card?.Icon;
+            binding.VoiceName = card?.Name;
+            binding.Detail = card is null ? "Todavía no hay ninguna voz en esa posición" : null;
         }
+        UpdateHoldDetail();
+    }
+
+    private void UpdateHoldDetail()
+    {
+        if (_hotkeys.Find(HotkeyActions.HoldVoice) is not { } binding) return;
+        var card = HoldVoice;
+        binding.Detail = card is null ? "Elige en la pestaña Voces qué voz suena («Al mantener»)" : "Mientras lo mantienes suena";
+        binding.VoiceIcon = card?.Icon;
+        binding.VoiceName = card?.Name;
     }
 
     private string UniqueName(string baseName)

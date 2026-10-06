@@ -104,6 +104,8 @@ En el editor puedes elegir:
 
 **Grabar** (botón de la barra inferior, o Ctrl+Alt+G): graba lo que sale por el micro, tal y como lo oyen los demás: tu voz con su efecto, los sonidos, las frases y la música del karaoke. Se guarda en MP3 en *Música\M0DV0IC3*; al acabar puedes abrir la carpeta o añadir la grabación al soundboard.
 
+**Atajos** (pestaña Atajos): todos los atajos de teclado globales, agrupados (Voz, Sonidos, Frases, Micro y auriculares, Música, karaoke y grabación, Elegir una voz) y con un buscador que encuentra acciones, sonidos, frases o teclas. Cada fila dice qué hace; las de «Voz 1…9» y «Mantener pulsado» muestran la voz a la que llevan. Funcionan dentro de los juegos; si un juego se ejecuta como administrador, abre M0DV0IC3 también como administrador.
+
 ## Latencia
 
 Medida con el motor completo en el PC de desarrollo (`m0dv0ic3-cli engine`, auriculares USB Logitech):

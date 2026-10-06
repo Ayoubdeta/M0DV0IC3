@@ -1,6 +1,19 @@
 namespace M0DV0IC3.App.Models;
 
-public sealed record HotkeyActionInfo(string Id, string Label, string? DefaultGesture);
+/// <summary>Grupos de la pestaña Atajos, en el orden en que se muestran.</summary>
+public enum HotkeyGroup
+{
+    Voice,
+    Sounds,
+    Phrases,
+    Mic,
+    Music,
+    PickVoice,
+}
+
+/// <param name="Label">Nombre corto de la acción.</param>
+/// <param name="Detail">Qué hace, en una línea (o null).</param>
+public sealed record HotkeyActionInfo(string Id, string Label, string? DefaultGesture, HotkeyGroup Group, string? Detail = null);
 
 /// <summary>Acciones globales con atajo de teclado. Los sonidos usan además "Sound:{id}" y las frases "Phrase:{id}".</summary>
 public static class HotkeyActions
@@ -45,24 +58,24 @@ public static class HotkeyActions
     {
         var list = new List<HotkeyActionInfo>
         {
-            new(ToggleVoice, "Activar / desactivar la voz", "Ctrl+Alt+V"),
-            new(ToggleMute, "Silenciar / reactivar el micrófono", "Ctrl+Alt+X"),
-            new(ToggleMonitor, "Escucharme (activar / desactivar)", "Ctrl+Alt+M"),
-            new(ToggleNoise, "Supresión de ruido (activar / desactivar)", "Ctrl+Alt+N"),
-            new(PrevVoice, "Voz anterior", "Ctrl+Alt+Left"),
-            new(NextVoice, "Voz siguiente", "Ctrl+Alt+Right"),
-            new(ToggleRandomVoice, "Voz aleatoria (activar / desactivar)", "Ctrl+Alt+R"),
+            new(ToggleVoice, "Activar / desactivar la voz", "Ctrl+Alt+V", HotkeyGroup.Voice, "El interruptor VOZ ON de arriba"),
             // El - del teclado numérico, sin Ctrl ni Alt: se mantiene pulsado con un dedo en mitad de una partida.
-            new(HoldVoice, "Mantener pulsado: usar la voz elegida en Voces (al soltar, vuelve la de antes)", "Subtract"),
-            new(ToggleAppAudio, "Música por el micro (activar / desactivar)", "Ctrl+Alt+P"),
-            new(ToggleKaraoke, "Modo karaoke (activar / desactivar)", "Ctrl+Alt+K"),
-            new(ToggleRecording, "Grabar lo que sale por el micro (empezar / parar)", "Ctrl+Alt+G"),
+            new(HoldVoice, "Mantener pulsado para cambiar de voz", "Subtract", HotkeyGroup.Voice),
+            new(PrevVoice, "Voz anterior", "Ctrl+Alt+Left", HotkeyGroup.Voice, "Con el filtro de favoritas, solo entre ellas"),
+            new(NextVoice, "Voz siguiente", "Ctrl+Alt+Right", HotkeyGroup.Voice, "Con el filtro de favoritas, solo entre ellas"),
+            new(ToggleRandomVoice, "Voz aleatoria", "Ctrl+Alt+R", HotkeyGroup.Voice, "Cambia sola de voz cada pocos segundos"),
+            // El + del teclado numérico, sin Ctrl ni Alt: así se para un sonido largo con una sola tecla. El + del teclado
+            // principal no se puede usar solo, porque dejaría de escribirse "+" en todas las apps.
+            new(StopSounds, "Parar sonidos y frases", "Add", HotkeyGroup.Sounds, "Corta todo lo que esté sonando"),
+            new(ToggleMute, "Silenciar el micro", "Ctrl+Alt+X", HotkeyGroup.Mic, "Nadie te oye: ni tu voz, ni los sonidos, ni la música"),
+            new(ToggleMonitor, "Escucharme", "Ctrl+Alt+M", HotkeyGroup.Mic, "Oír tu voz cambiada en los cascos"),
+            new(ToggleNoise, "Supresión de ruido", "Ctrl+Alt+N", HotkeyGroup.Mic, "Quita el ruido de fondo (teclado, ventilador)"),
+            new(ToggleAppAudio, "Música por el micro", "Ctrl+Alt+P", HotkeyGroup.Music, "Lo que suena en Spotify llega a Discord con tu voz"),
+            new(ToggleKaraoke, "Modo karaoke", "Ctrl+Alt+K", HotkeyGroup.Music, "Quita la voz de la canción y muestra la letra"),
+            new(ToggleRecording, "Grabar", "Ctrl+Alt+G", HotkeyGroup.Music, "Lo que sale por el micro, en MP3 en Música\\M0DV0IC3"),
         };
         for (int n = 1; n <= 9; n++)
-            list.Add(new(VoiceAction(n), $"Elegir la voz n.º {n} de la lista", $"Ctrl+Alt+{n}"));
-        // El + del teclado numérico, sin Ctrl ni Alt: así se para un sonido largo con una sola tecla. El + del teclado
-        // principal no se puede usar solo, porque dejaría de escribirse "+" en todas las apps.
-        list.Add(new(StopSounds, "Parar todos los sonidos y frases", "Add"));
+            list.Add(new(VoiceAction(n), $"Voz {n}", $"Ctrl+Alt+{n}", HotkeyGroup.PickVoice));
         return list;
     }
 }

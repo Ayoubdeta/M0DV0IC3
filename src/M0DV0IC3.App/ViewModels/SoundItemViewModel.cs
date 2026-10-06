@@ -218,7 +218,7 @@ public sealed partial class SoundItemViewModel : ObservableObject
     partial void OnNameChanged(string value)
     {
         Entry.Name = value;
-        Hotkey.Label = $"Sonido: {value}";
+        Hotkey.Label = value;
         _owner.OnItemChanged();
     }
 

@@ -11,7 +11,10 @@ public readonly record struct HotkeyGesture(ModifierKeys Modifiers, Key Key)
 {
     public uint VirtualKey => (uint)KeyInterop.VirtualKeyFromKey(Key);
 
-    public string DisplayText => Join(Modifiers, DisplayKeyName(Key), spanish: true);
+    public string DisplayText => string.Join("+", DisplayParts);
+
+    /// <summary>Cada tecla por separado, para dibujarlas: ["Ctrl", "Alt", "V"], ["Num +"].</summary>
+    public IReadOnlyList<string> DisplayParts => Parts(Modifiers, DisplayKeyName(Key), spanish: true);
 
     public static bool TryParse(string? text, out HotkeyGesture gesture)
     {
@@ -58,9 +61,9 @@ public readonly record struct HotkeyGesture(ModifierKeys Modifiers, Key Key)
         or Key.Pause or Key.Scroll or Key.Insert
         or >= Key.MediaNextTrack and <= Key.MediaPlayPause;
 
-    public override string ToString() => Join(Modifiers, KeyName(Key), spanish: false);
+    public override string ToString() => string.Join("+", Parts(Modifiers, KeyName(Key), spanish: false));
 
-    private static string Join(ModifierKeys modifiers, string key, bool spanish)
+    private static List<string> Parts(ModifierKeys modifiers, string key, bool spanish)
     {
         var parts = new List<string>(5);
         if (modifiers.HasFlag(ModifierKeys.Control)) parts.Add("Ctrl");
@@ -68,7 +71,7 @@ public readonly record struct HotkeyGesture(ModifierKeys Modifiers, Key Key)
         if (modifiers.HasFlag(ModifierKeys.Shift)) parts.Add(spanish ? "Mayús" : "Shift");
         if (modifiers.HasFlag(ModifierKeys.Windows)) parts.Add("Win");
         parts.Add(key);
-        return string.Join("+", parts);
+        return parts;
     }
 
     private static bool TryParseKey(string text, out Key key)

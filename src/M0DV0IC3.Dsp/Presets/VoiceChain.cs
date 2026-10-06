@@ -41,16 +41,23 @@ public sealed class VoiceChain : IAudioEffect
     private readonly Flanger _flanger;
     private readonly Echo _echo;
     private readonly Reverb _reverb;
+    private readonly bool _inTune;
     private float _outputGain = 1f;
     private VoicePreset? _pending;
 
     /// <param name="profile">Tono medio de la voz, compartido entre cadenas (para las voces con tono objetivo).</param>
-    public VoiceChain(VoicePreset preset, int sampleRate = DspMath.SampleRate, VoiceRange range = VoiceRange.Medium, PitchProfile? profile = null)
+    /// <param name="inTune">
+    /// Para cantar encima de una canción (la voz del cantante): la melodía no puede cambiar de tonalidad. Ver
+    /// <see cref="InTune"/>.
+    /// </param>
+    public VoiceChain(VoicePreset preset, int sampleRate = DspMath.SampleRate, VoiceRange range = VoiceRange.Medium, PitchProfile? profile = null,
+        bool inTune = false)
     {
         _sampleRate = sampleRate;
+        _inTune = inTune;
         Range = range;
         if (preset.UsesReverse) _reverse = new Reverse(sampleRate);
-        if (preset.UsesPitch) _psola = new PsolaPitchShifter(sampleRate, range, profile);
+        if (preset.UsesPitch) _psola = new PsolaPitchShifter(sampleRate, range, profile) { OctavesOnly = inTune };
         if (preset.UsesHarmony) _harmonizer = new Harmonizer(sampleRate, range);
         _vibrato = new Vibrato(sampleRate);
         _whisper = new Whisper(sampleRate);
@@ -154,8 +161,22 @@ public sealed class VoiceChain : IAudioEffect
         _reverb.Reset();
     }
 
+    /// <summary>
+    /// La misma voz, pero afinada con la canción: el cambio de tono va en octavas (<see cref="PsolaPitchShifter.OctavesOnly"/>),
+    /// el autotune ajusta a todas las notas y sin exagerar la melodía (su tonalidad de serie, La menor, no tiene por qué
+    /// ser la de la canción) y el robot, que habla en una nota fija, pasa a ser un autotune duro que sigue la melodía.
+    /// </summary>
+    public static VoicePreset InTune(VoicePreset p) => p with
+    {
+        AutotuneScale = p.AutotuneScale != AutotuneScale.Off || p.RobotHz > 0 ? AutotuneScale.Chromatic : AutotuneScale.Off,
+        AutotuneRetuneMs = p.RobotHz > 0 ? 0 : p.AutotuneRetuneMs,
+        AutotuneExaggeration = 0,
+        RobotHz = 0,
+    };
+
     private void Apply(VoicePreset p)
     {
+        if (_inTune) p = InTune(p);
         _reverse?.Configure(p.ReverseMs);
         if (_psola is not null)
         {

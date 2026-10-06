@@ -96,6 +96,7 @@ En el editor puedes elegir:
 - La voz se separa con el mismo filtro que el karaoke, pasa por su propia cadena de voz y se vuelve a mezclar. Medido con 140 canciones, ~80 % de la voz del cantante coge la voz nueva; la música del centro que va con ella también, y queda algo de la voz original de fondo, ~4,5 dB por debajo de la música.
 - La canción cambiada suena en tus cascos y en Discord, y la app (Spotify) se baja en Windows mientras tanto para que no la oigas dos veces.
 - Es una voz aparte de la tuya: puedes hablar con tu voz normal mientras el cantante suena como una ardilla. No va a la vez que el karaoke.
+- Va afinada con la canción. El tono del cantante solo cambia en octavas: Ardilla lo sube una octava en vez de 8 semitonos, que pasarían la melodía a otra tonalidad y desafinaría con la música. El autotune sigue todas las notas (no las de La menor) y el robot canta la melodía en vez de una nota fija. Medido con una canción real: con +8 semitonos ninguna nota quedaba en la tonalidad; en octavas, el 74 % (la canción original da el 81 % con la misma medida). Tu voz del micro no cambia.
 
 **Modo karaoke** (pestaña Karaoke, o Ctrl+Alt+K): pon una canción en Spotify y actívalo.
 - La app reconoce la canción (título, artista y por dónde va, con los controles multimedia de Windows) y busca su letra en [LRCLIB](https://lrclib.net). Si está sincronizada, la línea que toca se ilumina y la letra avanza sola; «Antes» y «Después» la ajustan si va desfasada.

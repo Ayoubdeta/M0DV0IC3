@@ -102,6 +102,13 @@ public sealed class PsolaPitchShifter : IAudioEffect
 
     public PitchProfile Profile => _profile;
 
+    /// <summary>
+    /// Solo octavas: el cambio de tono (fijo o calculado con el tono objetivo) se redondea a octavas enteras, y sin
+    /// transición. Para cantar encima de una canción: subir 8 semitonos pasa la melodía a otra tonalidad y choca con
+    /// la música; una octava la deja en la misma. Por debajo de 3 semitonos no se cambia.
+    /// </summary>
+    public bool OctavesOnly { get; init; }
+
     /// <summary>Cambia los parámetros. Se llama desde el hilo de audio y afecta a partir del siguiente grano.</summary>
     public void SetParameters(double pitchRatio, double formantRatio, double robotHz)
     {
@@ -361,11 +368,17 @@ public sealed class PsolaPitchShifter : IAudioEffect
         if (_targetHz > 0 && _profile.IsLearned)
             target = Math.Clamp(12 * Math.Log2(_targetHz / _profile.CenterHz), _minShift, _maxShift);
 
+        // En octavas el cambio es de golpe: una transición pasaría por notas desafinadas.
+        if (OctavesOnly) return _effectiveShift = ToOctaves(target);
         if (double.IsNaN(_effectiveShift)) _effectiveShift = target;
         double seconds = elapsedSamples / _sampleRate;
         _effectiveShift += seconds / (0.3 + seconds) * (target - _effectiveShift);
         return _effectiveShift;
     }
+
+    /// <summary>+8 → +12, -5 → -12, +19 → +24, +2 → 0.</summary>
+    public static double ToOctaves(double semitones) =>
+        Math.Abs(semitones) < 3 ? 0 : Math.Sign(semitones) * 12 * Math.Max(1, Math.Round(Math.Abs(semitones) / 12));
 
     /// <summary>Distancia a la marca anterior si las dos son sonoras y es creíble (±25 % del periodo medio).</summary>
     private double LocalPeriod(int mark, double averagePeriod)

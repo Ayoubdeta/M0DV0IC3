@@ -60,7 +60,7 @@
                     <TextBlock Style="{StaticResource BodyText}"
                                l:Rich.Text="{l:T '**Modo karaoke** (pestaña Karaoke, o Ctrl+Alt+K): quita la voz de la canción de Spotify, la pone en tus cascos y en Discord y muestra la letra para que cantes encima.'}" />
                     <TextBlock Style="{StaticResource BodyText}"
-                               l:Rich.Text="{l:T '**Voz del cantante** (pestaña Música): le cambia la voz a quien canta (Ardilla, Demonio, Robot…) y deja la música como está. Es una voz aparte de la tuya.'}" />
+                               l:Rich.Text="{l:T '**Voz del cantante** (pestaña Música): le cambia la voz a quien canta (Ardilla, Demonio, Robot…) y deja la música como está. Es una voz aparte de la tuya. Va afinada con la canción: el tono solo cambia en octavas, para que la melodía no se salga de la tonalidad.'}" />
                 </StackPanel>
             </Border>
 

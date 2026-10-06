@@ -10,6 +10,7 @@ namespace M0DV0IC3.Dsp.Presets;
 public sealed class VoiceProcessor : IAudioEffect
 {
     private readonly int _sampleRate;
+    private readonly bool _inTune;
     private readonly int _fadeLength;
     private readonly float[] _scratch;
     private VoiceChain _current;
@@ -18,9 +19,11 @@ public sealed class VoiceProcessor : IAudioEffect
     private VoiceChain _latestRequested;
     private int _fadePos;
 
-    public VoiceProcessor(int sampleRate = DspMath.SampleRate, int maxBlockSize = 8192)
+    /// <param name="inTune">Voces afinadas con una canción (la del cantante): ver <see cref="VoiceChain.InTune"/>.</param>
+    public VoiceProcessor(int sampleRate = DspMath.SampleRate, int maxBlockSize = 8192, bool inTune = false)
     {
         _sampleRate = sampleRate;
+        _inTune = inTune;
         _fadeLength = sampleRate * 30 / 1000;
         _scratch = new float[maxBlockSize];
         _current = _latestRequested = new VoiceChain(VoicePreset.Neutral, sampleRate, Range, Profile);
@@ -46,7 +49,7 @@ public sealed class VoiceProcessor : IAudioEffect
         var latest = _latestRequested;
         if (liveEdit && latest.Range == Range && latest.TryUpdate(preset)) return;
 
-        var chain = new VoiceChain(preset, _sampleRate, Range, Profile);
+        var chain = new VoiceChain(preset, _sampleRate, Range, Profile, _inTune);
         _latestRequested = chain;
         Volatile.Write(ref _incoming, chain);
     }

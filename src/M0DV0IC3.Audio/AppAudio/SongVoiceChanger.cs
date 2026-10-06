@@ -11,7 +11,9 @@ namespace M0DV0IC3.Audio.AppAudio;
 /// la música que suena en el centro, ~2 dB por debajo de la voz, y la voz original que se queda sin cambiar suena
 /// ~4,5 dB por debajo de la música. El bajo casi no se toca (-16 dB).</para>
 /// <para>La voz tiene su propio tono medio (el del cantante), así que las voces con tono objetivo (Mujer, Grave...)
-/// cambian lo justo para cada canción. El resto espera lo que tarda la voz, para que el cantante no vaya por detrás.</para>
+/// cambian lo justo para cada canción. Y va afinada con la música (<see cref="VoiceChain.InTune"/>): el tono solo cambia
+/// en octavas, porque subir, por ejemplo, 8 semitonos pasaría la melodía a otra tonalidad y desafinaría con la canción.
+/// El resto espera lo que tarda la voz, para que el cantante no vaya por detrás.</para>
 /// Entra estéreo y sale mono. No reserva memoria al procesar.
 /// </summary>
 public sealed class SongVoiceChanger
@@ -28,7 +30,7 @@ public sealed class SongVoiceChanger
     {
         _rest = new float[maxBlockSize];
         _vocals = new float[maxBlockSize];
-        Voice = new VoiceProcessor(DspMath.SampleRate, maxBlockSize);
+        Voice = new VoiceProcessor(DspMath.SampleRate, maxBlockSize, inTune: true);
     }
 
     /// <summary>La voz que se le pone al cantante (se cambia con <see cref="VoiceProcessor.SetPreset"/>).</summary>

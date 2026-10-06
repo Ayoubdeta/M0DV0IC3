@@ -65,6 +65,12 @@
                        Text="Cuando añadas sonidos en la pestaña Soundboard, aquí podrás asignarles un atajo."
                        Visibility="{Binding HasSoundBindings, Converter={StaticResource BoolToCollapsed}}" />
 
+            <TextBlock Text="Frases de texto a voz" Style="{StaticResource SectionHeader}" Margin="0,22,0,6" />
+            <ItemsControl ItemsSource="{Binding PhraseBindings}" ItemTemplate="{StaticResource BindingRow}" Focusable="False" />
+            <TextBlock Style="{StaticResource MutedText}"
+                       Text="Cuando guardes frases en la pestaña Texto a voz, aquí podrás asignarles un atajo."
+                       Visibility="{Binding HasPhraseBindings, Converter={StaticResource BoolToCollapsed}}" />
+
             <Button Content="Restablecer los atajos de serie" Command="{Binding ResetDefaultsCommand}" HorizontalAlignment="Left" Margin="0,18,0,0" />
         </StackPanel>
     </ScrollViewer>

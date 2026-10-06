@@ -20,6 +20,9 @@ internal static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool UnregisterHotKey(IntPtr hWnd, int id);
 
+    [LibraryImport("user32.dll")]
+    public static partial short GetAsyncKeyState(int virtualKey);
+
     [LibraryImport("user32.dll", EntryPoint = "MapVirtualKeyW")]
     public static partial uint MapVirtualKey(uint code, uint mapType);
 

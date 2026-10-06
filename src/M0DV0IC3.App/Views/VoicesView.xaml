@@ -137,8 +137,23 @@
                     <TextBlock Text="Voz aleatoria" />
                 </ToggleButton>
                 <ComboBox ItemsSource="{Binding RandomIntervals}" DisplayMemberPath="Label" SelectedValuePath="Seconds"
-                          SelectedValue="{Binding RandomSeconds}" Width="150" Margin="0,0,0,8" VerticalAlignment="Center"
+                          SelectedValue="{Binding RandomSeconds}" Width="150" Margin="0,0,20,8" VerticalAlignment="Center"
                           ToolTip="Cada cuánto cambia la voz aleatoria" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center"
+                            ToolTip="Mientras mantienes pulsado ese atajo suena esta voz; al soltarlo vuelve la que tenías (o ninguna, si estaba apagada). El atajo se cambia en Atajos.">
+                    <TextBlock Text="{Binding HoldKeyText}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ComboBox ItemsSource="{Binding HoldVoiceChoices}" SelectedItem="{Binding HoldVoice}" Width="180"
+                              AutomationProperties.Name="Voz al mantener pulsado">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:VoiceCardViewModel}">
+                                <TextBlock>
+                                    <Run Text="{Binding Icon, Mode=OneWay}" FontFamily="{StaticResource EmojiFont}" />
+                                    <Run Text="{Binding Name, Mode=OneWay}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
             </WrapPanel>
             <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" FontSize="12.5" Margin="4,0,6,10"
                        Text="Haz clic en una voz para usarla y en su estrella para guardarla en favoritas. Las voces incluidas no se pueden editar: duplícalas para crear tu versión." />

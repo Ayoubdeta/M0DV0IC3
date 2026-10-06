@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <!-- La proyección de las API de Windows ocupa 25 MB y precompilada (ReadyToRun) 55 MB. La app solo usa los
-         controles multimedia (karaoke), así que se deja sin precompilar. -->
+         controles multimedia (karaoke) y la síntesis de voz (texto a voz), así que se deja sin precompilar. -->
     <PublishReadyToRunExclude Include="Microsoft.Windows.SDK.NET.dll" />
   </ItemGroup>
 

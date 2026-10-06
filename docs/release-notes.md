@@ -20,4 +20,4 @@ Este ZIP lo ha compilado GitHub directamente desde el código fuente público de
 - **Atestación de procedencia** (prueba firmada de que sale de este repositorio y de este commit), con [GitHub CLI](https://cli.github.com/):
   `gh attestation verify {ZIP} --repo {REPO}`
 
-La app solo se conecta a internet en el modo karaoke, para buscar la letra en lrclib.net (envía el artista, el título y la duración de la canción). No pide permisos de administrador y solo usa tu micrófono y, si lo activas, el sonido de la app que elijas para «Música por el micro» o el karaoke.
+La app solo se conecta a internet en el modo karaoke, para buscar la letra en lrclib.net (envía el artista, el título y la duración de la canción). El texto a voz usa las voces de Windows, sin internet, y las grabaciones se quedan en tu PC. No pide permisos de administrador y solo usa tu micrófono y, si lo activas, el sonido de la app que elijas para «Música por el micro» o el karaoke.

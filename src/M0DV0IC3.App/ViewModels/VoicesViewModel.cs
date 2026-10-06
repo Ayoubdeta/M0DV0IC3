@@ -94,9 +94,12 @@ public sealed partial class VoicesViewModel : ObservableObject
 
         foreach (var binding in hotkeys.Actions)
             if (HotkeyActions.TryGetVoiceIndex(binding.ActionId, out _)) binding.GestureChanged += (_, _) => UpdateHotkeyHints();
+        if (hotkeys.Find(HotkeyActions.HoldVoice) is { } hold) hold.GestureChanged += (_, _) => OnPropertyChanged(nameof(HoldKeyText));
         Custom.CollectionChanged += (_, _) =>
         {
             UpdateHotkeyHints();
+            OnPropertyChanged(nameof(HoldVoiceChoices));
+            OnPropertyChanged(nameof(HoldVoice));
             OnPropertyChanged(nameof(HasCustom));
             OnPropertyChanged(nameof(ShowCustomSection));
             OnPropertyChanged(nameof(ShowNoCustomHint));
@@ -158,13 +161,31 @@ public sealed partial class VoicesViewModel : ObservableObject
     /// <summary>Orden de la lista para los atajos Voz 1..9 y anterior/siguiente: incluidas y luego personalizadas.</summary>
     public IEnumerable<VoiceCardViewModel> AllCards => BuiltIn.Concat(Custom);
 
+    /// <summary>La voz que suena mientras mantienes pulsado su atajo (null = ninguna).</summary>
+    public VoiceCardViewModel? HoldVoice
+    {
+        get => AllCards.FirstOrDefault(c => c.Id == _settings.Current.HoldVoiceId);
+        set
+        {
+            if (value?.Id == _settings.Current.HoldVoiceId) return;
+            _settings.Current.HoldVoiceId = value?.Id;
+            _settings.ScheduleSave();
+            OnPropertyChanged();
+        }
+    }
+
+    public IReadOnlyList<VoiceCardViewModel> HoldVoiceChoices => AllCards.ToList();
+
+    public string HoldKeyText => _hotkeys.Find(HotkeyActions.HoldVoice)?.Gesture is { } gesture
+        ? $"Al mantener {gesture.DisplayText}:"
+        : "Al mantener (sin atajo):";
+
     public void ActivateIndex(int index)
     {
         var card = AllCards.ElementAtOrDefault(index);
         if (card is not null) Activate(card);
     }
 
-    /// <summary>Voz anterior o siguiente. Con el filtro de favoritas, solo entre las favoritas.</summary>
     /// <summary>Elige una voz por su id (p. ej., "autotune-cantar" desde el karaoke) y enciende la voz.</summary>
     public void ActivateById(string id)
     {
@@ -172,6 +193,7 @@ public sealed partial class VoicesViewModel : ObservableObject
         if (card is not null) Activate(card);
     }
 
+    /// <summary>Voz anterior o siguiente. Con el filtro de favoritas, solo entre las favoritas.</summary>
     public void ActivateRelative(int delta)
     {
         var cards = ShownCards().ToList();

@@ -62,6 +62,7 @@
                 <ListBox x:Name="Nav" Style="{StaticResource NavList}" SelectedIndex="{Binding SelectedPage}">
                     <ListBoxItem Tag="&#xE720;" Content="Voces" />
                     <ListBoxItem Tag="&#xE767;" Content="Soundboard" />
+                    <ListBoxItem Tag="&#xE8F2;" Content="Texto a voz" />
                     <ListBoxItem Tag="&#xEC4F;" Content="Música" />
                     <ListBoxItem Tag="&#xE8D6;" Content="Karaoke" />
                     <ListBoxItem Tag="&#xE765;" Content="Atajos" />
@@ -170,6 +171,10 @@
                         <WrapPanel>
                             <ToggleButton Style="{StaticResource DangerChip}" Tag="&#xE74F;" Content="Silenciar" IsChecked="{Binding Muted}"
                                           ToolTip="Corta tu voz, los sonidos y la música hacia Discord y los auriculares, al instante (Ctrl+Alt+X por defecto). Úsalo también si oyes acople." />
+                            <ToggleButton Style="{StaticResource DangerChip}" Tag="&#xE7C8;" Content="{Binding Recorder.ButtonText}"
+                                          IsChecked="{Binding Recorder.Recording}" IsEnabled="{Binding Recorder.CanToggle}" ToolTipService.ShowOnDisabled="True"
+                                          AutomationProperties.Name="Grabar"
+                                          ToolTip="Graba lo que sale por el micro (tu voz con su efecto, los sonidos, las frases y la música del karaoke) y lo guarda en MP3 en Música\M0DV0IC3 (Ctrl+Alt+G por defecto)." />
                             <ToggleButton Style="{StaticResource Chip}" Tag="&#xE7F6;" Content="Escucharme" IsChecked="{Binding MonitorVoice}"
                                           IsEnabled="{Binding HasMonitor}" ToolTipService.ShowOnDisabled="True"
                                           ToolTip="Oír tu voz modificada en los auriculares. Primero elige tus auriculares arriba." />
@@ -203,6 +208,25 @@
                                        Visibility="{Binding GateWarning, Converter={StaticResource NullToCollapsed}}"
                                        ToolTip="La puerta de ruido solo deja pasar el sonido más fuerte que su umbral, y tu micro no llega. Muévela a la izquierda hasta que la barra «Salida» se mueva al hablar, o déjala en «apagada»." />
                         </Grid>
+                        <!-- Resultado de la última grabación -->
+                        <WrapPanel Margin="0,8,0,0" Visibility="{Binding Recorder.ShowResult, Converter={StaticResource BoolToVisible}}">
+                            <TextBlock Text="Guardando la grabación…" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,12,0"
+                                       Visibility="{Binding Recorder.IsSaving, Converter={StaticResource BoolToVisible}}" />
+                            <TextBlock Foreground="{StaticResource LimeBrush}" VerticalAlignment="Center" Margin="0,0,12,0" TextTrimming="CharacterEllipsis"
+                                       MaxWidth="420" Visibility="{Binding Recorder.SavedName, Converter={StaticResource NullToCollapsed}}">
+                                <Run Text="✔ Grabación guardada:" />
+                                <Run Text="{Binding Recorder.SavedName, Mode=OneWay}" FontWeight="SemiBold" />
+                            </TextBlock>
+                            <TextBlock Text="{Binding Recorder.Error}" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Center" Margin="0,0,12,0"
+                                       TextWrapping="Wrap" MaxWidth="520" Visibility="{Binding Recorder.Error, Converter={StaticResource NullToCollapsed}}" />
+                            <Button Content="Abrir carpeta" Command="{Binding Recorder.OpenFolderCommand}" Padding="10,3" FontSize="12" Margin="0,0,6,0"
+                                    Visibility="{Binding Recorder.SavedName, Converter={StaticResource NullToCollapsed}}" />
+                            <Button Content="Añadir al soundboard" Command="{Binding Recorder.AddToSoundboardCommand}" Padding="10,3" FontSize="12" Margin="0,0,6,0"
+                                    Visibility="{Binding Recorder.SavedName, Converter={StaticResource NullToCollapsed}}"
+                                    ToolTip="Lo añade como un sonido más (el soundboard usa como mucho los 2 primeros minutos)" />
+                            <Button Style="{StaticResource IconButton}" Content="&#xE711;" Command="{Binding Recorder.DismissCommand}" Width="24" Height="24"
+                                    FontSize="10" ToolTip="Cerrar" AutomationProperties.Name="Cerrar el aviso de la grabación" />
+                        </WrapPanel>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -216,14 +240,16 @@
                                       Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=0}" />
                     <views:SoundboardView DataContext="{Binding Soundboard}"
                                           Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=1}" />
+                    <views:SpeechView DataContext="{Binding Speech}"
+                                      Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=2}" />
                     <views:MusicView DataContext="{Binding Music}"
-                                     Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=2}" />
+                                     Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=3}" />
                     <views:KaraokeView DataContext="{Binding Karaoke}"
-                                       Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=3}" />
-                    <views:HotkeysView DataContext="{Binding Hotkeys}"
                                        Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=4}" />
-                    <views:SettingsView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=5}" />
-                    <views:HelpView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=6}" />
+                    <views:HotkeysView DataContext="{Binding Hotkeys}"
+                                       Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=5}" />
+                    <views:SettingsView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=6}" />
+                    <views:HelpView Visibility="{Binding SelectedIndex, ElementName=Nav, Converter={StaticResource IndexToVisible}, ConverterParameter=7}" />
                 </Grid>
             </Grid>
         </DockPanel>

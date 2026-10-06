@@ -46,6 +46,9 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly SettingsService _settings;
     private readonly AudioService _audio;
     private readonly DispatcherTimer _meterTimer;
+    private readonly DispatcherTimer _holdTimer;
+    private VoiceCardViewModel? _holding;
+    private uint _holdKey;
     private bool _refreshingDevices;
     private bool _cableSetupDismissed;
     private int _meterTicks;
@@ -90,6 +93,8 @@ public sealed partial class MainViewModel : ObservableObject
         Hotkeys = new HotkeysViewModel(hotkeys, settings, restartAsAdmin);
         Voices = new VoicesViewModel(settings, Hotkeys);
         Soundboard = new SoundboardViewModel(settings, audio.Pipeline.Soundboard, Hotkeys);
+        Speech = new SpeechViewModel(settings, audio.Pipeline.Speech, Hotkeys);
+        Recorder = new RecorderViewModel(audio.Pipeline.Recorder, Soundboard);
         Music = new MusicViewModel(settings, audio);
         Karaoke = new KaraokeViewModel(settings, audio, Music, Voices, () => HasMonitor);
 
@@ -116,6 +121,7 @@ public sealed partial class MainViewModel : ObservableObject
         {
             if (VoiceEnabled && card == Voices.Selected) ApplyVoice(liveEdit: true);
         };
+        Speech.WithVoiceChanged += (_, _) => ApplyVoice();
 
         hotkeys.Pressed += (_, action) => OnHotkey(action);
         audio.StateChanged += (_, _) => UpdateStatus();
@@ -123,6 +129,10 @@ public sealed partial class MainViewModel : ObservableObject
 
         _meterTimer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(33) };
         _meterTimer.Tick += OnMeterTick;
+
+        // «Mantener pulsado»: Windows avisa al pulsar el atajo, pero no al soltarlo; se mira la tecla cada 15 ms.
+        _holdTimer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(15) };
+        _holdTimer.Tick += OnHoldTick;
     }
 
     public HotkeysViewModel Hotkeys { get; }
@@ -131,11 +141,15 @@ public sealed partial class MainViewModel : ObservableObject
 
     public SoundboardViewModel Soundboard { get; }
 
+    public SpeechViewModel Speech { get; }
+
+    public RecorderViewModel Recorder { get; }
+
     public MusicViewModel Music { get; }
 
     public KaraokeViewModel Karaoke { get; }
 
-    /// <summary>Pestaña de la barra lateral que se ve (la del karaoke es la 3).</summary>
+    /// <summary>Pestaña de la barra lateral que se ve (la del karaoke es la 4).</summary>
     public int SelectedPage
     {
         get => _selectedPage;
@@ -148,7 +162,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private const int KaraokePage = 3;
+    private const int KaraokePage = 4;
     private int _selectedPage;
 
     public ObservableCollection<DeviceItem> InputDevices { get; } = [];
@@ -186,13 +200,40 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ToggleVoice() => VoiceEnabled = !VoiceEnabled;
 
-    /// <summary>Manda al pipeline la voz elegida, o la neutra si la voz está desactivada.</summary>
+    /// <summary>
+    /// Manda al pipeline la voz elegida, o la neutra si la voz está desactivada. Mientras se mantiene pulsado el atajo
+    /// «Mantener pulsado», manda la de ese atajo. Las frases de texto a voz llevan la misma (si así se pide).
+    /// </summary>
     public void ApplyVoice(bool liveEdit = false, bool force = false)
     {
-        var preset = VoiceEnabled && Voices.Selected is { } card ? card.Preset : VoicePreset.Neutral;
+        var preset = _holding is { } held ? held.Preset
+            : VoiceEnabled && Voices.Selected is { } card ? card.Preset
+            : VoicePreset.Neutral;
         var voice = _audio.Pipeline.Voice;
         if (force || voice.CurrentPreset != preset) voice.SetPreset(preset, liveEdit);
+
+        var speechPreset = Speech.WithVoice ? preset : VoicePreset.Neutral;
+        var speech = _audio.Pipeline.Speech.Voice;
+        if (force || speech.CurrentPreset != speechPreset) speech.SetPreset(speechPreset, liveEdit);
         UpdateTrayToolTip();
+    }
+
+    private void BeginHold()
+    {
+        if (_holding is not null || Voices.HoldVoice is not { } card) return;
+        if (Hotkeys.Find(HotkeyActions.HoldVoice)?.Gesture is not { } gesture) return;
+        _holdKey = gesture.VirtualKey;
+        _holding = card;
+        ApplyVoice();
+        _holdTimer.Start();
+    }
+
+    private void OnHoldTick(object? sender, EventArgs e)
+    {
+        if ((NativeMethods.GetAsyncKeyState((int)_holdKey) & 0x8000) != 0) return;
+        _holdTimer.Stop();
+        _holding = null;
+        ApplyVoice();
     }
 
     // ---- Barra inferior ----
@@ -330,6 +371,7 @@ public sealed partial class MainViewModel : ObservableObject
         ApplyVoice(force: true);
         RestartEngine();
         _ = Soundboard.LoadSavedSoundsAsync();
+        _ = Speech.PrepareSavedPhrasesAsync();
         UpdateLatency();
     }
 
@@ -337,10 +379,13 @@ public sealed partial class MainViewModel : ObservableObject
     public void Shutdown()
     {
         Karaoke.Shutdown();
+        Recorder.Shutdown();
+        _holdTimer.Stop();
         var profile = _audio.Pipeline.Voice.Profile;
         if (profile.IsLearned) _settings.Current.LearnedPitchHz = Math.Round(profile.CenterHz, 1);
         _meterTimer.Stop();
         Soundboard.StopAll();
+        Speech.Stop();
         Hotkeys.UnregisterAll();
     }
 
@@ -507,6 +552,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var state = _audio.State;
         IsRunning = state == EngineState.Running && _audio.Engine.IsRunning;
+        Recorder.EngineRunning = IsRunning;
 
         if (SelectedInput is null)
         {
@@ -687,20 +733,29 @@ public sealed partial class MainViewModel : ObservableObject
             case HotkeyActions.ToggleRandomVoice:
                 Voices.RandomEnabled = !Voices.RandomEnabled;
                 break;
+            case HotkeyActions.HoldVoice:
+                BeginHold();
+                break;
             case HotkeyActions.ToggleAppAudio:
                 if (Music.IsSupported) Music.IsStreaming = !Music.IsStreaming;
                 break;
             case HotkeyActions.ToggleKaraoke:
                 if (Karaoke.IsSupported) Karaoke.IsOn = !Karaoke.IsOn;
                 break;
+            case HotkeyActions.ToggleRecording:
+                Recorder.Toggle();
+                break;
             case HotkeyActions.StopSounds:
                 Soundboard.StopAll();
+                Speech.Stop();
                 break;
             default:
                 if (HotkeyActions.TryGetVoiceIndex(action, out int index))
                     Voices.ActivateIndex(index);
                 else if (action.StartsWith(HotkeyActions.SoundPrefix, StringComparison.Ordinal))
                     Soundboard.PlayById(action[HotkeyActions.SoundPrefix.Length..]);
+                else if (action.StartsWith(HotkeyActions.PhrasePrefix, StringComparison.Ordinal))
+                    Speech.PlayById(action[HotkeyActions.PhrasePrefix.Length..]);
                 break;
         }
     }

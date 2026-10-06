@@ -19,6 +19,12 @@ public static class SoundLoader
     public static SoundClip Load(string path, string id, string name)
     {
         using var reader = Open(path);
+        return Decode(reader, id, name);
+    }
+
+    /// <summary>Decodifica audio ya abierto (p. ej., una frase de texto a voz en memoria). Fuera del hilo de la UI.</summary>
+    public static SoundClip Decode(WaveStream reader, string id, string name)
+    {
         ISampleProvider provider = reader.ToSampleProvider();
         if (provider.WaveFormat.SampleRate != DspMath.SampleRate)
             provider = new WdlResamplingSampleProvider(provider, DspMath.SampleRate);

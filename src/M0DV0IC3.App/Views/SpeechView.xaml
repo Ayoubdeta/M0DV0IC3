@@ -1,0 +1,147 @@
+<UserControl x:Class="M0DV0IC3.App.Views.SpeechView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:SpeechViewModel}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="6,0,12,16" MaxWidth="900" HorizontalAlignment="Left">
+            <TextBlock Text="Escribe y suena por el micro" Style="{StaticResource SectionHeader}" />
+            <TextBlock Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,12"
+                       Text="Lo que escribas lo dice una voz de Windows y lo oyen en Discord o en el juego, como si hablaras tú (y tú también, si tienes «Sonidos en mis auriculares»). Intro lo dice; el + del teclado numérico lo para." />
+
+            <Border Style="{StaticResource WarningBox}" Margin="0,0,0,12"
+                    Visibility="{Binding HasVoices, Converter={StaticResource BoolToCollapsed}}">
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource WarningBrush}"
+                           Text="Este Windows no tiene voces de texto a voz. Puedes añadirlas en Configuración → Hora e idioma → Voz → Agregar voces." />
+            </Border>
+
+            <TextBox x:Name="Input" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" MaxLength="{Binding MaxLength}"
+                     TextWrapping="Wrap" AcceptsReturn="False" MinHeight="60" FontSize="15" Padding="10,8"
+                     AutomationProperties.Name="Texto que se dirá por el micro">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding SayCommand}" />
+                </TextBox.InputBindings>
+            </TextBox>
+
+            <WrapPanel Margin="0,10,0,0">
+                <Button Style="{StaticResource PrimaryButton}" Command="{Binding SayCommand}" Margin="0,0,8,8" AutomationProperties.Name="Decir">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE768;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Decir" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding StopCommand}" Margin="0,0,8,8" AutomationProperties.Name="Parar"
+                        ToolTip="Corta la frase que esté sonando (también el + del teclado numérico)">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE71A;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Parar" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding SavePhraseCommand}" Margin="0,0,14,8" AutomationProperties.Name="Guardar frase"
+                        ToolTip="La guarda abajo para decirla con un clic o con un atajo de teclado">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Guardar frase" />
+                    </StackPanel>
+                </Button>
+                <TextBlock Text="Preparando la voz…" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,0,8"
+                           Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisible}}" />
+            </WrapPanel>
+            <TextBlock Text="{Binding Error}" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" Margin="0,0,0,4"
+                       Visibility="{Binding Error, Converter={StaticResource NullToCollapsed}}" />
+
+            <Border Style="{StaticResource CardBorder}" Margin="0,10,0,0" Padding="16,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="130" />
+                        <ColumnDefinition Width="320" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="VOZ DE WINDOWS" Style="{StaticResource FieldLabel}" Margin="0" VerticalAlignment="Center" />
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding Voices}" SelectedItem="{Binding SelectedVoice}" DisplayMemberPath="Display"
+                              IsEnabled="{Binding HasVoices}" AutomationProperties.Name="Voz de Windows" />
+
+                    <TextBlock Grid.Row="1" Text="VELOCIDAD" Style="{StaticResource FieldLabel}" Margin="0,12,0,0" VerticalAlignment="Center" />
+                    <Slider Grid.Row="1" Grid.Column="1" Minimum="0.5" Maximum="2" TickFrequency="0.1" IsSnapToTickEnabled="True"
+                            SmallChange="0.1" LargeChange="0.25" Value="{Binding Rate}" Margin="0,12,0,0" VerticalAlignment="Center"
+                            AutomationProperties.Name="Velocidad" />
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding RateText}" Style="{StaticResource MutedText}" Margin="12,12,0,0"
+                               VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Row="2" Text="VOLUMEN" Style="{StaticResource FieldLabel}" Margin="0,12,0,0" VerticalAlignment="Center" />
+                    <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="2" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                            SmallChange="0.05" LargeChange="0.1" Value="{Binding Volume}" Margin="0,12,0,0" VerticalAlignment="Center"
+                            AutomationProperties.Name="Volumen de las frases" />
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Volume, StringFormat={}{0:P0}}" Style="{StaticResource MutedText}"
+                               Margin="12,12,0,0" VerticalAlignment="Center" />
+
+                    <CheckBox Grid.Row="3" Grid.ColumnSpan="3" Margin="0,14,0,0" IsChecked="{Binding WithVoice}"
+                              Content="Con la voz que tengas puesta (Robot, Demonio, Mujer…)"
+                              ToolTip="Si lo quitas, suena la voz de Windows tal cual. Con la voz desactivada también suena tal cual." />
+                </Grid>
+            </Border>
+
+            <TextBlock Text="Frases guardadas" Style="{StaticResource SectionHeader}" Margin="0,22,0,4" />
+            <TextBlock Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,8"
+                       Text="Ponles un atajo y suenan aunque estés en mitad de una partida. Los atajos también se ven en la pestaña Atajos." />
+
+            <ItemsControl ItemsSource="{Binding Phrases}" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:PhraseItemViewModel}">
+                        <Border BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="0,0,0,1" Padding="2,7">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="170" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Button Style="{StaticResource IconButton}" Content="&#xE768;" Command="{Binding SayCommand}"
+                                        Foreground="{StaticResource LimeBrush}" ToolTip="Decir por el micro" AutomationProperties.Name="Decir" />
+                                <TextBlock Grid.Column="1" Text="{Binding Text}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           Margin="8,0,12,0" ToolTip="{Binding Text}" />
+                                <TextBlock x:Name="Gesture" Grid.Column="2" Text="{Binding Hotkey.GestureText}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                                <Button Grid.Column="3" Content="Cambiar" Command="{Binding Hotkey.ChangeCommand}" Margin="8,0,0,0" MinWidth="84"
+                                        ToolTip="Pulsa y luego la combinación (Esc cancela, Retroceso quita el atajo)" />
+                                <Button Grid.Column="4" Content="Quitar" Command="{Binding Hotkey.ClearCommand}" Margin="6,0,0,0"
+                                        IsEnabled="{Binding Hotkey.HasGesture}" ToolTip="Quitar el atajo" />
+                                <Button Grid.Column="5" Style="{StaticResource IconButton}" Content="&#xE74D;" Command="{Binding DeleteCommand}"
+                                        Margin="6,0,0,0" Foreground="{StaticResource ErrorBrush}" ToolTip="Borrar la frase" AutomationProperties.Name="Borrar" />
+                                <TextBlock Grid.Row="1" Grid.ColumnSpan="6" Text="{Binding Hotkey.Error}" Foreground="{StaticResource ErrorBrush}"
+                                           TextWrapping="Wrap" Margin="0,4,0,0"
+                                           Visibility="{Binding Hotkey.HasError, Converter={StaticResource BoolToVisible}}" />
+                            </Grid>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Hotkey.IsCapturing}" Value="True">
+                                <Setter TargetName="Gesture" Property="Foreground" Value="{StaticResource AccentTextBrush}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Hotkey.HasGesture}" Value="False">
+                                <Setter TargetName="Gesture" Property="FontWeight" Value="Normal" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Style="{StaticResource MutedText}" TextWrapping="Wrap"
+                       Text="Todavía no hay frases guardadas: escribe una arriba y pulsa «Guardar frase»."
+                       Visibility="{Binding HasPhrases, Converter={StaticResource BoolToCollapsed}}" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

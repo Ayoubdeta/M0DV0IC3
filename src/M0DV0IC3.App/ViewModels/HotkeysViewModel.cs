@@ -8,7 +8,7 @@ using M0DV0IC3.App.Services;
 namespace M0DV0IC3.App.ViewModels;
 
 /// <summary>
-/// Pestaña Atajos: las acciones globales, los atajos de los sonidos y la captura de combinaciones.
+/// Pestaña Atajos: las acciones globales, los atajos de los sonidos y de las frases, y la captura de combinaciones.
 /// Mientras se captura, todos los atajos se quitan de Windows para que la combinación llegue a la ventana.
 /// </summary>
 public sealed partial class HotkeysViewModel : ObservableObject
@@ -38,6 +38,7 @@ public sealed partial class HotkeysViewModel : ObservableObject
         }
 
         SoundBindings.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasSoundBindings));
+        PhraseBindings.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasPhraseBindings));
     }
 
     public ObservableCollection<HotkeyBindingViewModel> Actions { get; } = [];
@@ -47,6 +48,11 @@ public sealed partial class HotkeysViewModel : ObservableObject
 
     public bool HasSoundBindings => SoundBindings.Count > 0;
 
+    /// <summary>Atajos de las frases guardadas de texto a voz; los añade y quita esa pestaña.</summary>
+    public ObservableCollection<HotkeyBindingViewModel> PhraseBindings { get; } = [];
+
+    public bool HasPhraseBindings => PhraseBindings.Count > 0;
+
     public bool IsCapturing => Capturing is not null;
 
     public bool IsElevated => Elevation.IsElevated;
@@ -55,7 +61,7 @@ public sealed partial class HotkeysViewModel : ObservableObject
         ? "M0DV0IC3 se está ejecutando como administrador: los atajos también funcionan dentro de juegos abiertos como administrador."
         : "Ahora mismo M0DV0IC3 se está ejecutando sin permisos de administrador.";
 
-    public IEnumerable<HotkeyBindingViewModel> AllBindings => Actions.Concat(SoundBindings);
+    public IEnumerable<HotkeyBindingViewModel> AllBindings => Actions.Concat(SoundBindings).Concat(PhraseBindings);
 
     public HotkeyBindingViewModel? Find(string actionId) => AllBindings.FirstOrDefault(b => b.ActionId == actionId);
 
@@ -78,6 +84,19 @@ public sealed partial class HotkeysViewModel : ObservableObject
     {
         if (Capturing == binding) CancelCapture();
         SoundBindings.Remove(binding);
+        _service.Unregister(binding.ActionId);
+    }
+
+    public void AddPhraseBinding(HotkeyBindingViewModel binding)
+    {
+        PhraseBindings.Add(binding);
+        if (!IsCapturing) RegisterOne(binding);
+    }
+
+    public void RemovePhraseBinding(HotkeyBindingViewModel binding)
+    {
+        if (Capturing == binding) CancelCapture();
+        PhraseBindings.Remove(binding);
         _service.Unregister(binding.ActionId);
     }
 
@@ -145,7 +164,7 @@ public sealed partial class HotkeysViewModel : ObservableObject
     [RelayCommand]
     private void ResetDefaults()
     {
-        if (!Dialogs.Confirm("¿Volver a poner los atajos de serie? Los atajos de los sonidos no se tocan.")) return;
+        if (!Dialogs.Confirm("¿Volver a poner los atajos de serie? Los atajos de los sonidos y de las frases no se tocan.")) return;
         FinishCapture();
         foreach (var binding in Actions)
         {

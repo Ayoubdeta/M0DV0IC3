@@ -1,6 +1,8 @@
 using M0DV0IC3.Audio.NoiseSuppression;
 using M0DV0IC3.Audio.Realtime;
+using M0DV0IC3.Audio.Recording;
 using M0DV0IC3.Audio.Soundboard;
+using M0DV0IC3.Audio.Speech;
 using M0DV0IC3.Dsp;
 using M0DV0IC3.Dsp.Dynamics;
 using M0DV0IC3.Dsp.Presets;
@@ -10,10 +12,10 @@ namespace M0DV0IC3.Audio;
 /// <summary>
 /// Todo el procesamiento, sin dispositivos (la app, la CLI y los tests usan el mismo):
 /// <code>
-/// micro → RNNoise (opcional) → puerta de ruido → voz → + soundboard + música de una app → limitador → CABLE Input
-///                                                └→ (voz si "Escucharme") + (sonidos si se pide) → limitador → auriculares
+/// micro → RNNoise (opcional) → puerta de ruido → voz → + soundboard + frases + música de una app → limitador → CABLE Input → grabación
+///                                                └→ (voz si "Escucharme") + (sonidos y frases si se pide) → limitador → auriculares
 /// </code>
-/// La música no va a los auriculares: ya la oyes en la propia app.
+/// La música no va a los auriculares (ya la oyes en la propia app), salvo en el karaoke.
 /// <see cref="Process"/> se llama desde el hilo de captura y no reserva memoria.
 /// </summary>
 public sealed class VoicePipeline : IDisposable
@@ -22,6 +24,7 @@ public sealed class VoicePipeline : IDisposable
 
     private readonly float[] _voice = new float[MaxBlockSize];
     private readonly float[] _sounds = new float[MaxBlockSize];
+    private readonly float[] _speech = new float[MaxBlockSize];
     private readonly float[] _appAudio = new float[MaxBlockSize];
     private readonly RnNoiseEffect? _rnNoise;
     private readonly Limiter _cableLimiter = new(DspMath.SampleRate);
@@ -56,6 +59,12 @@ public sealed class VoicePipeline : IDisposable
     public NoiseGate Gate { get; } = new(DspMath.SampleRate, NoiseGate.DisabledThresholdDb);
 
     public SoundboardMixer Soundboard { get; } = new();
+
+    /// <summary>Texto a voz: las frases suenan por el micro con su propia copia de la voz.</summary>
+    public SpeechPlayer Speech { get; } = new(MaxBlockSize);
+
+    /// <summary>Graba lo que sale por el micrófono virtual.</summary>
+    public MicRecorder Recorder { get; } = new();
 
     public bool NoiseSuppressionAvailable => _rnNoise is not null;
 
@@ -138,7 +147,11 @@ public sealed class VoicePipeline : IDisposable
         }
     }
 
-    public void Dispose() => _rnNoise?.Dispose();
+    public void Dispose()
+    {
+        Recorder.Dispose();
+        _rnNoise?.Dispose();
+    }
 
     private void ProcessBlock(ReadOnlySpan<float> input, Span<float> cable, Span<float> monitor)
     {
@@ -160,11 +173,17 @@ public sealed class VoicePipeline : IDisposable
 
         var sounds = _sounds.AsSpan(0, n);
         bool hasSounds = Soundboard.Render(sounds);
+        var speech = _speech.AsSpan(0, n);
+        bool hasSpeech = Speech.Render(speech);
 
         voice.CopyTo(cable);
         if (hasSounds)
         {
             for (int i = 0; i < n; i++) cable[i] += sounds[i];
+        }
+        if (hasSpeech)
+        {
+            for (int i = 0; i < n; i++) cable[i] += speech[i];
         }
 
         var appSource = AppAudio;
@@ -182,6 +201,7 @@ public sealed class VoicePipeline : IDisposable
         bool muted = _muted;
         if (muted) cable.Clear();
         _outputMeter.Update(DspMath.Peak(cable));
+        Recorder.Write(cable);
 
         if (monitor.IsEmpty) return;
         if (muted)
@@ -192,9 +212,13 @@ public sealed class VoicePipeline : IDisposable
 
         bool withVoice = _monitorVoice;
         bool withSounds = hasSounds && _monitorSounds;
+        bool withSpeech = hasSpeech && _monitorSounds;
         bool withMusic = appSource is not null && _appAudioToMonitor;
         for (int i = 0; i < n; i++)
-            monitor[i] = (withVoice ? voice[i] : 0f) + (withSounds ? sounds[i] : 0f) + (withMusic ? app[i] : 0f);
+        {
+            monitor[i] = (withVoice ? voice[i] : 0f) + (withSounds ? sounds[i] : 0f) + (withSpeech ? speech[i] : 0f)
+                + (withMusic ? app[i] : 0f);
+        }
         _monitorLimiter.Process(monitor);
     }
 }

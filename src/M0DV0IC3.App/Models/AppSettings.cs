@@ -59,6 +59,23 @@ public sealed class AppSettings
     /// </summary>
     public double KaraokeRestoreVolume { get; set; }
 
+    /// <summary>Voz que suena mientras se mantiene pulsado el atajo «Mantener pulsado» (null = ninguna).</summary>
+    public string? HoldVoiceId { get; set; } = "demonio";
+
+    /// <summary>Texto a voz: id de la voz de Windows (null = la predeterminada).</summary>
+    public string? SpeechVoiceId { get; set; }
+
+    /// <summary>Texto a voz: velocidad (1 = normal, de 0,5 a 2).</summary>
+    public double SpeechRate { get; set; } = 1.0;
+
+    /// <summary>Texto a voz: volumen de las frases (0..2).</summary>
+    public double SpeechVolume { get; set; } = 1.0;
+
+    /// <summary>Texto a voz: las frases pasan por la voz que tengas puesta.</summary>
+    public bool SpeechWithVoice { get; set; } = true;
+
+    public List<PhraseEntry> Phrases { get; set; } = [];
+
     public bool MinimizeToTray { get; set; } = true;
 
     public bool StartMinimized { get; set; }
@@ -89,6 +106,8 @@ public sealed class AppSettings
         FavoriteVoices ??= [];
         FavoriteVoices.RemoveAll(string.IsNullOrWhiteSpace);
         Sounds ??= [];
+        Phrases ??= [];
+        Phrases.RemoveAll(p => p is null || string.IsNullOrWhiteSpace(p.Id) || string.IsNullOrWhiteSpace(p.Text));
         Hotkeys ??= [];
         if (HotkeysVersion < 1)
         {
@@ -109,6 +128,8 @@ public sealed class AppSettings
         KaraokeVocalStrength = double.IsFinite(KaraokeVocalStrength) ? Math.Clamp(KaraokeVocalStrength, 0, 1) : 1;
         KaraokeLyricsOffset = double.IsFinite(KaraokeLyricsOffset) ? Math.Clamp(KaraokeLyricsOffset, -10, 10) : 0;
         KaraokeRestoreVolume = double.IsFinite(KaraokeRestoreVolume) ? Math.Clamp(KaraokeRestoreVolume, 0, 1) : 0;
+        SpeechRate = double.IsFinite(SpeechRate) ? Math.Clamp(SpeechRate, 0.5, 2) : 1;
+        SpeechVolume = double.IsFinite(SpeechVolume) ? Math.Clamp(SpeechVolume, 0, 2) : 1;
         LearnedPitchHz = double.IsFinite(LearnedPitchHz) && LearnedPitchHz is >= 40 and <= 1000 ? LearnedPitchHz : 0;
         foreach (var sound in Sounds)
         {
@@ -139,4 +160,14 @@ public sealed class SoundEntry
 
     /// <summary>Recorte: segundo en el que deja de sonar (0 = hasta el final).</summary>
     public double TrimEndSeconds { get; set; }
+}
+
+/// <summary>Una frase guardada de texto a voz.</summary>
+public sealed class PhraseEntry
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+
+    public string Text { get; set; } = "";
+
+    public string? Hotkey { get; set; }
 }

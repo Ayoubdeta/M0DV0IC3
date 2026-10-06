@@ -74,6 +74,24 @@
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
+                    <TextBlock Text="Texto a voz, mantener y grabar" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}">
+                        <Bold>Texto a voz</Bold> (su pestaña): escribe una frase y pulsa Intro. La dice una voz de Windows y suena por el micro con la voz
+                        que tengas puesta. Guarda las que más uses y ponles un atajo para decirlas en mitad de una partida.
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource BodyText}">
+                        <Bold>Mantener pulsado</Bold> (el - del teclado numérico): mientras lo mantienes suena la voz elegida en Voces («Al mantener»);
+                        al soltarlo vuelve la que tenías.
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource BodyText}">
+                        <Bold>Grabar</Bold> (abajo, o Ctrl+Alt+G) guarda en MP3 lo que sale por el micro, tal y como lo oyen los demás: tu voz, los sonidos,
+                        las frases y la música del karaoke. Lo encuentras en Música\M0DV0IC3, y puedes añadirlo al soundboard.
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                <StackPanel>
                     <TextBlock Text="Consejo de Windows: 48000 Hz" Style="{StaticResource SectionHeader}" />
                     <TextBlock Style="{StaticResource BodyText}">
                         M0DV0IC3 trabaja a 48000 Hz. Para evitar conversiones (y algo de latencia), pon VB-Cable a esa frecuencia:

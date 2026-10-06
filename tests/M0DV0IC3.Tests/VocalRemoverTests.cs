@@ -1,6 +1,8 @@
+using M0DV0IC3.Audio.AppAudio;
 using M0DV0IC3.Dsp;
 using M0DV0IC3.Dsp.Effects;
 using M0DV0IC3.Dsp.Filters;
+using M0DV0IC3.Dsp.Presets;
 using Xunit.Abstractions;
 
 namespace M0DV0IC3.Tests;
@@ -107,6 +109,81 @@ public sealed class VocalRemoverTests(ITestOutputHelper output)
         output.WriteLine($"canción: {before:F1} dB, sin voz: {after:F1} dB (la guitarra sola: {guitarAlone:F1} dB)");
         Assert.InRange(after - guitarAlone, 4, 6.5);
         Assert.True(after < before + 0.5);
+    }
+
+    [Fact]
+    public void Split_parts_add_up_to_the_original_song()
+    {
+        var voice = TestSignals.Vowel(220, 1.5, 0.3f);
+        var guitar = TestSignals.Sawtooth(330, 1.5, 0.2f);
+        var left = new float[voice.Length];
+        for (int i = 0; i < left.Length; i++) left[i] = voice[i] + guitar[i];
+        var remover = new VocalRemover { RestoreLoudness = false };
+        var rest = new float[voice.Length];
+        var vocals = new float[voice.Length];
+        for (int offset = 0; offset < left.Length; offset += 480)
+        {
+            int n = Math.Min(480, left.Length - offset);
+            remover.Split(left.AsSpan(offset, n), voice.AsSpan(offset, n), rest.AsSpan(offset, n), vocals.AsSpan(offset, n));
+        }
+        int delay = VocalRemover.FrameSize;
+        for (int i = delay; i < left.Length; i++)
+            Assert.Equal((left[i - delay] + voice[i - delay]) / 2, rest[i] + vocals[i], 1e-5);
+
+        // La voz del centro va a la parte "voz"; la guitarra, que solo suena a la izquierda, se queda en el resto.
+        double voiceInVocals = VoiceBandDb(vocals) - VoiceBandDb(Run(voice, voice, 0));
+        double guitarInRest = RmsDb(rest) - RmsDb(Run(guitar, new float[guitar.Length], 0));
+        output.WriteLine($"voz separada: {voiceInVocals:+0.0;-0.0} dB; resto frente a la guitarra sola: {guitarInRest:+0.0;-0.0} dB");
+        Assert.InRange(voiceInVocals, -1.5, 0.5);
+        Assert.InRange(guitarInRest, -1.5, 1.5);
+    }
+
+    [Fact]
+    public void The_singer_gets_the_new_voice_and_the_side_instruments_stay()
+    {
+        var changer = new SongVoiceChanger();
+        changer.Voice.SetPreset(VoicePreset.Neutral with { Id = "octava", PitchSemitones = 12 });
+        var singer = TestSignals.Vowel(180, 2.0, 0.3f);
+        var output1 = RunChanger(changer, singer, singer);
+        double f0 = TestSignals.MeasureF0(TestSignals.Segment(output1, 1.0, 1.8));
+        output.WriteLine($"cantante a 180 Hz con +12 semitonos: {f0:F1} Hz");
+        Assert.InRange(f0, 349, 371);
+
+        changer.Reset();
+        var guitar = TestSignals.Sawtooth(330, 2.0, 0.2f);
+        var silence = new float[guitar.Length];
+        var output2 = RunChanger(changer, guitar, silence);
+        double change = DspMath.GainToDb(DspMath.Rms(TestSignals.Segment(output2, 1.0, 1.8)))
+            - DspMath.GainToDb(DspMath.Rms(TestSignals.Segment(guitar, 1.0, 1.8)) / 2);
+        output.WriteLine($"guitarra a la izquierda: {change:+0.0;-0.0} dB");
+        Assert.InRange(change, -1, 1);
+        Assert.InRange(TestSignals.MeasureF0(TestSignals.Segment(output2, 1.0, 1.8)), 327, 333);
+    }
+
+    [Fact]
+    public void Changing_the_singer_does_not_allocate()
+    {
+        var changer = new SongVoiceChanger();
+        changer.Voice.SetPreset(VoicePreset.Neutral with { Id = "tono", PitchSemitones = 5 });
+        var left = TestSignals.Noise(0.5, 0.2f, seed: 1);
+        var right = TestSignals.Noise(0.5, 0.2f, seed: 2);
+        var mono = new float[480];
+        changer.Process(left.AsSpan(0, 480), right.AsSpan(0, 480), mono);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int offset = 480; offset + 480 <= left.Length; offset += 480)
+            changer.Process(left.AsSpan(offset, 480), right.AsSpan(offset, 480), mono);
+        Assert.Equal(before, GC.GetAllocatedBytesForCurrentThread());
+    }
+
+    private static float[] RunChanger(SongVoiceChanger changer, float[] left, float[] right)
+    {
+        var mono = new float[left.Length];
+        for (int offset = 0; offset < left.Length; offset += 480)
+        {
+            int n = Math.Min(480, left.Length - offset);
+            changer.Process(left.AsSpan(offset, n), right.AsSpan(offset, n), mono.AsSpan(offset, n));
+        }
+        return mono;
     }
 
     [Fact]

@@ -54,10 +54,17 @@ public sealed class AppSettings
     public double KaraokeLyricsOffset { get; set; }
 
     /// <summary>
-    /// Volumen que tenía Spotify antes del karaoke, mientras está bajado (0 = no está bajado). Si la app se cierra de
-    /// golpe, al volver a abrirla se le devuelve: Windows guarda el volumen de cada app.
+    /// Volumen que tenía Spotify (o la app de <see cref="DuckedAppExe"/>) antes de bajarla para el karaoke o para cambiar
+    /// la voz del cantante, mientras está bajada (0 = no está bajada). Si la app se cierra de golpe, al volver a abrirla se
+    /// le devuelve: Windows guarda el volumen de cada app.
     /// </summary>
     public double KaraokeRestoreVolume { get; set; }
+
+    /// <summary>Ejecutable de la app bajada (null = "Spotify", como en las versiones que solo bajaban Spotify).</summary>
+    public string? DuckedAppExe { get; set; }
+
+    /// <summary>Voz que se le pone al cantante con «Voz del cantante» (pestaña Música).</summary>
+    public string? SongVoiceId { get; set; } = "ardilla";
 
     /// <summary>Voz que suena mientras se mantiene pulsado el atajo «Mantener pulsado» (null = ninguna).</summary>
     public string? HoldVoiceId { get; set; } = "demonio";

@@ -11,8 +11,9 @@ namespace M0DV0IC3.Audio.AppAudio;
 /// Solo esa app: ni el resto del sistema ni Discord, que así no se oye a sí mismo. Entrega mono float a 48 kHz en
 /// un <see cref="SpscRingBuffer"/>. Tiene su propio hilo (MTA, MMCSS "Audio"), donde vive el cliente COM.
 /// Si la app está en silencio, Windows sigue entregando paquetes de silencio cada 10 ms.
-/// <para>En el modo karaoke, el estéreo pasa antes por <see cref="VocalRemover"/> (que necesita los dos canales).
-/// Lo que se captura ya lleva aplicado el volumen de la app en Windows: <see cref="Gain"/> lo compensa.</para>
+/// <para>En el modo karaoke, el estéreo pasa antes por <see cref="VocalRemover"/>, y para cambiarle la voz al cantante,
+/// por <see cref="SongVoiceChanger"/> (los dos necesitan los dos canales). Lo que se captura ya lleva aplicado el volumen
+/// de la app en Windows: <see cref="Gain"/> lo compensa.</para>
 /// </summary>
 internal sealed class AppAudioCapture : IDisposable
 {
@@ -21,25 +22,27 @@ internal sealed class AppAudioCapture : IDisposable
     private readonly uint _processId;
     private readonly SpscRingBuffer _ring;
     private readonly VocalRemover _remover;
-    private volatile bool _removeVocals;
+    private readonly SongVoiceChanger _changer;
+    private volatile SongProcessing _processing;
     private float _gain = 1f;
     private readonly ManualResetEventSlim _initialized = new();
     private Thread? _thread;
     private Exception? _initError;
     private volatile bool _stopRequested;
 
-    public AppAudioCapture(uint processId, SpscRingBuffer ring, VocalRemover remover)
+    public AppAudioCapture(uint processId, SpscRingBuffer ring, VocalRemover remover, SongVoiceChanger changer)
     {
         _processId = processId;
         _ring = ring;
         _remover = remover;
+        _changer = changer;
     }
 
-    /// <summary>Quitar la voz (modo karaoke). Se puede cambiar mientras captura.</summary>
-    public bool RemoveVocals
+    /// <summary>Quitar la voz (karaoke) o cambiársela al cantante. Se puede cambiar mientras captura.</summary>
+    public SongProcessing Processing
     {
-        get => _removeVocals;
-        set => _removeVocals = value;
+        get => _processing;
+        set => _processing = value;
     }
 
     /// <summary>Ganancia que se aplica a lo capturado (compensa el volumen bajado de la app).</summary>
@@ -109,6 +112,7 @@ internal sealed class AppAudioCapture : IDisposable
             var right = new float[mono.Length];
             bool stereoFloat = layout.Encoding == SampleEncoding.Float32 && layout.Channels == 2;
             _remover.Reset();
+            _changer.Reset();
             client.Start();
             _initialized.Set();
 
@@ -122,7 +126,9 @@ internal sealed class AppAudioCapture : IDisposable
                     for (int done = 0; done < frames; done += mono.Length)
                     {
                         var block = mono.AsSpan(0, Math.Min(mono.Length, frames - done));
-                        if (_removeVocals && stereoFloat)
+                        var processing = _processing;
+                        float gain = Gain;
+                        if (processing != SongProcessing.None && stereoFloat)
                         {
                             // El filtro necesita seguir recibiendo audio (también el silencio) para no desfasarse.
                             var l = left.AsSpan(0, block.Length);
@@ -136,21 +142,27 @@ internal sealed class AppAudioCapture : IDisposable
                             {
                                 Deinterleave(data + done * layout.BlockAlign, l, r);
                             }
-                            _remover.Process(l, r, block);
-                        }
-                        else if (silent)
-                        {
-                            block.Clear();
+                            // La compensación va antes de procesar: con la app bajada al 0,1 %, la voz del cantante
+                            // llegaría 60 dB por debajo y el detector de tono la tomaría por silencio.
+                            if (gain != 1f)
+                            {
+                                for (int i = 0; i < l.Length; i++)
+                                {
+                                    l[i] *= gain;
+                                    r[i] *= gain;
+                                }
+                            }
+                            if (processing == SongProcessing.RemoveVocals) _remover.Process(l, r, block);
+                            else _changer.Process(l, r, block);
                         }
                         else
                         {
-                            SampleConverter.ToMono(data + done * layout.BlockAlign, block.Length, layout, block);
-                        }
-
-                        float gain = Gain;
-                        if (gain != 1f)
-                        {
-                            for (int i = 0; i < block.Length; i++) block[i] *= gain;
+                            if (silent) block.Clear();
+                            else SampleConverter.ToMono(data + done * layout.BlockAlign, block.Length, layout, block);
+                            if (gain != 1f)
+                            {
+                                for (int i = 0; i < block.Length; i++) block[i] *= gain;
+                            }
                         }
                         _ring.Write(block);
                     }

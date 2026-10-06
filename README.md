@@ -92,6 +92,11 @@ En el editor puedes elegir:
 - Tú la sigues oyendo como siempre.
 - Si la app se cierra o se reinicia, se vuelve a enganchar sola.
 
+**Voz del cantante** (pestaña Música): cambia la voz de quien canta en la canción que suena (Ardilla, Demonio, Robot, Mujer…) y deja la música como está.
+- La voz se separa con el mismo filtro que el karaoke, pasa por su propia cadena de voz y se vuelve a mezclar. Medido con 140 canciones, ~80 % de la voz del cantante coge la voz nueva; la música del centro que va con ella también, y queda algo de la voz original de fondo, ~4,5 dB por debajo de la música.
+- La canción cambiada suena en tus cascos y en Discord, y la app (Spotify) se baja en Windows mientras tanto para que no la oigas dos veces.
+- Es una voz aparte de la tuya: puedes hablar con tu voz normal mientras el cantante suena como una ardilla. No va a la vez que el karaoke.
+
 **Modo karaoke** (pestaña Karaoke, o Ctrl+Alt+K): pon una canción en Spotify y actívalo.
 - La app reconoce la canción (título, artista y por dónde va, con los controles multimedia de Windows) y busca su letra en [LRCLIB](https://lrclib.net). Si está sincronizada, la línea que toca se ilumina y la letra avanza sola; «Antes» y «Después» la ajustan si va desfasada.
 - La voz se quita con un filtro que atenúa lo que suena en el centro de la mezcla, solo en la zona de la voz: el bajo y la batería no se tocan, y la canción recupera poco a poco el volumen que pierde al quitar la voz. Medido con 140 canciones con las pistas separadas, la voz baja unos 12 dB y la música pierde 1,6 dB. Se oye mucho menos, pero puede quedar algo de fondo: el eco de la voz y los coros abiertos a los lados.

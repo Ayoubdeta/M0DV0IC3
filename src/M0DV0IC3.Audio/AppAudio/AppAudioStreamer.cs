@@ -4,6 +4,18 @@ using M0DV0IC3.Dsp.Effects;
 
 namespace M0DV0IC3.Audio.AppAudio;
 
+/// <summary>Qué se le hace a la canción antes de mandarla.</summary>
+public enum SongProcessing
+{
+    None,
+
+    /// <summary>Modo karaoke: sin la voz del cantante.</summary>
+    RemoveVocals,
+
+    /// <summary>Con otra voz para el cantante (<see cref="SongVoiceChanger"/>).</summary>
+    ChangeVoice,
+}
+
 /// <summary>
 /// "Música por el micro": lo que suena en una app (Spotify, el navegador...) se mezcla con tu voz hacia el micrófono
 /// virtual. Va aparte del motor: arrancarla o pararla no corta tu voz, y sigue puesta aunque el motor se reinicie.
@@ -21,7 +33,7 @@ public sealed class AppAudioStreamer : IDisposable
     private readonly Lock _gate = new();
     private readonly VocalRemover _remover = new();
     private AppAudioCapture? _capture;
-    private bool _removeVocals;
+    private SongProcessing _processing;
     private float _gain = 1f;
 
     public AppAudioStreamer(VoicePipeline pipeline) => _pipeline = pipeline;
@@ -34,19 +46,22 @@ public sealed class AppAudioStreamer : IDisposable
 
     public bool IsRunning => Volatile.Read(ref _capture) is not null;
 
-    /// <summary>Modo karaoke: quita la voz de la canción (ver <see cref="VocalRemover"/>). Vale también para capturas futuras.</summary>
-    public bool RemoveVocals
+    /// <summary>Quitar la voz de la canción (karaoke) o cambiársela al cantante. Vale también para capturas futuras.</summary>
+    public SongProcessing Processing
     {
-        get => _removeVocals;
+        get => _processing;
         set
         {
             lock (_gate)
             {
-                _removeVocals = value;
-                if (_capture is { } capture) capture.RemoveVocals = value;
+                _processing = value;
+                if (_capture is { } capture) capture.Processing = value;
             }
         }
     }
+
+    /// <summary>La voz que se le pone al cantante con <see cref="SongProcessing.ChangeVoice"/>.</summary>
+    public SongVoiceChanger SongVoice { get; } = new();
 
     /// <summary>Cuánta voz se quita en el modo karaoke (0..1).</summary>
     public float VocalRemovalStrength
@@ -80,7 +95,7 @@ public sealed class AppAudioStreamer : IDisposable
             StopCore();
             var ring = new SpscRingBuffer(RingCapacity);
             var reader = new DriftCompensatedReader(ring, (int)(SafetyMs * DspMath.SampleRate / 1000));
-            var capture = new AppAudioCapture(app.ProcessId, ring, _remover) { RemoveVocals = _removeVocals, Gain = _gain };
+            var capture = new AppAudioCapture(app.ProcessId, ring, _remover, SongVoice) { Processing = _processing, Gain = _gain };
             capture.Faulted += OnCaptureFaulted;
             try
             {

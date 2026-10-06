@@ -85,6 +85,53 @@
                                Text="Consejos: baja el volumen hasta que se te entienda bien al hablar. Si en Discord la música se corta o suena a lata, desactiva su supresión de ruido (Krisp) y su cancelación de eco, y pon la sensibilidad de entrada en manual." />
                 </StackPanel>
             </Border>
+
+            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Voz del cantante" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,12" TextWrapping="Wrap"
+                               Text="Cambia la voz de quien canta en la canción que suena: Ardilla, Demonio, Robot… La música sigue igual. La canción cambiada suena en tus cascos y en Discord, y mientras tanto la app se baja en Windows para que no la oigas dos veces." />
+
+                    <Grid Margin="0,0,0,10" IsEnabled="{Binding CanChangeSongVoice}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="320" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Voz" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding SongVoiceChoices}" SelectedItem="{Binding SongVoice}"
+                                  AutomationProperties.Name="Voz del cantante" ToolTip="La voz que se le pone al cantante (se puede cambiar mientras suena)">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:VoiceCardViewModel}">
+                                    <TextBlock>
+                                        <Run Text="{Binding Icon, Mode=OneWay}" FontFamily="{StaticResource EmojiFont}" />
+                                        <Run Text="{Binding Name, Mode=OneWay}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+
+                    <ToggleButton Style="{StaticResource OnAirToggle}" HorizontalAlignment="Left" Margin="4,8,0,12" AutomationProperties.Name="Cambiar la voz del cantante"
+                                  IsChecked="{Binding SongVoiceOn}" IsEnabled="{Binding CanChangeSongVoice}" ToolTipService.ShowOnDisabled="True"
+                                  ToolTip="Separa la voz del cantante de la app elegida arriba, le pone la voz que elijas y la vuelve a mezclar con la música">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🎭" FontFamily="{StaticResource EmojiFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <TextBlock Text="Cambiar la voz del cantante" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </ToggleButton>
+
+                    <Border Style="{StaticResource WarningBox}" Margin="0,0,0,8" HorizontalAlignment="Left"
+                            Visibility="{Binding ShowMonitorWarning, Converter={StaticResource BoolToVisible}}">
+                        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource WarningBrush}"
+                                   Text="Para oír la canción cambiada, elige tus cascos arriba, en «AURICULARES · ESCUCHARME»." />
+                    </Border>
+                    <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,8" TextWrapping="Wrap"
+                               Visibility="{Binding KaraokeActive, Converter={StaticResource BoolToVisible}}"
+                               Text="Con el karaoke puesto no se puede: el karaoke quita la voz del cantante. Apágalo para cambiársela." />
+                    <TextBlock Style="{StaticResource MutedText}" FontSize="12" TextWrapping="Wrap"
+                               Text="La voz se separa con el mismo filtro que el karaoke, así que algo de la música del centro también coge el efecto y queda un poco de la voz original de fondo. Funciona mejor con canciones donde la voz va sola en el centro." />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

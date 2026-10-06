@@ -30,8 +30,7 @@ public sealed partial class LyricLineViewModel(LyricLine line) : ObservableObjec
 /// <item>La canción y su posición salen de los controles multimedia de Windows (<see cref="NowPlayingService"/>).</item>
 /// <item>La letra, de LRCLIB (<see cref="LrclibClient"/>); si está sincronizada, la línea que toca se ilumina.</item>
 /// <item>La voz se quita al capturar Spotify (<see cref="M0DV0IC3.Dsp.Effects.VocalRemover"/>) y la música va
-/// también a los auriculares. Spotify se baja al 0,1 % en Windows para que no suene dos veces (con voz); la captura
-/// lo compensa, y al apagar el karaoke vuelve a su volumen.</item>
+/// también a los auriculares. Spotify se baja en Windows para que no suene dos veces (con voz): <see cref="AppDucking"/>.</item>
 /// </list>
 /// </summary>
 public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
@@ -50,7 +49,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
     private readonly Func<bool> _hasMonitor;
     private readonly NowPlayingService _nowPlaying = new();
     private readonly LrclibClient _lyricsClient;
-    private readonly AppVolumeDucker _ducker = new();
+    private readonly AppDucking _ducking;
     private readonly DispatcherTimer _songTimer = new() { Interval = TimeSpan.FromSeconds(1) };
     private readonly DispatcherTimer _lineTimer = new() { Interval = TimeSpan.FromMilliseconds(100) };
     private NowPlaying? _song;
@@ -61,7 +60,6 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
     private bool _busy;
     private bool _pageVisible;
     private bool _ticking;
-    private uint _duckedRoot;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowMonitorWarning))]
@@ -74,11 +72,13 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _isSynced;
     [ObservableProperty] private int _currentIndex = -1;
 
-    public KaraokeViewModel(SettingsService settings, AudioService audio, MusicViewModel music, VoicesViewModel voices, Func<bool> hasMonitor)
+    public KaraokeViewModel(SettingsService settings, AudioService audio, MusicViewModel music, VoicesViewModel voices, AppDucking ducking,
+        Func<bool> hasMonitor)
     {
         _settings = settings;
         _audio = audio;
         _music = music;
+        _ducking = ducking;
         _voices = voices;
         _hasMonitor = hasMonitor;
         string version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "1";
@@ -190,9 +190,12 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
                 return;
             }
 
+            // Quitar la voz y cambiársela al cantante no van a la vez.
+            await _music.StopSongVoiceAsync();
             bool wasStreamingSpotify = _music.IsStreaming
                 && string.Equals(_audio.AppAudio.Current?.ExeName, SpotifyExe, StringComparison.OrdinalIgnoreCase);
-            _audio.AppAudio.RemoveVocals = true;
+            _music.KaraokeActive = true;
+            _audio.AppAudio.Processing = SongProcessing.RemoveVocals;
             _audio.Pipeline.AppAudioToMonitor = true;
             if (!wasStreamingSpotify && !await _music.StreamAppAsync(SpotifyExe))
             {
@@ -202,7 +205,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
                 return;
             }
             _startedStreaming = !wasStreamingSpotify;
-            await DuckAsync(app.ProcessId);
+            await _ducking.DuckAsync(SpotifyExe);
             _lineTimer.Start();
             OnPropertyChanged(nameof(ShowMonitorWarning));
             await OnSongTickAsync();
@@ -220,7 +223,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
         try
         {
             _lineTimer.Stop();
-            await RestoreVolumeAsync();
+            await _ducking.ReleaseAsync();
             ResetAudio();
             if (_startedStreaming && _music.IsStreaming) _music.IsStreaming = false;
             _startedStreaming = false;
@@ -234,67 +237,16 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
 
     private void ResetAudio()
     {
-        _audio.AppAudio.RemoveVocals = false;
-        _audio.AppAudio.CaptureGain = 1f;
+        _audio.AppAudio.Processing = SongProcessing.None;
         _audio.Pipeline.AppAudioToMonitor = false;
+        _music.KaraokeActive = false;
     }
 
-    /// <summary>Baja Spotify en Windows y compensa la captura. Se apunta el volumen original por si la app se cierra de golpe.</summary>
-    private async Task DuckAsync(uint root)
-    {
-        try
-        {
-            await Task.Run(() => _ducker.Duck(root));
-            _duckedRoot = root;
-            if (_ducker.IsDucked)
-            {
-                _audio.AppAudio.CaptureGain = _ducker.OriginalVolume / AppVolumeDucker.DuckedLevel;
-                if (Math.Abs(_settings.Current.KaraokeRestoreVolume - _ducker.OriginalVolume) > 0.001)
-                {
-                    _settings.Current.KaraokeRestoreVolume = _ducker.OriginalVolume;
-                    _settings.SaveNow();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Warn("No se pudo bajar el volumen de Spotify", ex);
-        }
-    }
-
-    private async Task RestoreVolumeAsync()
-    {
-        if (_settings.Current.KaraokeRestoreVolume <= 0) return;
-        var app = AudioAppFinder.FindByExe(SpotifyExe);
-        float fallback = (float)_settings.Current.KaraokeRestoreVolume;
-        try
-        {
-            if (app is not null) await Task.Run(() => _ducker.Restore(app.ProcessId, fallback));
-            else if (_duckedRoot != 0) return; // Spotify cerrado: se restaurará cuando vuelva a abrirse
-            _duckedRoot = 0;
-            _settings.Current.KaraokeRestoreVolume = 0;
-            _settings.SaveNow();
-        }
-        catch (Exception ex)
-        {
-            Log.Warn("No se pudo restaurar el volumen de Spotify", ex);
-        }
-    }
-
-    /// <summary>Al salir de la app: Spotify vuelve a su volumen.</summary>
+    /// <summary>Al salir de la app (Spotify vuelve a su volumen con <see cref="AppDucking.Shutdown"/>).</summary>
     public void Shutdown()
     {
         _songTimer.Stop();
         _lineTimer.Stop();
-        if (_settings.Current.KaraokeRestoreVolume <= 0) return;
-        try
-        {
-            RestoreVolumeAsync().Wait(TimeSpan.FromSeconds(3));
-        }
-        catch (Exception ex)
-        {
-            Log.Warn("No se pudo restaurar el volumen de Spotify al salir", ex);
-        }
     }
 
     public void Dispose()
@@ -326,15 +278,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
         SongTitle = song?.Title ?? "";
         SongArtist = song?.Artist ?? "";
 
-        // Si la app se cerró con el karaoke puesto, Spotify se quedó al 0,1 %: se le devuelve su volumen.
-        if (!IsOn && !_busy && _settings.Current.KaraokeRestoreVolume > 0) await RestoreVolumeAsync();
-
-        if (IsOn && !_busy)
-        {
-            // Spotify puede abrir sesiones de audio nuevas, o tú cambiar su volumen: se vuelve a ajustar.
-            if (AudioAppFinder.FindByExe(SpotifyExe) is { } app) await DuckAsync(app.ProcessId);
-            OnPropertyChanged(nameof(ShowMonitorWarning));
-        }
+        if (IsOn && !_busy) OnPropertyChanged(nameof(ShowMonitorWarning));
 
         if (song is null)
         {

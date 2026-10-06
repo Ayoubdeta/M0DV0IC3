@@ -47,6 +47,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly AudioService _audio;
     private readonly DispatcherTimer _meterTimer;
     private readonly DispatcherTimer _holdTimer;
+    private readonly AppDucking _ducking;
     private VoiceCardViewModel? _holding;
     private uint _holdKey;
     private bool _refreshingDevices;
@@ -95,8 +96,9 @@ public sealed partial class MainViewModel : ObservableObject
         Soundboard = new SoundboardViewModel(settings, audio.Pipeline.Soundboard, Hotkeys);
         Speech = new SpeechViewModel(settings, audio.Pipeline.Speech, Hotkeys);
         Recorder = new RecorderViewModel(audio.Pipeline.Recorder, Soundboard);
-        Music = new MusicViewModel(settings, audio);
-        Karaoke = new KaraokeViewModel(settings, audio, Music, Voices, () => HasMonitor);
+        _ducking = new AppDucking(settings, audio.AppAudio);
+        Music = new MusicViewModel(settings, audio, Voices, _ducking, () => HasMonitor);
+        Karaoke = new KaraokeViewModel(settings, audio, Music, Voices, _ducking, () => HasMonitor);
 
         var pipeline = audio.Pipeline;
         pipeline.Voice.Range = s.VoiceRange;
@@ -379,6 +381,8 @@ public sealed partial class MainViewModel : ObservableObject
     public void Shutdown()
     {
         Karaoke.Shutdown();
+        Music.Shutdown();
+        _ducking.Shutdown();
         Recorder.Shutdown();
         _holdTimer.Stop();
         var profile = _audio.Pipeline.Voice.Profile;
@@ -459,6 +463,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     partial void OnSelectedMonitorChanged(DeviceItem? value)
     {
+        Music?.RefreshMonitorWarning();
         if (_refreshingDevices) return;
         S.MonitorDeviceId = value?.Id;
         _settings.ScheduleSave();

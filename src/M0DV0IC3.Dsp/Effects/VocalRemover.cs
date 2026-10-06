@@ -16,6 +16,8 @@ namespace M0DV0IC3.Dsp.Effects;
 /// con este método no se puede quitar del todo.</para>
 /// <para>Entra estéreo y sale mono, como el resto del audio de la app. Latencia: 2048 muestras (43 ms a 48 kHz). Con
 /// <see cref="Strength"/> = 0 la salida es la mezcla mono original, solo que retrasada.</para>
+/// <para><see cref="Split"/> separa en vez de quitar: devuelve la canción sin voz y, aparte, lo que ha quitado (la voz),
+/// y entre las dos suman la mezcla original. Así se le puede cambiar la voz al cantante.</para>
 /// </summary>
 public sealed class VocalRemover
 {
@@ -39,6 +41,10 @@ public sealed class VocalRemover
     private readonly float[] _inRight = new float[FrameSize];
     private readonly double[] _overlap = new double[FrameSize];
     private readonly float[] _ready = new float[Hop];
+    private readonly double[] _overlapVocals = new double[FrameSize];
+    private readonly float[] _readyVocals = new float[Hop];
+    private readonly double[] _vocalsRe = new double[FrameSize];
+    private readonly double[] _vocalsIm = new double[FrameSize];
     private readonly double[] _re = new double[FrameSize];
     private readonly double[] _im = new double[FrameSize];
     private readonly double[] _powerMid = new double[Bins];
@@ -49,6 +55,8 @@ public sealed class VocalRemover
     private double _levelOut;
     private int _filled = FrameSize - Hop;
     private float _strength = 1f;
+    private volatile bool _restoreLoudness = true;
+    private bool _split;
 
     public VocalRemover(int sampleRate = DspMath.SampleRate)
     {
@@ -75,15 +83,34 @@ public sealed class VocalRemover
         set => Volatile.Write(ref _strength, Math.Clamp(value, 0f, 1f));
     }
 
+    /// <summary>Al quitar la voz, recuperar poco a poco el volumen que pierde la canción (en el karaoke, sí).</summary>
+    public bool RestoreLoudness
+    {
+        get => _restoreLoudness;
+        set => _restoreLoudness = value;
+    }
+
     public int LatencySamples => FrameSize;
 
     /// <summary>Procesa un bloque: <paramref name="mono"/> recibe la canción sin voz, con <see cref="LatencySamples"/> de retraso.</summary>
-    public void Process(ReadOnlySpan<float> left, ReadOnlySpan<float> right, Span<float> mono)
+    public void Process(ReadOnlySpan<float> left, ReadOnlySpan<float> right, Span<float> mono) => Run(left, right, mono, [], split: false);
+
+    /// <summary>
+    /// Separa un bloque: <paramref name="rest"/> recibe la canción sin voz y <paramref name="vocals"/> la voz que se le ha
+    /// quitado, las dos con <see cref="LatencySamples"/> de retraso. Sumadas dan la mezcla mono original (sin recuperar
+    /// volumen, aunque <see cref="RestoreLoudness"/> esté activado).
+    /// </summary>
+    public void Split(ReadOnlySpan<float> left, ReadOnlySpan<float> right, Span<float> rest, Span<float> vocals) =>
+        Run(left, right, rest, vocals, split: true);
+
+    private void Run(ReadOnlySpan<float> left, ReadOnlySpan<float> right, Span<float> mono, Span<float> vocals, bool split)
     {
+        _split = split;
         for (int i = 0; i < left.Length; i++)
         {
             int slot = _filled - (FrameSize - Hop);
             mono[i] = _ready[slot];
+            if (split) vocals[i] = _readyVocals[slot];
             _inLeft[_filled] = left[i];
             _inRight[_filled] = right[i];
             if (++_filled == FrameSize)
@@ -100,6 +127,8 @@ public sealed class VocalRemover
         Array.Clear(_inRight);
         Array.Clear(_overlap);
         Array.Clear(_ready);
+        Array.Clear(_overlapVocals);
+        Array.Clear(_readyVocals);
         Array.Clear(_powerMid);
         Array.Clear(_powerSide);
         _levelIn = _levelOut = 0;
@@ -153,7 +182,7 @@ public sealed class VocalRemover
             _gain[k] = g;
         }
         double makeup = 1;
-        if (strength > 0)
+        if (strength > 0 && _restoreLoudness && !_split)
         {
             if (loudIn > QuietLoudness)
             {
@@ -162,6 +191,8 @@ public sealed class VocalRemover
             }
             if (_levelOut > 0) makeup = Math.Clamp(Math.Sqrt(_levelIn / _levelOut), 1, MaxMakeup);
         }
+
+        if (_split) SynthesizeVocals();
 
         // Espectro simétrico de una señal real.
         for (int k = 0; k < Bins; k++)
@@ -190,6 +221,30 @@ public sealed class VocalRemover
             _powerMid[k] = DspMath.FlushDenormal(_powerMid[k]);
             _powerSide[k] = DspMath.FlushDenormal(_powerSide[k]);
         }
+    }
+
+    /// <summary>Lo que se quita (la voz) es lo que le falta a la ganancia para llegar a 1: M·(1 - g).</summary>
+    private void SynthesizeVocals()
+    {
+        for (int k = 0; k < Bins; k++)
+        {
+            double removed = 1 - _gain[k];
+            _vocalsRe[k] = _re[k] * removed;
+            _vocalsIm[k] = _im[k] * removed;
+        }
+        _vocalsIm[0] = 0;
+        _vocalsIm[Bins - 1] = 0;
+        for (int k = 1; k < Bins - 1; k++)
+        {
+            _vocalsRe[FrameSize - k] = _vocalsRe[k];
+            _vocalsIm[FrameSize - k] = -_vocalsIm[k];
+        }
+        _fft.Inverse(_vocalsRe, _vocalsIm);
+
+        for (int i = 0; i < FrameSize; i++) _overlapVocals[i] += _vocalsRe[i] * _window[i] * 0.5;
+        for (int i = 0; i < Hop; i++) _readyVocals[i] = (float)_overlapVocals[i];
+        Array.Copy(_overlapVocals, Hop, _overlapVocals, 0, FrameSize - Hop);
+        Array.Clear(_overlapVocals, FrameSize - Hop, Hop);
     }
 
     /// <summary>Ponderación A (en potencia, 1 a 1 kHz): cuánto pesa cada frecuencia en lo fuerte que se oye.</summary>

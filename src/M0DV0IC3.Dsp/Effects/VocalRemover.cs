@@ -7,11 +7,13 @@ namespace M0DV0IC3.Dsp.Effects;
 /// mezcla (igual en el canal izquierdo y en el derecho) y los instrumentos repartidos a los lados. Por cada
 /// frecuencia (STFT de 2048 muestras, salto de 512), la mezcla central se baja hasta la potencia que tiene la
 /// lateral (filtro de Wiener): lo que solo está en el centro desaparece y lo demás se queda. Solo en la zona de la
-/// voz (de ~100 Hz a ~8 kHz): a diferencia del truco clásico de restar los canales, se conservan el bajo, el bombo y
-/// los platillos.
-/// <para>Medido con una mezcla de prueba (voz en el centro con eco estéreo, pad, guitarra, teclado, bajo, bombo y
-/// platillos): la voz baja 24 dB (14 dB con una voz de hombre muy grave) y la música cambia -7,6 dB. La versión
-/// anterior, que solo quitaba lo muy correlacionado, bajaba la voz unos 6 dB.</para>
+/// voz (de ~200 Hz a ~8 kHz): el bajo y el bombo, que también van en el centro, no se tocan.
+/// <para>Al quitar la voz la canción pierde volumen (la voz suele ser lo que más suena), así que se recupera poco a
+/// poco el volumen que tenía, hasta +6 dB: si no, el ritmo se queda bajo.</para>
+/// <para>Medido con 140 canciones reales (MUSDB18, pistas separadas): la voz baja ~12 dB y la música pierde ~1,6 dB
+/// (batería -0,9, bajo -0,3). Con la zona empezando en 70-110 Hz, la música perdía 4,8 dB (bajo -4,4) y la voz se
+/// oía más. Lo que queda de voz (su reverb, los coros abiertos a los lados) suena ~4,5 dB por debajo de la música:
+/// con este método no se puede quitar del todo.</para>
 /// <para>Entra estéreo y sale mono, como el resto del audio de la app. Latencia: 2048 muestras (43 ms a 48 kHz). Con
 /// <see cref="Strength"/> = 0 la salida es la mezcla mono original, solo que retrasada.</para>
 /// </summary>
@@ -24,9 +26,15 @@ public sealed class VocalRemover
     // Suavizado de las estadísticas de cada frecuencia entre tramas (~25 ms): sin él, la máscara salta y suena a agua.
     private const double Smoothing = 0.6;
 
+    // Recuperación del volumen: constante de tiempo de ~3 s, como mucho +6 dB y sin moverse en los silencios
+    // (por debajo de ~-60 dBFS).
+    private const double MaxMakeup = 2.0;
+    private const double QuietLoudness = 1.0;
+
     private readonly Fft _fft = new(FrameSize);
     private readonly double[] _window = new double[FrameSize];
     private readonly double[] _bandWeight = new double[Bins];
+    private readonly double[] _loudnessWeight = new double[Bins];
     private readonly float[] _inLeft = new float[FrameSize];
     private readonly float[] _inRight = new float[FrameSize];
     private readonly double[] _overlap = new double[FrameSize];
@@ -36,6 +44,9 @@ public sealed class VocalRemover
     private readonly double[] _powerMid = new double[Bins];
     private readonly double[] _powerSide = new double[Bins];
     private readonly double[] _gain = new double[Bins];
+    private readonly double _levelCoefficient;
+    private double _levelIn;
+    private double _levelOut;
     private int _filled = FrameSize - Hop;
     private float _strength = 1f;
 
@@ -44,15 +55,17 @@ public sealed class VocalRemover
         // Raíz de Hann en el análisis y en la síntesis: con un salto de N/4, las ventanas suman 2 en cada muestra.
         for (int i = 0; i < FrameSize; i++) _window[i] = Math.Sqrt(0.5 - 0.5 * Math.Cos(2 * Math.PI * i / FrameSize));
 
-        // Solo la zona de la voz: sube de 70 a 110 Hz (las voces graves bajan de 100 Hz; el bajo y el bombo quedan
-        // casi todos por debajo) y baja de 7 a 11 kHz.
+        // Solo la zona de la voz: sube de 150 a 250 Hz y baja de 7 a 11 kHz. Lo que queda por debajo de una voz grave
+        // (su nota fundamental) apenas se entiende, y ahí van el bajo y el bombo.
         for (int k = 0; k < Bins; k++)
         {
             double hz = (double)k * sampleRate / FrameSize;
-            double low = Math.Clamp((hz - 70) / 40, 0, 1);
+            double low = Math.Clamp((hz - 150) / 100, 0, 1);
             double high = Math.Clamp((11000 - hz) / 4000, 0, 1);
             _bandWeight[k] = low * high;
+            _loudnessWeight[k] = AWeighting(Math.Max(hz, 1));
         }
+        _levelCoefficient = Math.Exp(-(double)Hop / (3.0 * sampleRate));
     }
 
     /// <summary>Cuánta voz se quita, de 0 (nada) a 1 (todo lo que esté en el centro). Se puede cambiar desde otro hilo.</summary>
@@ -89,6 +102,7 @@ public sealed class VocalRemover
         Array.Clear(_ready);
         Array.Clear(_powerMid);
         Array.Clear(_powerSide);
+        _levelIn = _levelOut = 0;
         _filled = FrameSize - Hop;
     }
 
@@ -123,16 +137,37 @@ public sealed class VocalRemover
             _gain[k] = 1 - strength * _bandWeight[k] * (1 - keep);
 
             // De momento se guarda la mezcla mono (L + R) / 2 de esta frecuencia.
-            _re[k] = 0.5 * (lRe + rRe);
-            _im[k] = 0.5 * (lIm + rIm);
+            _re[k] = mRe;
+            _im[k] = mIm;
         }
 
-        // Ganancias suavizadas entre frecuencias vecinas (menos "ruido musical") y espectro simétrico de una señal real.
+        // Ganancias suavizadas entre frecuencias vecinas (menos "ruido musical"), y cuánto volumen (ponderado como el
+        // oído) entra y sale.
+        double loudIn = 0, loudOut = 0;
         for (int k = 0; k < Bins; k++)
         {
             double g = (2 * _gain[k] + _gain[Math.Max(0, k - 1)] + _gain[Math.Min(Bins - 1, k + 1)]) / 4;
-            _re[k] *= g;
-            _im[k] *= g;
+            double power = (_re[k] * _re[k] + _im[k] * _im[k]) * _loudnessWeight[k];
+            loudIn += power;
+            loudOut += power * g * g;
+            _gain[k] = g;
+        }
+        double makeup = 1;
+        if (strength > 0)
+        {
+            if (loudIn > QuietLoudness)
+            {
+                _levelIn = _levelCoefficient * _levelIn + (1 - _levelCoefficient) * loudIn;
+                _levelOut = _levelCoefficient * _levelOut + (1 - _levelCoefficient) * loudOut;
+            }
+            if (_levelOut > 0) makeup = Math.Clamp(Math.Sqrt(_levelIn / _levelOut), 1, MaxMakeup);
+        }
+
+        // Espectro simétrico de una señal real.
+        for (int k = 0; k < Bins; k++)
+        {
+            _re[k] *= _gain[k] * makeup;
+            _im[k] *= _gain[k] * makeup;
         }
         _im[0] = 0;
         _im[Bins - 1] = 0;
@@ -155,5 +190,14 @@ public sealed class VocalRemover
             _powerMid[k] = DspMath.FlushDenormal(_powerMid[k]);
             _powerSide[k] = DspMath.FlushDenormal(_powerSide[k]);
         }
+    }
+
+    /// <summary>Ponderación A (en potencia, 1 a 1 kHz): cuánto pesa cada frecuencia en lo fuerte que se oye.</summary>
+    private static double AWeighting(double hz)
+    {
+        double f2 = hz * hz;
+        double ra = 12194.0 * 12194.0 * f2 * f2 /
+                    ((f2 + 20.6 * 20.6) * Math.Sqrt((f2 + 107.7 * 107.7) * (f2 + 737.9 * 737.9)) * (f2 + 12194.0 * 12194.0));
+        return ra * ra / (0.7943 * 0.7943);
     }
 }

@@ -23,6 +23,25 @@ public sealed class VocalRemoverTests(ITestOutputHelper output)
 
     private static double RmsDb(float[] x) => DspMath.GainToDb(DspMath.Rms(x.AsSpan(Rate / 2)));
 
+    // Donde se entienden las palabras: de 400 Hz a 4 kHz (la fundamental de una voz grave y los agudos de las "s" se
+    // dejan a propósito).
+    private static double VoiceBandDb(float[] x)
+    {
+        var y = (float[])x.Clone();
+        var highPass = new Biquad();
+        var lowPass = new Biquad();
+        highPass.SetHighPass(Rate, 400);
+        lowPass.SetLowPass(Rate, 4000);
+        for (int pass = 0; pass < 2; pass++)
+        {
+            highPass.Reset();
+            lowPass.Reset();
+            highPass.Process(y);
+            lowPass.Process(y);
+        }
+        return RmsDb(y);
+    }
+
     [Fact]
     public void Fft_roundtrip_is_exact()
     {
@@ -51,10 +70,10 @@ public sealed class VocalRemoverTests(ITestOutputHelper output)
     [Fact]
     public void Centered_voice_is_removed()
     {
-        var voice = TestSignals.Vowel(200, 1.5);
-        double before = RmsDb(Run(voice, voice, 0));
-        double after = RmsDb(Run(voice, voice, 1));
-        output.WriteLine($"voz en el centro: {before:F1} dB → {after:F1} dB");
+        var voice = TestSignals.Vowel(130, 1.5);
+        double before = VoiceBandDb(Run(voice, voice, 0));
+        double after = VoiceBandDb(Run(voice, voice, 1));
+        output.WriteLine($"voz grave en el centro, de 400 Hz a 4 kHz: {before:F1} dB → {after:F1} dB");
         Assert.True(after < before - 15);
     }
 
@@ -70,6 +89,24 @@ public sealed class VocalRemoverTests(ITestOutputHelper output)
         output.WriteLine($"guitarra a la izquierda: {side:+0.0;-0.0} dB, bajo en el centro: {low:+0.0;-0.0} dB");
         Assert.InRange(side, -1, 0.5);
         Assert.InRange(low, -1.5, 0.5);
+    }
+
+    // Sin la voz la canción baja de volumen; poco a poco se recupera (hasta +6 dB) para que el ritmo no se quede bajo.
+    [Fact]
+    public void The_song_gets_its_loudness_back()
+    {
+        var voice = TestSignals.Vowel(280, 6, 0.4f);
+        var guitar = TestSignals.Sawtooth(415, 6, 0.1f);
+        var left = new float[voice.Length];
+        for (int i = 0; i < left.Length; i++) left[i] = voice[i] + guitar[i];
+        var original = Run(left, voice, 0);
+        var karaoke = Run(left, voice, 1);
+        double before = DspMath.GainToDb(DspMath.Rms(original.AsSpan(5 * Rate)));
+        double after = DspMath.GainToDb(DspMath.Rms(karaoke.AsSpan(5 * Rate)));
+        double guitarAlone = DspMath.GainToDb(DspMath.Rms(Run(guitar, new float[guitar.Length], 0).AsSpan(5 * Rate)));
+        output.WriteLine($"canción: {before:F1} dB, sin voz: {after:F1} dB (la guitarra sola: {guitarAlone:F1} dB)");
+        Assert.InRange(after - guitarAlone, 4, 6.5);
+        Assert.True(after < before + 0.5);
     }
 
     [Fact]

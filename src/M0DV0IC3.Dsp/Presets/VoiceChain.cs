@@ -171,7 +171,7 @@ public sealed class VoiceChain : IAudioEffect
         }
         _whisper.Configure(p.WhisperMix);
         _breath.Configure(p.Breathiness);
-        _harmonizer?.Configure(p.HarmonyMix);
+        _harmonizer?.Configure(p.HarmonyMix, p.Harmony);
         _vocoder.Configure(p.VocoderMix, p.VocoderHz);
         _ring.Configure(p.RingModHz, p.RingModMix);
         _comb.Configure(p.CombMs, p.CombFeedback, p.CombMix);

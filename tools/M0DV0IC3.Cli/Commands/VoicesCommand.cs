@@ -42,7 +42,8 @@ internal static class VoicesCommand
         }
         if (p.VibratoSemitones > 0) parts.Add($"vibrato {p.VibratoHz:0.##} Hz ±{p.VibratoSemitones:0.#} st");
         if (p.ReverseMs > 0) parts.Add($"invertida {p.ReverseMs:0} ms");
-        if (p.HarmonyMix > 0) parts.Add($"coro {p.HarmonyMix:P0}");
+        if (p.HarmonyMix > 0)
+            parts.Add($"{p.Harmony switch { HarmonyStyle.Angelic => "coro celestial", HarmonyStyle.Demonic => "coro demoníaco", _ => "coro" }} {p.HarmonyMix:P0}");
         if (p.WhisperMix > 0) parts.Add($"susurro {p.WhisperMix:P0}");
         if (p.Breathiness > 0) parts.Add($"aire {p.Breathiness:P0}");
         if (p.VocoderMix > 0) parts.Add($"vocoder {p.VocoderMix:P0} ({p.VocoderHz:0} Hz)");

@@ -75,6 +75,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
 
     public void Play(SoundItemViewModel item)
     {
+        item.FlushTrim();
         if (item.Clip is { } clip) _mixer.Play(clip, (float)item.Volume);
     }
 
@@ -216,7 +217,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
         {
             string id = item.Id;
             string name = item.Name;
-            item.Clip = await Task.Run(() => SoundLoader.Load(path, id, name));
+            item.SetFullClip(await Task.Run(() => SoundLoader.Load(path, id, name)));
             return true;
         }
         catch (Exception ex)

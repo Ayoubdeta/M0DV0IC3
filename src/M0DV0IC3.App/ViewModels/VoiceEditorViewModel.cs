@@ -33,6 +33,13 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
         new(TransmissionStyle.Space, "Astronauta (pitidos de la NASA)"),
     ];
 
+    private static readonly IReadOnlyList<EditorOption<HarmonyStyle>> HarmonyOptions =
+    [
+        new(HarmonyStyle.Choir, "Coro (octava abajo, quinta y octava arriba)"),
+        new(HarmonyStyle.Angelic, "Celestial (octavas arriba y abajo)"),
+        new(HarmonyStyle.Demonic, "Demoníaco (voces graves debajo)"),
+    ];
+
     private const string DefaultIcon = "🎭";
 
     private readonly VoicePreset _original;
@@ -75,6 +82,7 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
     [ObservableProperty] private double _nasalDb;
     [ObservableProperty] private double _compression;
     [ObservableProperty] private double _harmonyMix;
+    [ObservableProperty] private HarmonyStyle _harmony;
     [ObservableProperty] private double _vocoderMix;
     [ObservableProperty] private double _vocoderHz = 110;
 
@@ -109,6 +117,8 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
     public IReadOnlyList<string> Keys => AutotuneNames.Notes;
 
     public IReadOnlyList<EditorOption<TransmissionStyle>> Transmissions => TransmissionOptions;
+
+    public IReadOnlyList<EditorOption<HarmonyStyle>> Harmonies => HarmonyOptions;
 
     public bool TransmissionEnabled => Transmission != TransmissionStyle.Off;
 
@@ -187,6 +197,7 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
             NasalDb = p.NasalDb;
             Compression = p.Compression;
             HarmonyMix = p.HarmonyMix;
+            Harmony = p.Harmony;
             VocoderMix = p.VocoderMix;
             VocoderHz = Math.Clamp(p.VocoderHz, 55, 220);
             Transmission = p.Transmission;
@@ -239,6 +250,7 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
             NasalDb = Math.Round(NasalDb * 2) / 2,
             Compression = Math.Round(Compression, 2),
             HarmonyMix = Math.Round(HarmonyMix, 2),
+            Harmony = Harmony,
             VocoderMix = Math.Round(VocoderMix, 2),
             VocoderHz = Math.Round(VocoderHz),
             Transmission = Transmission,

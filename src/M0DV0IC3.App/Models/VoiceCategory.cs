@@ -20,8 +20,9 @@ public static class VoiceCategories
     {
         "autotune" or "autotune-mujer" or "autotune-cantar" => VoiceCategory.Autotune,
         "susurro" or "invertida" or "agua" or "espacial" or "radio" or "telefono" or "megafono" or "distorsion"
-            or "coro" or "vocoder" or "walkie" or "astronauta" => VoiceCategory.Effects,
-        "lejana" or "cueva" or "reverb" or "delay" or "chorus" or "flanger" => VoiceCategory.Ambience,
+            or "coro" or "vocoder" or "walkie" or "astronauta" or "8bits" or "vinilo" or "lata" or "mascarilla" => VoiceCategory.Effects,
+        "lejana" or "cueva" or "reverb" or "delay" or "chorus" or "flanger" or "estadio" or "ducha" or "catedral"
+            or "megafonia" => VoiceCategory.Ambience,
         _ => VoiceCategory.Characters,
     };
 

@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
+             xmlns:controls="clr-namespace:M0DV0IC3.App.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:SoundboardViewModel}"
              AllowDrop="True" Background="Transparent"
@@ -22,7 +23,7 @@
                         <TextBlock Text="Añadir sonido" />
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding StopAllCommand}" Margin="0,0,20,0" ToolTip="Parar todos los sonidos (Ctrl+Alt+S por defecto)" AutomationProperties.Name="Parar todo">
+                <Button Command="{Binding StopAllCommand}" Margin="0,0,20,0" ToolTip="Parar todos los sonidos que estén sonando (el + del teclado numérico, por defecto)" AutomationProperties.Name="Parar todo">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE71A;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
                         <TextBlock Text="Parar todo" />
@@ -99,6 +100,7 @@
         <!-- Detalles del sonido elegido con el engranaje -->
         <Border Grid.Column="1" Width="320" Margin="12,0,0,0" Style="{StaticResource CardBorder}"
                 Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisible}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-8,0" Padding="0,0,8,0">
             <StackPanel DataContext="{Binding Selected}" d:DataContext="{d:DesignInstance Type=vm:SoundItemViewModel}">
                 <Grid>
                     <TextBlock Text="Sonido" Style="{StaticResource SectionHeader}" />
@@ -121,6 +123,39 @@
                     <TextBlock Grid.Column="1" Text="{Binding Volume, StringFormat={}{0:P0}}" Style="{StaticResource MutedText}"
                                VerticalAlignment="Center" HorizontalAlignment="Right" />
                 </Grid>
+
+                <TextBlock Text="Recortar" Style="{StaticResource FieldLabel}" Margin="2,14,0,4" />
+                <StackPanel Visibility="{Binding HasFullClip, Converter={StaticResource BoolToVisible}}">
+                    <controls:WaveformView Height="72" Peaks="{Binding Peaks}" Duration="{Binding FullDuration}"
+                                           Start="{Binding TrimStart}" End="{Binding TrimEnd}" />
+                    <TextBlock Text="{Binding TrimText}" Style="{StaticResource MutedText}" FontSize="11.5" Margin="0,6,0,0" TextWrapping="Wrap" />
+                    <Grid Margin="0,6,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="44" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Inicio" VerticalAlignment="Center" />
+                        <Slider Grid.Column="1" Minimum="0" Maximum="{Binding FullDuration}" Value="{Binding TrimStart}"
+                                SmallChange="0.01" LargeChange="0.1" VerticalAlignment="Center" AutomationProperties.Name="Inicio del recorte" />
+                        <TextBlock Grid.Row="1" Text="Fin" VerticalAlignment="Center" Margin="0,4,0,0" />
+                        <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="{Binding FullDuration}" Value="{Binding TrimEnd}"
+                                SmallChange="0.01" LargeChange="0.1" VerticalAlignment="Center" Margin="0,4,0,0" AutomationProperties.Name="Fin del recorte" />
+                    </Grid>
+                    <WrapPanel Margin="0,8,0,0">
+                        <Button Content="Quitar silencios" Command="{Binding TrimSilenceCommand}" Margin="0,0,6,6"
+                                ToolTip="Recorta el silencio del principio y del final" />
+                        <Button Content="Sonido entero" Command="{Binding ResetTrimCommand}" Margin="0,0,6,6"
+                                IsEnabled="{Binding IsTrimmed}" ToolTip="Quita el recorte" />
+                        <Button Content="Exportar WAV…" Command="{Binding ExportWavCommand}" Margin="0,0,0,6"
+                                ToolTip="Guarda el trozo recortado como un archivo WAV nuevo" />
+                    </WrapPanel>
+                    <TextBlock Style="{StaticResource MutedText}" FontSize="11" TextWrapping="Wrap"
+                               Text="Arrastra las marcas o usa Inicio y Fin. Se guarda solo y el archivo original no se modifica: «Sonido entero» lo deshace." />
+                </StackPanel>
 
                 <TextBlock Text="Atajo de teclado" Style="{StaticResource FieldLabel}" Margin="2,14,0,4" />
                 <Grid DataContext="{Binding Hotkey}">
@@ -166,6 +201,7 @@
                 <TextBlock Text="{Binding LoadError}" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" Margin="0,4,0,0"
                            Visibility="{Binding HasError, Converter={StaticResource BoolToVisible}}" />
             </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
 </UserControl>

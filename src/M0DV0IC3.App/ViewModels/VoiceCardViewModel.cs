@@ -17,6 +17,13 @@ public sealed partial class VoiceCardViewModel : ObservableObject
     [ObservableProperty]
     private string? _hotkeyHint;
 
+    [ObservableProperty]
+    private bool _isFavorite;
+
+    /// <summary>Se ve con el filtro actual (todas, o solo las favoritas).</summary>
+    [ObservableProperty]
+    private bool _isShown = true;
+
     public VoiceCardViewModel(VoicePreset preset)
     {
         _preset = preset;

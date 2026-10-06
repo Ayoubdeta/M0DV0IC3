@@ -124,7 +124,16 @@
                                       Value="{Binding Distortion}" Format="{}{0:P0}" OffText="apagada" />
                 <controls:ParamSlider Label="Coro" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
                                       Value="{Binding HarmonyMix}" Format="{}{0:P0}" OffText="apagado"
-                                      Hint="Tu voz con tres copias: una octava abajo, una quinta y una octava arriba. Gasta como tres voces con cambio de tono." />
+                                      Hint="Tu voz con tres copias con otro tono a la vez. Gasta como tres voces con cambio de tono." />
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="118" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Coro (estilo)" VerticalAlignment="Center" />
+                    <ComboBox Grid.Column="1" Margin="6,0,0,0" ItemsSource="{Binding Harmonies}" DisplayMemberPath="Name"
+                              SelectedValuePath="Value" SelectedValue="{Binding Harmony}" />
+                </Grid>
                 <controls:ParamSlider Label="Vocoder" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
                                       Value="{Binding VocoderMix}" Format="{}{0:P0}" OffText="apagado"
                                       Hint="Tu voz toca un acorde de sintetizador: el robot musical de la música electrónica." />

@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <!-- Tarjeta: el icono y el borde toman el color de su grupo -->
         <DataTemplate x:Key="VoiceCardTemplate" DataType="{x:Type vm:VoiceCardViewModel}">
+            <Grid x:Name="Card" Visibility="{Binding IsShown, Converter={StaticResource BoolToVisible}}">
             <Button Style="{StaticResource VoiceCardButton}" AutomationProperties.Name="{Binding Name}"
                     Tag="{Binding Category, Converter={StaticResource CategoryAccent}}"
                     Command="{Binding DataContext.ActivateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -31,6 +32,46 @@
                     </Border>
                 </StackPanel>
             </Button>
+            <!-- Estrella de favorita: se ve al pasar el ratón por la tarjeta, o siempre si ya es favorita -->
+            <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,10,0" Width="26" Height="26"
+                    Command="{Binding DataContext.ToggleFavoriteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    CommandParameter="{Binding}" Cursor="Hand" Focusable="False">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent">
+                            <TextBlock x:Name="Star" Text="&#xE734;" FontFamily="{StaticResource IconFont}" FontSize="15"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                <Setter TargetName="Star" Property="Text" Value="&#xE735;" />
+                                <Setter TargetName="Star" Property="Foreground" Value="{StaticResource LimeBrush}" />
+                            </DataTrigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Star" Property="Foreground" Value="{StaticResource LimeBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Opacity" Value="0" />
+                        <Setter Property="ToolTip" Value="Añadir a favoritas" />
+                        <Setter Property="AutomationProperties.Name" Value="Añadir a favoritas" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMouseOver, ElementName=Card}" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="ToolTip" Value="Quitar de favoritas" />
+                                <Setter Property="AutomationProperties.Name" Value="Quitar de favoritas" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            </Grid>
         </DataTemplate>
 
         <ItemsPanelTemplate x:Key="WrapPanelTemplate">
@@ -39,7 +80,7 @@
 
         <!-- Cabecera de un grupo: barra con su color, título y subtítulo -->
         <DataTemplate x:Key="GroupTemplate" DataType="{x:Type vm:VoiceGroupViewModel}">
-            <StackPanel Margin="0,0,0,14">
+            <StackPanel Margin="0,0,0,14" Visibility="{Binding HasShownCards, Converter={StaticResource BoolToVisible}}">
                 <StackPanel Orientation="Horizontal" Margin="8,4,0,2">
                     <Border Width="4" Height="20" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"
                             Background="{Binding Category, Converter={StaticResource CategoryAccent}}" />
@@ -85,6 +126,11 @@
                         <TextBlock Text="Borrar" />
                     </StackPanel>
                 </Button>
+                <ToggleButton Style="{StaticResource Chip}" Tag="&#xE734;" IsChecked="{Binding FavoritesOnly}" Margin="0,0,8,8"
+                              AutomationProperties.Name="Solo favoritas" VerticalAlignment="Center"
+                              ToolTip="Muestra solo las voces con estrella. Voz aleatoria y voz anterior / siguiente eligen entonces entre ellas.">
+                    <TextBlock Text="Favoritas" />
+                </ToggleButton>
                 <ToggleButton Style="{StaticResource Chip}" Tag="&#xE8B1;" IsChecked="{Binding RandomEnabled}" Margin="0,0,6,8" AutomationProperties.Name="Voz aleatoria"
                               VerticalAlignment="Center"
                               ToolTip="Voz aleatoria: va cambiando sola de voz mientras hablas (Ctrl+Alt+R por defecto). Se salta la voz invertida.">
@@ -95,12 +141,18 @@
                           ToolTip="Cada cuánto cambia la voz aleatoria" />
             </WrapPanel>
             <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" FontSize="12.5" Margin="4,0,6,10"
-                       Text="Haz clic en una voz para usarla. Las voces incluidas no se pueden editar: duplícalas para crear tu versión." />
+                       Text="Haz clic en una voz para usarla y en su estrella para guardarla en favoritas. Las voces incluidas no se pueden editar: duplícalas para crear tu versión." />
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="0,0,6,12">
+                    <Border Style="{StaticResource CardBorder}" Margin="6,0,6,14" Padding="16,12"
+                            Visibility="{Binding ShowNoFavoritesHint, Converter={StaticResource BoolToVisible}}">
+                        <TextBlock TextWrapping="Wrap"
+                                   Text="Todavía no tienes voces favoritas. Quita el filtro «Favoritas», pasa el ratón por una voz y pulsa su estrella." />
+                    </Border>
                     <ItemsControl ItemsSource="{Binding Groups}" ItemTemplate="{StaticResource GroupTemplate}" Focusable="False" />
 
+                    <StackPanel Visibility="{Binding ShowCustomSection, Converter={StaticResource BoolToVisible}}">
                     <StackPanel Orientation="Horizontal" Margin="8,4,0,2">
                         <Border Width="4" Height="20" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"
                                 Background="{StaticResource CustomAccentBrush}" />
@@ -112,7 +164,8 @@
                                   ItemsPanel="{StaticResource WrapPanelTemplate}" Focusable="False" />
                     <TextBlock Style="{StaticResource MutedText}" Margin="8,6,0,0"
                                Text="Todavía no tienes voces propias. Pulsa «Nueva voz», o elige una voz y pulsa «Duplicar»."
-                               Visibility="{Binding HasCustom, Converter={StaticResource BoolToCollapsed}}" />
+                               Visibility="{Binding ShowNoCustomHint, Converter={StaticResource BoolToVisible}}" />
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </DockPanel>

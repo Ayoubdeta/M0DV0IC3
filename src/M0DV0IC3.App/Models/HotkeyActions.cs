@@ -50,7 +50,9 @@ public static class HotkeyActions
         };
         for (int n = 1; n <= 9; n++)
             list.Add(new(VoiceAction(n), $"Elegir la voz n.º {n} de la lista", $"Ctrl+Alt+{n}"));
-        list.Add(new(StopSounds, "Parar todos los sonidos", "Ctrl+Alt+S"));
+        // El + del teclado numérico, sin Ctrl ni Alt: así se para un sonido largo con una sola tecla. El + del teclado
+        // principal no se puede usar solo, porque dejaría de escribirse "+" en todas las apps.
+        list.Add(new(StopSounds, "Parar todos los sonidos", "Add"));
         return list;
     }
 }

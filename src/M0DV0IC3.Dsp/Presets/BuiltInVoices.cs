@@ -181,6 +181,95 @@ public static class BuiltInVoices
         },
         new()
         {
+            // Pato: casi el mismo tono pero una garganta diminuta y muy nasal.
+            Id = "pato", Name = "Pato", Icon = "🦆", IsBuiltIn = true,
+            PitchSemitones = 3, FormantRatio = 1.65, NasalDb = 10, HighPassHz = 300, OutputGainDb = -1.5,
+        },
+        new()
+        {
+            // Hada: muy aguda (~380 Hz), con aire, un brillo de coro y sala grande.
+            Id = "hada", Name = "Hada", Icon = "🧚", IsBuiltIn = true,
+            PitchSemitones = 12, TargetPitchHz = 380, FormantRatio = 1.35, Breathiness = 0.3, HighPassHz = 250,
+            HighShelfDb = 4, ChorusMix = 0.25, ReverbMix = 0.3, ReverbSize = 0.85, OutputGainDb = 1.5,
+        },
+        new()
+        {
+            // Bruja: voz de mujer mayor, nasal y temblorosa, algo rota.
+            Id = "bruja", Name = "Bruja", Icon = "🧹", IsBuiltIn = true,
+            PitchSemitones = 6, TargetPitchHz = 230, FormantRatio = 1.1, NasalDb = 7, VibratoHz = 5.5, VibratoSemitones = 0.5,
+            Distortion = 0.1, HighPassHz = 180, ReverbMix = 0.15, ReverbSize = 0.6, OutputGainDb = -3.5,
+        },
+        new()
+        {
+            // Ogro: muy grave, garganta enorme, nasal y bruto.
+            Id = "ogro", Name = "Ogro", Icon = "👺", IsBuiltIn = true,
+            PitchSemitones = -8, TargetPitchHz = 70, FormantRatio = 0.72, NasalDb = 5, LowShelfDb = 3, Distortion = 0.25,
+            LowPassHz = 5000, OutputGainDb = -3.5,
+        },
+        new()
+        {
+            // Vampiro: grave y susurrante, con una sala de castillo.
+            Id = "vampiro", Name = "Vampiro", Icon = "🧛", IsBuiltIn = true,
+            PitchSemitones = -3, TargetPitchHz = 85, FormantRatio = 0.88, Breathiness = 0.18, PresenceDb = -1,
+            EchoMs = 380, EchoFeedback = 0.2, EchoMix = 0.12, ReverbMix = 0.3, ReverbSize = 0.85, OutputGainDb = 2.5,
+        },
+        new()
+        {
+            // Poseído: tu voz con dos voces demoníacas por debajo (una octava, una cuarta y una octava y quinta).
+            Id = "poseido", Name = "Poseído", Icon = "💀", IsBuiltIn = true,
+            HarmonyMix = 0.9, Harmony = HarmonyStyle.Demonic, Distortion = 0.2, LowPassHz = 6000,
+            ReverbMix = 0.3, ReverbSize = 0.8, OutputGainDb = -5,
+        },
+        new()
+        {
+            // Voz divina: grave y solemne, con octavas arriba y abajo y una catedral.
+            Id = "divina", Name = "Voz divina", Icon = "👼", IsBuiltIn = true,
+            PitchSemitones = -3, TargetPitchHz = 95, FormantRatio = 0.92, HarmonyMix = 0.6, Harmony = HarmonyStyle.Angelic,
+            EchoMs = 450, EchoFeedback = 0.3, EchoMix = 0.15, ReverbMix = 0.5, ReverbSize = 0.97, OutputGainDb = -1,
+        },
+        new()
+        {
+            // Insecto: muy pequeño y zumbón (modulador a 180 Hz).
+            Id = "insecto", Name = "Insecto", Icon = "🐝", IsBuiltIn = true,
+            PitchSemitones = 10, FormantRatio = 1.6, RingModHz = 180, RingModMix = 0.4, HighPassHz = 400, OutputGainDb = 6,
+        },
+        new()
+        {
+            // Cíborg: tu voz con un toque metálico y digital, sin perder lo humano.
+            Id = "ciborg", Name = "Cíborg", Icon = "🦾", IsBuiltIn = true,
+            FormantRatio = 0.95, RingModHz = 90, RingModMix = 0.25, CombMs = 3.5, CombFeedback = 0.45, CombMix = 0.3,
+            BitcrushRateHz = 16000, BitcrushBits = 8, Compression = 0.5, OutputGainDb = 1,
+        },
+        new()
+        {
+            // Robot gigante: grave, metálico y saturado, en un hangar.
+            Id = "mecha", Name = "Robot gigante", Icon = "⚙", IsBuiltIn = true,
+            PitchSemitones = -8, TargetPitchHz = 62, FormantRatio = 0.8, RingModHz = 50, RingModMix = 0.3,
+            CombMs = 5, CombFeedback = 0.6, CombMix = 0.4, Distortion = 0.3, ReverbMix = 0.2, ReverbSize = 0.7, OutputGainDb = 1,
+        },
+        new()
+        {
+            // Androide: afinación perfecta e instantánea (autotune cromático) y un brillo metálico: una voz de IA.
+            Id = "androide", Name = "Androide", Icon = "💻", IsBuiltIn = true,
+            FormantRatio = 1.03, AutotuneScale = AutotuneScale.Chromatic, AutotuneRetuneMs = 0,
+            CombMs = 2, CombFeedback = 0.3, CombMix = 0.2, PresenceDb = 2, Compression = 0.4, OutputGainDb = -1,
+        },
+        new()
+        {
+            // Payaso: agudo, nasal y con un vibrato rápido y tonto.
+            Id = "payaso", Name = "Payaso", Icon = "🤡", IsBuiltIn = true,
+            PitchSemitones = 7, TargetPitchHz = 260, FormantRatio = 1.3, NasalDb = 8, VibratoHz = 7, VibratoSemitones = 0.6,
+            ChorusMix = 0.2, HighPassHz = 200, OutputGainDb = 0,
+        },
+        new()
+        {
+            // Hombre lobo: grave, con gruñido (modulador a 30 Hz), aire y rasgado.
+            Id = "lobo", Name = "Hombre lobo", Icon = "🐺", IsBuiltIn = true,
+            PitchSemitones = -6, TargetPitchHz = 75, FormantRatio = 0.8, RingModHz = 30, RingModMix = 0.25, Breathiness = 0.2,
+            Distortion = 0.3, LowPassHz = 5000, ReverbMix = 0.15, ReverbSize = 0.6, OutputGainDb = -1,
+        },
+        new()
+        {
             Id = "susurro", Name = "Susurro", Icon = "🤫", IsBuiltIn = true,
             WhisperMix = 1, HighPassHz = 150, PresenceDb = 2, OutputGainDb = 0,
         },
@@ -251,6 +340,32 @@ public static class BuiltInVoices
         },
         new()
         {
+            // Videojuego de 8 bits: afinación perfecta, 6 bits y 6 kHz.
+            Id = "8bits", Name = "8 bits", Icon = "👾", IsBuiltIn = true,
+            AutotuneScale = AutotuneScale.Chromatic, AutotuneRetuneMs = 0, BitcrushRateHz = 6000, BitcrushBits = 6,
+            HighPassHz = 200, OutputGainDb = 1,
+        },
+        new()
+        {
+            // Disco antiguo: banda estrecha, saturado y con el «wow» lento de un tocadiscos.
+            Id = "vinilo", Name = "Disco antiguo", Icon = "💿", IsBuiltIn = true,
+            VibratoHz = 0.6, VibratoSemitones = 0.15, HighPassHz = 400, LowPassHz = 3200, Distortion = 0.25,
+            BitcrushRateHz = 11000, ReverbMix = 0.1, ReverbSize = 0.3, OutputGainDb = -1,
+        },
+        new()
+        {
+            // Dentro de una lata: resonancia metálica muy corta.
+            Id = "lata", Name = "Dentro de una lata", Icon = "🥫", IsBuiltIn = true,
+            CombMs = 1.2, CombFeedback = 0.6, CombMix = 0.45, HighPassHz = 400, LowPassHz = 4500, OutputGainDb = 6,
+        },
+        new()
+        {
+            // Con mascarilla: sin agudos y apagada.
+            Id = "mascarilla", Name = "Con mascarilla", Icon = "😷", IsBuiltIn = true,
+            LowPassHz = 1800, PresenceDb = -4, HighShelfDb = -6, OutputGainDb = 0.5,
+        },
+        new()
+        {
             // Sin graves ni agudos y con más sala que voz directa, como si hablaras desde el otro lado de una nave.
             Id = "lejana", Name = "Lejana", Icon = "🏔", IsBuiltIn = true,
             HighPassHz = 350, LowPassHz = 3500, PresenceDb = -2, ReverbMix = 0.7, ReverbSize = 0.75, OutputGainDb = -2.5,
@@ -279,6 +394,31 @@ public static class BuiltInVoices
         {
             Id = "flanger", Name = "Flanger", Icon = "🌀", IsBuiltIn = true,
             FlangerMix = 0.8, FlangerHz = 0.25, OutputGainDb = 2,
+        },
+        new()
+        {
+            // El locutor de un estadio: comprimido, con el eco del graderío y mucha sala.
+            Id = "estadio", Name = "Estadio", Icon = "🏟", IsBuiltIn = true,
+            Compression = 0.5, PresenceDb = 2, EchoMs = 380, EchoFeedback = 0.35, EchoMix = 0.3,
+            ReverbMix = 0.45, ReverbSize = 0.95, OutputGainDb = -4,
+        },
+        new()
+        {
+            // Ducha: sala pequeña y brillante.
+            Id = "ducha", Name = "Ducha", Icon = "🚿", IsBuiltIn = true,
+            HighShelfDb = 2, ReverbMix = 0.35, ReverbSize = 0.25, OutputGainDb = 1,
+        },
+        new()
+        {
+            Id = "catedral", Name = "Catedral", Icon = "⛪", IsBuiltIn = true,
+            LowPassHz = 8000, ReverbMix = 0.6, ReverbSize = 0.98, OutputGainDb = -6,
+        },
+        new()
+        {
+            // Megafonía de una estación: altavoz de banda estrecha en una nave grande.
+            Id = "megafonia", Name = "Megafonía", Icon = "🚉", IsBuiltIn = true,
+            HighPassHz = 300, LowPassHz = 4000, PresenceDb = 4, Distortion = 0.15, EchoMs = 350, EchoFeedback = 0.25,
+            EchoMix = 0.2, ReverbMix = 0.35, ReverbSize = 0.9, OutputGainDb = -4.5,
         },
     ];
 

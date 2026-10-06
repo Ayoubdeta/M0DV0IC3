@@ -56,17 +56,36 @@ public sealed class AppSettings
 
     public List<VoicePreset> CustomVoices { get; set; } = [];
 
+    /// <summary>Ids de las voces marcadas con la estrella.</summary>
+    public List<string> FavoriteVoices { get; set; } = [];
+
+    /// <summary>La pestaña Voces muestra solo las favoritas.</summary>
+    public bool FavoritesOnly { get; set; }
+
     public List<SoundEntry> Sounds { get; set; } = [];
 
     /// <summary>Acción → combinación ("Ctrl+Alt+V"). Una cadena vacía significa "sin atajo" (no se usa el de serie).</summary>
     public Dictionary<string, string> Hotkeys { get; set; } = [];
 
+    /// <summary>Cambios de atajos de serie ya aplicados a los ajustes guardados.</summary>
+    public int HotkeysVersion { get; set; }
+
     /// <summary>Corrige valores fuera de rango o nulos de un archivo editado a mano.</summary>
     public void Normalize()
     {
         CustomVoices ??= [];
+        FavoriteVoices ??= [];
+        FavoriteVoices.RemoveAll(string.IsNullOrWhiteSpace);
         Sounds ??= [];
         Hotkeys ??= [];
+        if (HotkeysVersion < 1)
+        {
+            // v1.1: "Parar todos los sonidos" pasa al + del teclado numérico. Si estaba con el atajo antiguo o quitado,
+            // se pone el nuevo una vez (lo pidió quien lo usa: parar un sonido largo sin esperar a que acabe).
+            if (Hotkeys.TryGetValue(HotkeyActions.StopSounds, out string? stop) && stop is "" or "Ctrl+Alt+S")
+                Hotkeys.Remove(HotkeyActions.StopSounds);
+            HotkeysVersion = 1;
+        }
         CustomVoices.RemoveAll(v => v is null);
         Sounds.RemoveAll(s => s is null || string.IsNullOrWhiteSpace(s.Id) || string.IsNullOrWhiteSpace(s.FileName));
         if (!Enum.IsDefined(VoiceRange)) VoiceRange = VoiceRange.Medium;
@@ -80,6 +99,8 @@ public sealed class AppSettings
         {
             sound.Name ??= "Sonido";
             sound.Volume = double.IsFinite(sound.Volume) ? Math.Clamp(sound.Volume, 0, 2) : 1;
+            sound.TrimStartSeconds = double.IsFinite(sound.TrimStartSeconds) ? Math.Max(0, sound.TrimStartSeconds) : 0;
+            sound.TrimEndSeconds = double.IsFinite(sound.TrimEndSeconds) ? Math.Max(0, sound.TrimEndSeconds) : 0;
         }
     }
 }
@@ -97,4 +118,10 @@ public sealed class SoundEntry
     public double Volume { get; set; } = 1.0;
 
     public string? Hotkey { get; set; }
+
+    /// <summary>Recorte: segundo en el que empieza a sonar (0 = desde el principio). El archivo no se modifica.</summary>
+    public double TrimStartSeconds { get; set; }
+
+    /// <summary>Recorte: segundo en el que deja de sonar (0 = hasta el final).</summary>
+    public double TrimEndSeconds { get; set; }
 }

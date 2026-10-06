@@ -11,8 +11,12 @@ namespace M0DV0IC3.App.ViewModels;
 public sealed record RandomIntervalOption(double Seconds, string Label);
 
 /// <summary>Un grupo de voces incluidas (Autotune, Personajes...) con su título.</summary>
-public sealed class VoiceGroupViewModel(VoiceCategory category, IReadOnlyList<VoiceCardViewModel> cards)
+public sealed partial class VoiceGroupViewModel(VoiceCategory category, IReadOnlyList<VoiceCardViewModel> cards) : ObservableObject
 {
+    /// <summary>Con el filtro de favoritas, los grupos sin ninguna se ocultan.</summary>
+    [ObservableProperty]
+    private bool _hasShownCards = true;
+
     public VoiceCategory Category { get; } = category;
 
     public string Title => VoiceCategories.Title(Category);
@@ -20,6 +24,8 @@ public sealed class VoiceGroupViewModel(VoiceCategory category, IReadOnlyList<Vo
     public string Subtitle => VoiceCategories.Subtitle(Category);
 
     public IReadOnlyList<VoiceCardViewModel> Cards { get; } = cards;
+
+    public void Refresh() => HasShownCards = Cards.Any(c => c.IsShown);
 }
 
 /// <summary>Pestaña Voces: tarjetas de las voces incluidas y de las personalizadas, el editor y la voz aleatoria.</summary>
@@ -43,6 +49,10 @@ public sealed partial class VoicesViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsEditing))]
     private VoiceEditorViewModel? _editor;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowNoFavoritesHint), nameof(ShowCustomSection), nameof(ShowNoCustomHint))]
+    private bool _favoritesOnly;
 
     public VoicesViewModel(SettingsService settings, HotkeysViewModel hotkeys)
     {
@@ -73,6 +83,11 @@ public sealed partial class VoicesViewModel : ObservableObject
         }
         settings.Current.CustomVoices = Custom.Select(c => c.Preset).ToList();
 
+        var favorites = new HashSet<string>(settings.Current.FavoriteVoices);
+        foreach (var card in AllCards) card.IsFavorite = favorites.Contains(card.Id);
+        _favoritesOnly = settings.Current.FavoritesOnly;
+        ApplyFilter();
+
         var initial = AllCards.FirstOrDefault(c => c.Id == settings.Current.SelectedVoiceId) ?? BuiltIn[0];
         initial.IsSelected = true;
         _selected = initial;
@@ -83,6 +98,8 @@ public sealed partial class VoicesViewModel : ObservableObject
         {
             UpdateHotkeyHints();
             OnPropertyChanged(nameof(HasCustom));
+            OnPropertyChanged(nameof(ShowCustomSection));
+            OnPropertyChanged(nameof(ShowNoCustomHint));
         };
         UpdateHotkeyHints();
 
@@ -103,6 +120,15 @@ public sealed partial class VoicesViewModel : ObservableObject
     public ObservableCollection<VoiceCardViewModel> Custom { get; } = [];
 
     public bool HasCustom => Custom.Count > 0;
+
+    public bool HasFavorites => AllCards.Any(c => c.IsFavorite);
+
+    public bool ShowNoFavoritesHint => FavoritesOnly && !HasFavorites;
+
+    /// <summary>"Mis voces" se ve sin filtro, o con él si alguna de las tuyas es favorita.</summary>
+    public bool ShowCustomSection => !FavoritesOnly || Custom.Any(c => c.IsFavorite);
+
+    public bool ShowNoCustomHint => !FavoritesOnly && !HasCustom;
 
     public bool IsEditing => Editor is not null;
 
@@ -138,9 +164,10 @@ public sealed partial class VoicesViewModel : ObservableObject
         if (card is not null) Activate(card);
     }
 
+    /// <summary>Voz anterior o siguiente. Con el filtro de favoritas, solo entre las favoritas.</summary>
     public void ActivateRelative(int delta)
     {
-        var cards = AllCards.ToList();
+        var cards = ShownCards().ToList();
         if (cards.Count == 0) return;
         int current = Selected is null ? -1 : cards.IndexOf(Selected);
         int next = current < 0 ? 0 : ((current + delta) % cards.Count + cards.Count) % cards.Count;
@@ -157,6 +184,44 @@ public sealed partial class VoicesViewModel : ObservableObject
 
     [RelayCommand]
     private void ToggleRandom() => RandomEnabled = !RandomEnabled;
+
+    [RelayCommand]
+    private void ToggleFavorite(VoiceCardViewModel? card)
+    {
+        if (card is null) return;
+        card.IsFavorite = !card.IsFavorite;
+        SaveFavorites();
+        ApplyFilter();
+    }
+
+    partial void OnFavoritesOnlyChanged(bool value)
+    {
+        _settings.Current.FavoritesOnly = value;
+        _settings.ScheduleSave();
+        ApplyFilter();
+    }
+
+    /// <summary>Las voces que se ven: todas, o solo las favoritas (si hay alguna).</summary>
+    private IEnumerable<VoiceCardViewModel> ShownCards()
+    {
+        var shown = AllCards.Where(c => c.IsShown).ToList();
+        return shown.Count > 0 ? shown : AllCards;
+    }
+
+    private void ApplyFilter()
+    {
+        foreach (var card in AllCards) card.IsShown = !FavoritesOnly || card.IsFavorite;
+        foreach (var group in Groups) group.Refresh();
+        OnPropertyChanged(nameof(HasFavorites));
+        OnPropertyChanged(nameof(ShowNoFavoritesHint));
+        OnPropertyChanged(nameof(ShowCustomSection));
+    }
+
+    private void SaveFavorites()
+    {
+        _settings.Current.FavoriteVoices = AllCards.Where(c => c.IsFavorite).Select(c => c.Id).ToList();
+        _settings.ScheduleSave();
+    }
 
     partial void OnRandomEnabledChanged(bool value)
     {
@@ -185,12 +250,13 @@ public sealed partial class VoicesViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Elige otra voz al azar. Al activar el modo se enciende también la voz; en los cambios siguientes no, para no
-    /// volver a encenderla si la apagas. La voz invertida se salta: sus 200 ms de retardo dejarían un hueco en cada cambio.
+    /// Elige otra voz al azar (con el filtro de favoritas, entre las favoritas). Al activar el modo se enciende también
+    /// la voz; en los cambios siguientes no, para no volver a encenderla si la apagas. La voz invertida se salta: sus
+    /// 200 ms de retardo dejarían un hueco en cada cambio.
     /// </summary>
     private void PickRandom(bool activate)
     {
-        var pool = AllCards.Where(c => c != Selected && !c.Preset.UsesReverse).ToList();
+        var pool = ShownCards().Where(c => c != Selected && !c.Preset.UsesReverse).ToList();
         if (pool.Count == 0) return;
         var card = pool[_random.Next(pool.Count)];
         if (activate) Activate(card);
@@ -230,6 +296,11 @@ public sealed partial class VoicesViewModel : ObservableObject
         int index = Custom.IndexOf(card);
         Custom.Remove(card);
         SaveCustomVoices();
+        if (card.IsFavorite)
+        {
+            SaveFavorites();
+            ApplyFilter();
+        }
 
         var next = Custom.Count > 0 ? Custom[Math.Clamp(index, 0, Custom.Count - 1)] : BuiltIn[0];
         Select(next);
@@ -241,6 +312,8 @@ public sealed partial class VoicesViewModel : ObservableObject
 
     private void AddCustomAndEdit(VoicePreset preset)
     {
+        // Una voz recién creada no es favorita: se quita el filtro para que se vea la que estás editando.
+        FavoritesOnly = false;
         var card = new VoiceCardViewModel(preset);
         Custom.Add(card);
         SaveCustomVoices();

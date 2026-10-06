@@ -96,6 +96,9 @@ public sealed record VoicePreset
     /// <summary>Coro 0..1: tu voz con copias una octava abajo, una quinta y una octava arriba.</summary>
     public double HarmonyMix { get; init; }
 
+    /// <summary>Qué voces suma el coro: coro, celestial o demoníaco.</summary>
+    public HarmonyStyle Harmony { get; init; }
+
     /// <summary>Vocoder 0..1: tu voz da forma a un acorde de sintetizador (robot musical).</summary>
     public double VocoderMix { get; init; }
 

@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Services;
 
 namespace M0DV0IC3.App.Models;
@@ -68,7 +69,7 @@ public readonly record struct HotkeyGesture(ModifierKeys Modifiers, Key Key)
         var parts = new List<string>(5);
         if (modifiers.HasFlag(ModifierKeys.Control)) parts.Add("Ctrl");
         if (modifiers.HasFlag(ModifierKeys.Alt)) parts.Add("Alt");
-        if (modifiers.HasFlag(ModifierKeys.Shift)) parts.Add(spanish ? "Mayús" : "Shift");
+        if (modifiers.HasFlag(ModifierKeys.Shift)) parts.Add(spanish ? Loc.T("Mayús") : "Shift");
         if (modifiers.HasFlag(ModifierKeys.Windows)) parts.Add("Win");
         parts.Add(key);
         return parts;
@@ -118,26 +119,26 @@ public readonly record struct HotkeyGesture(ModifierKeys Modifiers, Key Key)
             Key.Right => "→",
             Key.Up => "↑",
             Key.Down => "↓",
-            Key.Space => "Espacio",
-            Key.Enter => "Intro",
-            Key.Back => "Retroceso",
-            Key.Delete => "Supr",
+            Key.Space => Loc.T("Espacio"),
+            Key.Enter => Loc.T("Intro"),
+            Key.Back => Loc.T("Retroceso"),
+            Key.Delete => Loc.T("Supr"),
             Key.Insert => "Insert",
-            Key.Home => "Inicio",
-            Key.End => "Fin",
-            Key.PageUp => "RePág",
-            Key.PageDown => "AvPág",
+            Key.Home => Loc.T("Inicio"),
+            Key.End => Loc.T("Fin"),
+            Key.PageUp => Loc.T("RePág"),
+            Key.PageDown => Loc.T("AvPág"),
             Key.Tab => "Tab",
-            Key.Pause => "Pausa",
-            Key.Scroll => "Bloq Despl",
+            Key.Pause => Loc.T("Pausa"),
+            Key.Scroll => Loc.T("Bloq Despl"),
             Key.Multiply => "Num *",
             Key.Add => "Num +",
             Key.Subtract => "Num -",
             Key.Divide => "Num /",
             Key.Decimal => "Num .",
-            Key.MediaPlayPause => "Play/Pausa",
-            Key.MediaNextTrack => "Siguiente pista",
-            Key.MediaPreviousTrack => "Pista anterior",
+            Key.MediaPlayPause => Loc.T("Play/Pausa"),
+            Key.MediaNextTrack => Loc.T("Siguiente pista"),
+            Key.MediaPreviousTrack => Loc.T("Pista anterior"),
             Key.MediaStop => "Stop",
             _ => null,
         };

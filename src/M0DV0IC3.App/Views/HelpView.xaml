@@ -1,132 +1,106 @@
 <UserControl x:Class="M0DV0IC3.App.Views.HelpView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:M0DV0IC3.App.Localization">
+    <!-- Cada párrafo es un solo texto que traducir; lo que va entre ** sale en negrita (l:Rich.Text). -->
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="6,0,12,16" MaxWidth="820" HorizontalAlignment="Left">
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Cómo funciona" Style="{StaticResource SectionHeader}" />
-                    <TextBlock Style="{StaticResource BodyText}">
-                        M0DV0IC3 coge tu micrófono, le aplica la voz que elijas y la manda a un micrófono virtual:
-                        <Bold>CABLE Input (VB-Audio Virtual Cable)</Bold>. Las demás aplicaciones lo ven como un micrófono más llamado
-                        <Bold>CABLE Output (VB-Audio Virtual Cable)</Bold>. Solo tienes que elegir ese micrófono en Discord, en el juego o en la app que uses.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        Para oírte a ti mismo con la voz cambiada, elige tus auriculares arriba, en «Auriculares (escucharme)», y activa «Escucharme» abajo.
-                        Usa auriculares, no altavoces: con altavoces el micrófono recogería tu propia voz y se acoplaría.
-                    </TextBlock>
+                    <TextBlock Text="{l:T 'Cómo funciona'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T 'M0DV0IC3 coge tu micrófono, le aplica la voz que elijas y la manda a un micrófono virtual: **CABLE Input (VB-Audio Virtual Cable)**. Las demás aplicaciones lo ven como un micrófono más llamado **CABLE Output (VB-Audio Virtual Cable)**. Solo tienes que elegir ese micrófono en Discord, en el juego o en la app que uses.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               Text="{l:T 'Para oírte a ti mismo con la voz cambiada, elige tus auriculares arriba, en «Auriculares (escucharme)», y activa «Escucharme» abajo. Usa auriculares, no altavoces: con altavoces el micrófono recogería tu propia voz y se acoplaría.'}" />
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
                     <TextBlock Text="Discord" Style="{StaticResource SectionHeader}" />
-                    <TextBlock Style="{StaticResource BodyText}">
-                        1. Abre <Bold>Ajustes de usuario</Bold> (la rueda junto a tu nombre) → <Bold>Voz y vídeo</Bold>.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        2. En <Bold>Dispositivo de entrada</Bold> elige <Bold>CABLE Output (VB-Audio Virtual Cable)</Bold>.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        3. Desactiva la <Bold>supresión de ruido (Krisp)</Bold>, la <Bold>cancelación de eco</Bold> y, si quieres, el control automático de ganancia:
-                        Discord cree que los efectos son ruido y los deforma o los corta. Si necesitas quitar ruido, usa «Supresión de ruido» de M0DV0IC3.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        4. <Bold>Sensibilidad de entrada</Bold>: desactiva «Determinar automáticamente» y ajusta la barra para que se active al hablar, o usa pulsar para hablar.
-                        Con voces de mucho eco o reverb, la detección automática puede cortar el final de las frases.
-                    </TextBlock>
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '1. Abre **Ajustes de usuario** (la rueda junto a tu nombre) → **Voz y vídeo**.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '2. En **Dispositivo de entrada** elige **CABLE Output (VB-Audio Virtual Cable)**.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '3. Desactiva la **supresión de ruido (Krisp)**, la **cancelación de eco** y, si quieres, el control automático de ganancia: Discord cree que los efectos son ruido y los deforma o los corta. Si necesitas quitar ruido, usa «Supresión de ruido» de M0DV0IC3.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '4. **Sensibilidad de entrada**: desactiva «Determinar automáticamente» y ajusta la barra para que se active al hablar, o usa pulsar para hablar. Con voces de mucho eco o reverb, la detección automática puede cortar el final de las frases.'}" />
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Juegos y otras aplicaciones" Style="{StaticResource SectionHeader}" />
-                    <TextBlock Style="{StaticResource BodyText}">
-                        En las opciones de audio o de voz del juego (o de Teams, Zoom, OBS, el navegador...), elige como micrófono
-                        <Bold>CABLE Output (VB-Audio Virtual Cable)</Bold>. Si el juego no deja elegir micrófono, usa el predeterminado de Windows:
-                        Configuración → Sistema → Sonido → Entrada → «CABLE Output».
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        Los atajos de teclado (pestaña Atajos) funcionan dentro de los juegos. Si el juego se ejecuta como administrador,
-                        abre también M0DV0IC3 como administrador.
-                    </TextBlock>
+                    <TextBlock Text="{l:T 'Juegos y otras aplicaciones'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T 'En las opciones de audio o de voz del juego (o de Teams, Zoom, OBS, el navegador...), elige como micrófono **CABLE Output (VB-Audio Virtual Cable)**. Si el juego no deja elegir micrófono, usa el predeterminado de Windows: Configuración → Sistema → Sonido → Entrada → «CABLE Output».'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               Text="{l:T 'Los atajos de teclado (pestaña Atajos) funcionan dentro de los juegos. Si el juego se ejecuta como administrador, abre también M0DV0IC3 como administrador.'}" />
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Autotune, voz aleatoria y música" Style="{StaticResource SectionHeader}" />
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Autotune</Bold> es el exagerado de los cantantes: al hablar, tu voz salta de nota en nota como si cantaras.
-                        Para cantar encima de una canción usa <Bold>Autotune cantar</Bold>, que no toca tu melodía. Duplica cualquiera de las dos
-                        para cambiar la escala, la tonalidad, la velocidad o cuánto se exagera la melodía.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>🎲 Aleatoria</Bold> (pestaña Voces, o Ctrl+Alt+R) va cambiando sola de voz cada pocos segundos mientras hablas.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Música por el micro</Bold> (pestaña Música, o Ctrl+Alt+P) manda a Discord lo que suena en Spotify u otra app,
-                        mezclado con tu voz. Solo se captura esa app, así que nadie se oye a sí mismo.
-                    </TextBlock>
+                    <TextBlock Text="{l:T 'Autotune, voz aleatoria y mantener pulsado'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Autotune** es el exagerado de los cantantes: al hablar, tu voz salta de nota en nota como si cantaras. Para cantar encima de una canción usa **Autotune cantar**, que no toca tu melodía. Duplica cualquiera de las dos para cambiar la escala, la tonalidad, la velocidad o cuánto se exagera la melodía.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**🎲 Aleatoria** (pestaña Voces, o Ctrl+Alt+R) va cambiando sola de voz cada pocos segundos mientras hablas.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Mantener pulsado** (el - del teclado numérico): mientras lo mantienes suena la voz elegida en Voces («Al mantener»); al soltarlo vuelve la que tenías.'}" />
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Texto a voz, mantener y grabar" Style="{StaticResource SectionHeader}" />
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Texto a voz</Bold> (su pestaña): escribe una frase y pulsa Intro. La dice una voz de Windows y suena por el micro con la voz
-                        que tengas puesta. Guarda las que más uses y ponles un atajo para decirlas en mitad de una partida.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Mantener pulsado</Bold> (el - del teclado numérico): mientras lo mantienes suena la voz elegida en Voces («Al mantener»);
-                        al soltarlo vuelve la que tenías.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Grabar</Bold> (abajo, o Ctrl+Alt+G) guarda en MP3 lo que sale por el micro, tal y como lo oyen los demás: tu voz, los sonidos,
-                        las frases y la música del karaoke. Lo encuentras en Música\M0DV0IC3, y puedes añadirlo al soundboard.
-                    </TextBlock>
+                    <TextBlock Text="{l:T 'Música, karaoke y voz del cantante'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Música por el micro** (pestaña Música, o Ctrl+Alt+P) manda a Discord lo que suena en Spotify u otra app, mezclado con tu voz. Solo se captura esa app, así que nadie se oye a sí mismo.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Modo karaoke** (pestaña Karaoke, o Ctrl+Alt+K): quita la voz de la canción de Spotify, la pone en tus cascos y en Discord y muestra la letra para que cantes encima.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Voz del cantante** (pestaña Música): le cambia la voz a quien canta (Ardilla, Demonio, Robot…) y deja la música como está. Es una voz aparte de la tuya.'}" />
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Consejo de Windows: 48000 Hz" Style="{StaticResource SectionHeader}" />
-                    <TextBlock Style="{StaticResource BodyText}">
-                        M0DV0IC3 trabaja a 48000 Hz. Para evitar conversiones (y algo de latencia), pon VB-Cable a esa frecuencia:
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        1. Pulsa Win + R, escribe <Bold>mmsys.cpl</Bold> y pulsa Intro (Panel de sonido).
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        2. Pestaña <Bold>Reproducción</Bold> → «CABLE Input» → Propiedades → Opciones avanzadas → <Bold>24 bits, 48000 Hz</Bold>.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        3. Pestaña <Bold>Grabación</Bold> → «CABLE Output» → Propiedades → Opciones avanzadas → <Bold>24 bits, 48000 Hz</Bold>.
-                    </TextBlock>
+                    <TextBlock Text="{l:T 'Texto a voz y grabar'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Texto a voz** (su pestaña): escribe una frase y pulsa Intro. La dice una voz de Windows y suena por el micro con la voz que tengas puesta. Guarda las que más uses y ponles un atajo para decirlas en mitad de una partida.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Grabar** (abajo, o Ctrl+Alt+G) guarda en MP3 lo que sale por el micro, tal y como lo oyen los demás: tu voz, los sonidos, las frases y la música del karaoke. Lo encuentras en Música\\M0DV0IC3, y puedes añadirlo al soundboard.'}" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="{l:T 'Consejo de Windows: 48000 Hz'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               Text="{l:T 'M0DV0IC3 trabaja a 48000 Hz. Para evitar conversiones (y algo de latencia), pon VB-Cable a esa frecuencia:'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '1. Pulsa Win + R, escribe **mmsys.cpl** y pulsa Intro (Panel de sonido).'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '2. Pestaña **Reproducción** → «CABLE Input» → Propiedades → Opciones avanzadas → **24 bits, 48000 Hz**.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '3. Pestaña **Grabación** → «CABLE Output» → Propiedades → Opciones avanzadas → **24 bits, 48000 Hz**.'}" />
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardBorder}">
                 <StackPanel>
-                    <TextBlock Text="Problemas frecuentes" Style="{StaticResource SectionHeader}" />
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Se oyen chasquidos o cortes</Bold> (abajo aparece «cortes: N»): sube el «Margen anti-cortes» en Ajustes, o desactiva «Baja latencia».
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Mucha latencia</Bold>: pasa el ratón por encima de «Latencia» (abajo a la derecha) para ver de dónde viene.
-                        Las voces con cambio de tono añaden unos 11-27 ms según lo grave que hables, y la supresión de ruido 10 ms más.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>La voz suena rara o salta de octava</Bold>: revisa el «Rango de tu voz» en Ajustes (Media sirve para casi todo el mundo).
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}">
-                        <Bold>Entra ruido de fondo</Bold>: activa «Supresión de ruido» o sube la «Puerta de ruido» hasta que el medidor de salida se quede quieto cuando no hablas.
-                    </TextBlock>
-                    <TextBlock Style="{StaticResource BodyText}" Margin="0">
-                        <Bold>Algo ha fallado</Bold>: el registro de errores está en la carpeta de datos (Ajustes → Abrir la carpeta de datos), en log.txt.
-                    </TextBlock>
+                    <TextBlock Text="{l:T 'Problemas frecuentes'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Se oyen chasquidos o cortes** (abajo aparece «cortes: N»): sube el «Margen anti-cortes» en Ajustes, o desactiva «Baja latencia».'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Mucha latencia**: pasa el ratón por encima de «Latencia» (abajo a la izquierda) para ver de dónde viene. Las voces con cambio de tono añaden unos 11-27 ms según lo grave que hables, y la supresión de ruido 10 ms más.'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**La voz suena rara o salta de octava**: revisa el «Rango de tu voz» en Ajustes (Media sirve para casi todo el mundo).'}" />
+                    <TextBlock Style="{StaticResource BodyText}"
+                               l:Rich.Text="{l:T '**Entra ruido de fondo**: activa «Supresión de ruido» o sube la «Puerta de ruido» hasta que el medidor de salida se quede quieto cuando no hablas.'}" />
+                    <TextBlock Style="{StaticResource BodyText}" Margin="0"
+                               l:Rich.Text="{l:T '**Algo ha fallado**: el registro de errores está en la carpeta de datos (Ajustes → Abrir la carpeta de datos), en log.txt.'}" />
                 </StackPanel>
             </Border>
         </StackPanel>

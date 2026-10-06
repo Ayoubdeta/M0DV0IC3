@@ -1,3 +1,5 @@
+using M0DV0IC3.App.Localization;
+
 namespace M0DV0IC3.App.Models;
 
 /// <summary>Grupos de la pestaña Voces, en el orden en que se muestran (y en el que cuentan los atajos Voz 1..9).</summary>
@@ -29,18 +31,18 @@ public static class VoiceCategories
     public static string Title(VoiceCategory category) => category switch
     {
         VoiceCategory.Autotune => "Autotune",
-        VoiceCategory.Characters => "Personajes",
-        VoiceCategory.Effects => "Efectos",
-        VoiceCategory.Ambience => "Ambientes",
-        _ => "Mis voces",
+        VoiceCategory.Characters => Loc.T("Personajes"),
+        VoiceCategory.Effects => Loc.T("Efectos"),
+        VoiceCategory.Ambience => Loc.T("Ambientes"),
+        _ => Loc.T("Mis voces"),
     };
 
     public static string Subtitle(VoiceCategory category) => category switch
     {
-        VoiceCategory.Autotune => "Tu voz afinada como en las canciones",
-        VoiceCategory.Characters => "Cambia quién parece que habla",
-        VoiceCategory.Effects => "Transforma el sonido de tu voz",
-        VoiceCategory.Ambience => "Lleva tu voz a otro sitio",
-        _ => "Las que has creado o duplicado",
+        VoiceCategory.Autotune => Loc.T("Tu voz afinada como en las canciones"),
+        VoiceCategory.Characters => Loc.T("Cambia quién parece que habla"),
+        VoiceCategory.Effects => Loc.T("Transforma el sonido de tu voz"),
+        VoiceCategory.Ambience => Loc.T("Lleva tu voz a otro sitio"),
+        _ => Loc.T("Las que has creado o duplicado"),
     };
 }

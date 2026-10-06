@@ -1,9 +1,10 @@
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
-using H.NotifyIcon;
+using System.Windows;
 using H.NotifyIcon.Core;
+using H.NotifyIcon;
+using M0DV0IC3.App.Localization;
 
 namespace M0DV0IC3.App.Services;
 
@@ -15,13 +16,13 @@ public sealed class TrayService : IDisposable
     /// <param name="voiceSource">Objeto con la propiedad booleana <paramref name="voiceProperty"/> (la voz ON/OFF).</param>
     public TrayService(object voiceSource, string voiceProperty, Action show, Action exit)
     {
-        var showItem = new MenuItem { Header = "Mostrar M0DV0IC3", FontWeight = FontWeights.SemiBold };
+        var showItem = new MenuItem { Header = Loc.T("Mostrar M0DV0IC3"), FontWeight = FontWeights.SemiBold };
         showItem.Click += (_, _) => show();
 
-        var voiceItem = new MenuItem { Header = "Voz activada", IsCheckable = true };
+        var voiceItem = new MenuItem { Header = Loc.T("Voz activada"), IsCheckable = true };
         voiceItem.SetBinding(MenuItem.IsCheckedProperty, new Binding(voiceProperty) { Source = voiceSource, Mode = BindingMode.TwoWay });
 
-        var exitItem = new MenuItem { Header = "Salir" };
+        var exitItem = new MenuItem { Header = Loc.T("Salir") };
         exitItem.Click += (_, _) => exit();
 
         var menu = new ContextMenu();

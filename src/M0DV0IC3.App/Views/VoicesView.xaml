@@ -1,6 +1,7 @@
 <UserControl x:Class="M0DV0IC3.App.Views.VoicesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:M0DV0IC3.App.Localization"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
@@ -17,7 +18,7 @@
                     CommandParameter="{Binding}">
                 <Button.ToolTip>
                     <TextBlock>
-                        <Run Text="Usar la voz" />
+                        <Run Text="{l:T 'Usar la voz'}" />
                         <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold" />
                     </TextBlock>
                 </Button.ToolTip>
@@ -102,48 +103,48 @@
 
         <DockPanel>
             <WrapPanel DockPanel.Dock="Top" Margin="2,0,6,8">
-                <Button Style="{StaticResource PrimaryButton}" Command="{Binding NewVoiceCommand}" Margin="0,0,8,8" AutomationProperties.Name="Nueva voz">
+                <Button Style="{StaticResource PrimaryButton}" Command="{Binding NewVoiceCommand}" Margin="0,0,8,8" AutomationProperties.Name="{l:T 'Nueva voz'}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE710;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                        <TextBlock Text="Nueva voz" />
+                        <TextBlock Text="{l:T 'Nueva voz'}" />
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding EditCommand}" Margin="0,0,8,8" ToolTip="Editar la voz personalizada seleccionada" AutomationProperties.Name="Editar">
+                <Button Command="{Binding EditCommand}" Margin="0,0,8,8" ToolTip="{l:T 'Editar la voz personalizada seleccionada'}" AutomationProperties.Name="{l:T 'Editar'}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE70F;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                        <TextBlock Text="Editar" />
+                        <TextBlock Text="{l:T 'Editar'}" />
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding DuplicateCommand}" Margin="0,0,8,8" ToolTip="Crear una copia editable de la voz seleccionada" AutomationProperties.Name="Duplicar">
+                <Button Command="{Binding DuplicateCommand}" Margin="0,0,8,8" ToolTip="{l:T 'Crear una copia editable de la voz seleccionada'}" AutomationProperties.Name="{l:T 'Duplicar'}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE8C8;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                        <TextBlock Text="Duplicar" />
+                        <TextBlock Text="{l:T 'Duplicar'}" />
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding DeleteCommand}" Margin="0,0,20,8" ToolTip="Borrar la voz personalizada seleccionada" AutomationProperties.Name="Borrar">
+                <Button Command="{Binding DeleteCommand}" Margin="0,0,20,8" ToolTip="{l:T 'Borrar la voz personalizada seleccionada'}" AutomationProperties.Name="{l:T 'Borrar'}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE74D;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                        <TextBlock Text="Borrar" />
+                        <TextBlock Text="{l:T 'Borrar'}" />
                     </StackPanel>
                 </Button>
                 <ToggleButton Style="{StaticResource Chip}" Tag="&#xE734;" IsChecked="{Binding FavoritesOnly}" Margin="0,0,8,8"
-                              AutomationProperties.Name="Solo favoritas" VerticalAlignment="Center"
-                              ToolTip="Muestra solo las voces con estrella. Voz aleatoria y voz anterior / siguiente eligen entonces entre ellas.">
-                    <TextBlock Text="Favoritas" />
+                              AutomationProperties.Name="{l:T 'Solo favoritas'}" VerticalAlignment="Center"
+                              ToolTip="{l:T 'Muestra solo las voces con estrella. Voz aleatoria y voz anterior / siguiente eligen entonces entre ellas.'}">
+                    <TextBlock Text="{l:T 'Favoritas'}" />
                 </ToggleButton>
-                <ToggleButton Style="{StaticResource Chip}" Tag="&#xE8B1;" IsChecked="{Binding RandomEnabled}" Margin="0,0,6,8" AutomationProperties.Name="Voz aleatoria"
+                <ToggleButton Style="{StaticResource Chip}" Tag="&#xE8B1;" IsChecked="{Binding RandomEnabled}" Margin="0,0,6,8" AutomationProperties.Name="{l:T 'Voz aleatoria'}"
                               VerticalAlignment="Center"
-                              ToolTip="Voz aleatoria: va cambiando sola de voz mientras hablas (Ctrl+Alt+R por defecto). Se salta la voz invertida.">
-                    <TextBlock Text="Voz aleatoria" />
+                              ToolTip="{l:T 'Voz aleatoria: va cambiando sola de voz mientras hablas (Ctrl+Alt+R por defecto). Se salta la voz invertida.'}">
+                    <TextBlock Text="{l:T 'Voz aleatoria'}" />
                 </ToggleButton>
                 <ComboBox ItemsSource="{Binding RandomIntervals}" DisplayMemberPath="Label" SelectedValuePath="Seconds"
                           SelectedValue="{Binding RandomSeconds}" Width="150" Margin="0,0,20,8" VerticalAlignment="Center"
-                          ToolTip="Cada cuánto cambia la voz aleatoria" />
+                          ToolTip="{l:T 'Cada cuánto cambia la voz aleatoria'}" />
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center"
-                            ToolTip="Mientras mantienes pulsado ese atajo suena esta voz; al soltarlo vuelve la que tenías (o ninguna, si estaba apagada). El atajo se cambia en Atajos.">
+                            ToolTip="{l:T 'Mientras mantienes pulsado ese atajo suena esta voz; al soltarlo vuelve la que tenías (o ninguna, si estaba apagada). El atajo se cambia en Atajos.'}">
                     <TextBlock Text="{Binding HoldKeyText}" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <ComboBox ItemsSource="{Binding HoldVoiceChoices}" SelectedItem="{Binding HoldVoice}" Width="180"
-                              AutomationProperties.Name="Voz al mantener pulsado">
+                              AutomationProperties.Name="{l:T 'Voz al mantener pulsado'}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:VoiceCardViewModel}">
                                 <TextBlock>
@@ -156,14 +157,14 @@
                 </StackPanel>
             </WrapPanel>
             <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" FontSize="12.5" Margin="4,0,6,10"
-                       Text="Haz clic en una voz para usarla y en su estrella para guardarla en favoritas. Las voces incluidas no se pueden editar: duplícalas para crear tu versión." />
+                       Text="{l:T 'Haz clic en una voz para usarla y en su estrella para guardarla en favoritas. Las voces incluidas no se pueden editar: duplícalas para crear tu versión.'}" />
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="0,0,6,12">
                     <Border Style="{StaticResource CardBorder}" Margin="6,0,6,14" Padding="16,12"
                             Visibility="{Binding ShowNoFavoritesHint, Converter={StaticResource BoolToVisible}}">
                         <TextBlock TextWrapping="Wrap"
-                                   Text="Todavía no tienes voces favoritas. Quita el filtro «Favoritas», pasa el ratón por una voz y pulsa su estrella." />
+                                   Text="{l:T 'Todavía no tienes voces favoritas. Quita el filtro «Favoritas», pasa el ratón por una voz y pulsa su estrella.'}" />
                     </Border>
                     <ItemsControl ItemsSource="{Binding Groups}" ItemTemplate="{StaticResource GroupTemplate}" Focusable="False" />
 
@@ -171,14 +172,14 @@
                     <StackPanel Orientation="Horizontal" Margin="8,4,0,2">
                         <Border Width="4" Height="20" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"
                                 Background="{StaticResource CustomAccentBrush}" />
-                        <TextBlock Text="Mis voces" FontFamily="{StaticResource HeadingFont}" FontSize="17" VerticalAlignment="Center" />
-                        <TextBlock Text="Las que has creado o duplicado" Style="{StaticResource MutedText}" FontSize="12.5" Margin="12,1,0,0"
+                        <TextBlock Text="{l:T 'Mis voces'}" FontFamily="{StaticResource HeadingFont}" FontSize="17" VerticalAlignment="Center" />
+                        <TextBlock Text="{l:T 'Las que has creado o duplicado'}" Style="{StaticResource MutedText}" FontSize="12.5" Margin="12,1,0,0"
                                    VerticalAlignment="Center" />
                     </StackPanel>
                     <ItemsControl ItemsSource="{Binding Custom}" ItemTemplate="{StaticResource VoiceCardTemplate}"
                                   ItemsPanel="{StaticResource WrapPanelTemplate}" Focusable="False" />
                     <TextBlock Style="{StaticResource MutedText}" Margin="8,6,0,0"
-                               Text="Todavía no tienes voces propias. Pulsa «Nueva voz», o elige una voz y pulsa «Duplicar»."
+                               Text="{l:T 'Todavía no tienes voces propias. Pulsa «Nueva voz», o elige una voz y pulsa «Duplicar».'}"
                                Visibility="{Binding ShowNoCustomHint, Converter={StaticResource BoolToVisible}}" />
                     </StackPanel>
                 </StackPanel>

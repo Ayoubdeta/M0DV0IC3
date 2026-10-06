@@ -1,6 +1,7 @@
 <UserControl x:Class="M0DV0IC3.App.Views.VoiceEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:M0DV0IC3.App.Localization"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
@@ -10,66 +11,66 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <Grid>
-                <TextBlock Text="Editar voz" Style="{StaticResource SectionHeader}" />
+                <TextBlock Text="{l:T 'Editar voz'}" Style="{StaticResource SectionHeader}" />
                 <Button Style="{StaticResource IconButton}" Content="&#xE711;" HorizontalAlignment="Right" VerticalAlignment="Top"
-                        Command="{Binding CloseCommand}" ToolTip="Cerrar el editor" />
+                        Command="{Binding CloseCommand}" ToolTip="{l:T 'Cerrar el editor'}" />
             </Grid>
             <TextBlock Style="{StaticResource MutedText}" FontSize="12" Margin="0,0,0,10"
-                       Text="Los cambios se oyen al momento y se guardan solos. Doble clic en un control: valor por defecto." />
+                       Text="{l:T 'Los cambios se oyen al momento y se guardan solos. Doble clic en un control: valor por defecto.'}" />
             <Grid Margin="0,0,0,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="64" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Margin="0,0,8,0">
-                    <TextBlock Text="Icono" Style="{StaticResource FieldLabel}" />
+                    <TextBlock Text="{l:T 'Icono'}" Style="{StaticResource FieldLabel}" />
                     <TextBox Text="{Binding Icon, UpdateSourceTrigger=PropertyChanged}" FontFamily="{StaticResource EmojiFont}"
                              FontSize="18" HorizontalContentAlignment="Center" MaxLength="8"
-                             ToolTip="Escribe o pega un emoji (Win + . abre el selector de emojis)" />
+                             ToolTip="{l:T 'Escribe o pega un emoji (Win + . abre el selector de emojis)'}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1">
-                    <TextBlock Text="Nombre" Style="{StaticResource FieldLabel}" />
+                    <TextBlock Text="{l:T 'Nombre'}" Style="{StaticResource FieldLabel}" />
                     <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MaxLength="40" FontSize="14" />
                 </StackPanel>
             </Grid>
         </StackPanel>
 
         <WrapPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Deshacer cambios" Command="{Binding UndoCommand}" Margin="0,0,8,0"
-                    ToolTip="Vuelve a como estaba la voz al abrir el editor" />
-            <Button Content="Quitar efectos" Command="{Binding ClearEffectsCommand}" Margin="0,0,8,0"
-                    ToolTip="Deja la voz sin ningún efecto (conserva el nombre y el icono)" />
-            <Button Content="Listo" Style="{StaticResource PrimaryButton}" Command="{Binding CloseCommand}" />
+            <Button Content="{l:T 'Deshacer cambios'}" Command="{Binding UndoCommand}" Margin="0,0,8,0"
+                    ToolTip="{l:T 'Vuelve a como estaba la voz al abrir el editor'}" />
+            <Button Content="{l:T 'Quitar efectos'}" Command="{Binding ClearEffectsCommand}" Margin="0,0,8,0"
+                    ToolTip="{l:T 'Deja la voz sin ningún efecto (conserva el nombre y el icono)'}" />
+            <Button Content="{l:T 'Listo'}" Style="{StaticResource PrimaryButton}" Command="{Binding CloseCommand}" />
         </WrapPanel>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
             <StackPanel>
-                <TextBlock Text="Tono" Style="{StaticResource SubHeader}" />
-                <controls:ParamSlider Label="Tono" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
-                                      Value="{Binding Pitch}" Format="{}{0:+0.#;-0.#;0} semitonos"
-                                      Hint="Más grave (negativo) o más agudo (positivo). 12 semitonos = una octava." />
-                <controls:ParamSlider Label="Formantes" Minimum="0.5" Maximum="2" Step="0.01" DefaultValue="1"
+                <TextBlock Text="{l:T 'Tono'}" Style="{StaticResource SubHeader}" />
+                <controls:ParamSlider Label="{l:T 'Tono'}" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
+                                      Value="{Binding Pitch}" Format="{Binding SemitoneFormat}"
+                                      Hint="{l:T 'Más grave (negativo) o más agudo (positivo). 12 semitonos = una octava.'}" />
+                <controls:ParamSlider Label="{l:T 'Formantes'}" Minimum="0.5" Maximum="2" Step="0.01" DefaultValue="1"
                                       Value="{Binding Formant}" Format="{}{0:0.00}×"
-                                      Hint="El tamaño de la «garganta»: menos de 1 suena más grande u oscuro; más de 1, más pequeño o brillante." />
-                <CheckBox Content="Tono objetivo (se adapta a tu voz)" IsChecked="{Binding TargetPitchEnabled}" Margin="0,4,0,0" />
-                <controls:ParamSlider Label="Tono objetivo" Minimum="50" Maximum="450" Step="5" DefaultValue="200"
+                                      Hint="{l:T 'El tamaño de la «garganta»: menos de 1 suena más grande u oscuro; más de 1, más pequeño o brillante.'}" />
+                <CheckBox Content="{l:T 'Tono objetivo (se adapta a tu voz)'}" IsChecked="{Binding TargetPitchEnabled}" Margin="0,4,0,0" />
+                <controls:ParamSlider Label="{l:T 'Tono objetivo'}" Minimum="50" Maximum="450" Step="5" DefaultValue="200"
                                       Value="{Binding TargetPitchHz}" Format="{}{0:0} Hz" IsEnabled="{Binding TargetPitchEnabled}"
-                                      Hint="Lleva tu tono medio hasta aquí, sea tu voz grave o aguda: ~215 Hz mujer, ~290 Hz niño, ~85 Hz voz grave. «Tono» dice si la voz sube (positivo) o baja (negativo), y se usa mientras la app aprende tu tono." />
-                <CheckBox Content="Robot (voz monótona)" IsChecked="{Binding RobotEnabled}" Margin="0,4,0,0" />
-                <controls:ParamSlider Label="Nota del robot" Minimum="60" Maximum="300" Step="1" DefaultValue="110"
+                                      Hint="{l:T 'Lleva tu tono medio hasta aquí, sea tu voz grave o aguda: ~215 Hz mujer, ~290 Hz niño, ~85 Hz voz grave. «Tono» dice si la voz sube (positivo) o baja (negativo), y se usa mientras la app aprende tu tono.'}" />
+                <CheckBox Content="{l:T 'Robot (voz monótona)'}" IsChecked="{Binding RobotEnabled}" Margin="0,4,0,0" />
+                <controls:ParamSlider Label="{l:T 'Nota del robot'}" Minimum="60" Maximum="300" Step="1" DefaultValue="110"
                                       Value="{Binding RobotHz}" Format="{}{0:0} Hz" IsEnabled="{Binding RobotEnabled}"
-                                      Hint="Frecuencia fija a la que habla el robot." />
+                                      Hint="{l:T 'Frecuencia fija a la que habla el robot.'}" />
 
-                <TextBlock Text="Autotune" Style="{StaticResource SubHeader}" />
+                <TextBlock Text="{l:T 'Autotune'}" Style="{StaticResource SubHeader}" />
                 <Grid Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="118" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Escala" VerticalAlignment="Center" />
+                    <TextBlock Text="{l:T 'Escala'}" VerticalAlignment="Center" />
                     <ComboBox Grid.Column="1" Margin="6,0,0,0" ItemsSource="{Binding Scales}" DisplayMemberPath="Name"
                               SelectedValuePath="Value" SelectedValue="{Binding AutotuneScale}"
-                              ToolTip="Notas a las que se ajusta tu voz. «Apagado» quita el autotune." />
+                              ToolTip="{l:T 'Notas a las que se ajusta tu voz. «Apagado» quita el autotune.'}" />
                 </Grid>
                 <Grid Margin="0,2" IsEnabled="{Binding AutotuneKeyEnabled}">
                     <Grid.Style>
@@ -85,130 +86,130 @@
                         <ColumnDefinition Width="118" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Tonalidad" VerticalAlignment="Center" />
+                    <TextBlock Text="{l:T 'Tonalidad'}" VerticalAlignment="Center" />
                     <ComboBox Grid.Column="1" Margin="6,0,0,0" ItemsSource="{Binding Keys}" SelectedIndex="{Binding AutotuneKey}"
-                              ToolTip="Pon la tonalidad de la canción si cantas encima de una. La menor = Do mayor (las notas blancas del piano)." />
+                              ToolTip="{l:T 'Pon la tonalidad de la canción si cantas encima de una. La menor = Do mayor (las notas blancas del piano).'}" />
                 </Grid>
-                <controls:ParamSlider Label="Velocidad" Minimum="0" Maximum="200" Step="5" DefaultValue="0"
-                                      Value="{Binding AutotuneRetuneMs}" Format="{}{0:0} ms" OffText="instantánea"
+                <controls:ParamSlider Label="{l:T 'Velocidad'}" Minimum="0" Maximum="200" Step="5" DefaultValue="0"
+                                      Value="{Binding AutotuneRetuneMs}" Format="{}{0:0} ms" OffText="{l:T 'instantánea'}"
                                       IsEnabled="{Binding AutotuneEnabled}"
-                                      Hint="Instantánea = autotune duro: saltas de nota en nota, como en el reggaetón o el trap. 50-200 ms = corrección natural." />
-                <controls:ParamSlider Label="Exagerar melodía" Minimum="0" Maximum="1" Step="0.05" DefaultValue="0"
-                                      Value="{Binding AutotuneExaggeration}" Format="{}{0:P0}" OffText="no"
+                                      Hint="{l:T 'Instantánea = autotune duro: saltas de nota en nota, como en el reggaetón o el trap. 50-200 ms = corrección natural.'}" />
+                <controls:ParamSlider Label="{l:T 'Exagerar melodía'}" Minimum="0" Maximum="1" Step="0.05" DefaultValue="0"
+                                      Value="{Binding AutotuneExaggeration}" Format="{}{0:P0}" OffText="{l:T 'no'}"
                                       IsEnabled="{Binding AutotuneEnabled}"
-                                      Hint="Amplía las subidas y bajadas de tu voz (hasta 2,5×) para que al hablar suene cantado. Si cantas encima de una canción, déjalo en «no»." />
+                                      Hint="{l:T 'Amplía las subidas y bajadas de tu voz (hasta 2,5×) para que al hablar suene cantado. Si cantas encima de una canción, déjalo en «no».'}" />
 
-                <TextBlock Text="Vibrato" Style="{StaticResource SubHeader}" />
-                <controls:ParamSlider Label="Vibrato" Minimum="0" Maximum="3" Step="0.1" DefaultValue="0"
-                                      Value="{Binding VibratoSemitones}" Format="{}±{0:0.0} st" OffText="apagado"
-                                      Hint="Hace temblar el tono. Lento y profundo: borracho; rápido y suave: bajo el agua o fantasma." />
-                <controls:ParamSlider Label="Vibrato (velocidad)" Minimum="0.2" Maximum="10" Step="0.05" DefaultValue="5.5"
+                <TextBlock Text="{l:T 'Vibrato'}" Style="{StaticResource SubHeader}" />
+                <controls:ParamSlider Label="{l:T 'Vibrato'}" Minimum="0" Maximum="3" Step="0.1" DefaultValue="0"
+                                      Value="{Binding VibratoSemitones}" Format="{}±{0:0.0} st" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Hace temblar el tono. Lento y profundo: borracho; rápido y suave: bajo el agua o fantasma.'}" />
+                <controls:ParamSlider Label="{l:T 'Vibrato (velocidad)'}" Minimum="0.2" Maximum="10" Step="0.05" DefaultValue="5.5"
                                       Value="{Binding VibratoHz}" Format="{}{0:0.##} Hz"
-                                      Hint="Oscilaciones por segundo." />
+                                      Hint="{l:T 'Oscilaciones por segundo.'}" />
                 <TextBlock Style="{StaticResource MutedText}" FontSize="11" Margin="0,2,0,0" TextWrapping="Wrap"
-                           Text="Tono, formantes, robot y autotune añaden algo de latencia, según lo grave que hables: ~11 ms con voz aguda, ~20 ms con voz media, ~27 ms con voz muy grave. El vibrato sin cambio de tono añade de 1 a 20 ms." />
+                           Text="{l:T 'Tono, formantes, robot y autotune añaden algo de latencia, según lo grave que hables: ~11 ms con voz aguda, ~20 ms con voz media, ~27 ms con voz muy grave. El vibrato sin cambio de tono añade de 1 a 20 ms.'}" />
 
-                <TextBlock Text="Efectos" Style="{StaticResource SubHeader}" />
-                <controls:ParamSlider Label="Susurro" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding WhisperMix}" Format="{}{0:P0}" OffText="apagado"
-                                      Hint="Cambia la vibración de la voz por un soplo con la misma forma de boca. Sin latencia." />
-                <controls:ParamSlider Label="Aire (respiración)" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding Breathiness}" Format="{}{0:P0}" OffText="apagado"
-                                      Hint="Añade un soplo suave que sigue tu voz: más femenina o susurrada. Sin latencia." />
-                <controls:ParamSlider Label="Modulador (Hz)" Minimum="20" Maximum="1000" Step="1" DefaultValue="60"
+                <TextBlock Text="{l:T 'Efectos'}" Style="{StaticResource SubHeader}" />
+                <controls:ParamSlider Label="{l:T 'Susurro'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding WhisperMix}" Format="{}{0:P0}" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Cambia la vibración de la voz por un soplo con la misma forma de boca. Sin latencia.'}" />
+                <controls:ParamSlider Label="{l:T 'Aire (respiración)'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding Breathiness}" Format="{}{0:P0}" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Añade un soplo suave que sigue tu voz: más femenina o susurrada. Sin latencia.'}" />
+                <controls:ParamSlider Label="{l:T 'Modulador (Hz)'}" Minimum="20" Maximum="1000" Step="1" DefaultValue="60"
                                       Value="{Binding RingHz}" Format="{}{0:0} Hz"
-                                      Hint="Modulación en anillo: sonido metálico o de alien." />
-                <controls:ParamSlider Label="Modulador (mezcla)" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding RingMix}" Format="{}{0:P0}" OffText="apagado" />
-                <controls:ParamSlider Label="Distorsión" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding Distortion}" Format="{}{0:P0}" OffText="apagada" />
-                <controls:ParamSlider Label="Coro" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding HarmonyMix}" Format="{}{0:P0}" OffText="apagado"
-                                      Hint="Tu voz con tres copias con otro tono a la vez. Gasta como tres voces con cambio de tono." />
+                                      Hint="{l:T 'Modulación en anillo: sonido metálico o de alien.'}" />
+                <controls:ParamSlider Label="{l:T 'Modulador (mezcla)'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding RingMix}" Format="{}{0:P0}" OffText="{l:T 'apagado'}" />
+                <controls:ParamSlider Label="{l:T 'Distorsión'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding Distortion}" Format="{}{0:P0}" OffText="{l:T 'apagada'}" />
+                <controls:ParamSlider Label="{l:T 'Coro'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding HarmonyMix}" Format="{}{0:P0}" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Tu voz con tres copias con otro tono a la vez. Gasta como tres voces con cambio de tono.'}" />
                 <Grid Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="118" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Coro (estilo)" VerticalAlignment="Center" />
+                    <TextBlock Text="{l:T 'Coro (estilo)'}" VerticalAlignment="Center" />
                     <ComboBox Grid.Column="1" Margin="6,0,0,0" ItemsSource="{Binding Harmonies}" DisplayMemberPath="Name"
                               SelectedValuePath="Value" SelectedValue="{Binding Harmony}" />
                 </Grid>
-                <controls:ParamSlider Label="Vocoder" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding VocoderMix}" Format="{}{0:P0}" OffText="apagado"
-                                      Hint="Tu voz toca un acorde de sintetizador: el robot musical de la música electrónica." />
-                <controls:ParamSlider Label="Vocoder (nota)" Minimum="55" Maximum="220" Step="1" DefaultValue="110"
+                <controls:ParamSlider Label="{l:T 'Vocoder'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding VocoderMix}" Format="{}{0:P0}" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Tu voz toca un acorde de sintetizador: el robot musical de la música electrónica.'}" />
+                <controls:ParamSlider Label="{l:T 'Vocoder (nota)'}" Minimum="55" Maximum="220" Step="1" DefaultValue="110"
                                       Value="{Binding VocoderHz}" Format="{}{0:0} Hz"
-                                      Hint="Nota grave del acorde (110 Hz = La)." />
-                <controls:ParamSlider Label="Compresión" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding Compression}" Format="{}{0:P0}" OffText="apagada"
-                                      Hint="Iguala lo que dices flojo y fuerte, como en la radio." />
-                <controls:ParamSlider Label="Chorus" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding ChorusMix}" Format="{}{0:P0}" OffText="apagado"
-                                      Hint="Tres copias de tu voz con pequeñas variaciones: suena a varias personas a la vez." />
-                <controls:ParamSlider Label="Flanger" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding FlangerMix}" Format="{}{0:P0}" OffText="apagado"
-                                      Hint="Resonancias que suben y bajan: sonido de avión a reacción o espacial." />
-                <controls:ParamSlider Label="Flanger (velocidad)" Minimum="0.05" Maximum="2" Step="0.05" DefaultValue="0.25"
+                                      Hint="{l:T 'Nota grave del acorde (110 Hz = La).'}" />
+                <controls:ParamSlider Label="{l:T 'Compresión'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding Compression}" Format="{}{0:P0}" OffText="{l:T 'apagada'}"
+                                      Hint="{l:T 'Iguala lo que dices flojo y fuerte, como en la radio.'}" />
+                <controls:ParamSlider Label="{l:T 'Chorus'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding ChorusMix}" Format="{}{0:P0}" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Tres copias de tu voz con pequeñas variaciones: suena a varias personas a la vez.'}" />
+                <controls:ParamSlider Label="{l:T 'Flanger'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding FlangerMix}" Format="{}{0:P0}" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Resonancias que suben y bajan: sonido de avión a reacción o espacial.'}" />
+                <controls:ParamSlider Label="{l:T 'Flanger (velocidad)'}" Minimum="0.05" Maximum="2" Step="0.05" DefaultValue="0.25"
                                       Value="{Binding FlangerHz}" Format="{}{0:0.##} Hz"
-                                      Hint="Barridos por segundo." />
-                <CheckBox Content="Voz invertida (al revés)" IsChecked="{Binding ReverseEnabled}" Margin="0,4,0,0" />
-                <controls:ParamSlider Label="Trozo invertido" Minimum="60" Maximum="500" Step="10" DefaultValue="200"
+                                      Hint="{l:T 'Barridos por segundo.'}" />
+                <CheckBox Content="{l:T 'Voz invertida (al revés)'}" IsChecked="{Binding ReverseEnabled}" Margin="0,4,0,0" />
+                <controls:ParamSlider Label="{l:T 'Trozo invertido'}" Minimum="60" Maximum="500" Step="10" DefaultValue="200"
                                       Value="{Binding ReverseMs}" Format="{}{0:0} ms" IsEnabled="{Binding ReverseEnabled}"
-                                      Hint="Cada trozo de esta duración se oye al revés. Para invertirlo hay que esperar a que acabe: añade esa latencia." />
+                                      Hint="{l:T 'Cada trozo de esta duración se oye al revés. Para invertirlo hay que esperar a que acabe: añade esa latencia.'}" />
 
-                <TextBlock Text="Ecualización" Style="{StaticResource SubHeader}" />
-                <controls:ParamSlider Label="Paso alto" Minimum="0" Maximum="1000" Step="10" DefaultValue="0"
-                                      Value="{Binding HighPassHz}" Format="{}{0:0} Hz" OffText="apagado"
-                                      Hint="Quita graves por debajo de esta frecuencia (voz más fina)." />
-                <CheckBox Content="Paso bajo (quitar agudos)" IsChecked="{Binding LowPassEnabled}" Margin="0,4,0,0" />
-                <controls:ParamSlider Label="Paso bajo" Minimum="1000" Maximum="12000" Step="100" DefaultValue="6000"
+                <TextBlock Text="{l:T 'Ecualización'}" Style="{StaticResource SubHeader}" />
+                <controls:ParamSlider Label="{l:T 'Paso alto'}" Minimum="0" Maximum="1000" Step="10" DefaultValue="0"
+                                      Value="{Binding HighPassHz}" Format="{}{0:0} Hz" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Quita graves por debajo de esta frecuencia (voz más fina).'}" />
+                <CheckBox Content="{l:T 'Paso bajo (quitar agudos)'}" IsChecked="{Binding LowPassEnabled}" Margin="0,4,0,0" />
+                <controls:ParamSlider Label="{l:T 'Paso bajo'}" Minimum="1000" Maximum="12000" Step="100" DefaultValue="6000"
                                       Value="{Binding LowPassHz}" Format="{}{0:0} Hz" IsEnabled="{Binding LowPassEnabled}"
-                                      Hint="Quita agudos por encima de esta frecuencia (voz apagada, de radio o lejana)." />
-                <controls:ParamSlider Label="Presencia" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
+                                      Hint="{l:T 'Quita agudos por encima de esta frecuencia (voz apagada, de radio o lejana).'}" />
+                <controls:ParamSlider Label="{l:T 'Presencia'}" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
                                       Value="{Binding PresenceDb}" Format="{}{0:+0.#;-0.#;0} dB"
-                                      Hint="Realza o atenúa la zona de 1,8 kHz (voz más «delante»)." />
-                <controls:ParamSlider Label="Agudos" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
+                                      Hint="{l:T 'Realza o atenúa la zona de 1,8 kHz (voz más «delante»).'}" />
+                <controls:ParamSlider Label="{l:T 'Agudos'}" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
                                       Value="{Binding HighShelfDb}" Format="{}{0:+0.#;-0.#;0} dB" />
-                <controls:ParamSlider Label="Graves" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
+                <controls:ParamSlider Label="{l:T 'Graves'}" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
                                       Value="{Binding LowShelfDb}" Format="{}{0:+0.#;-0.#;0} dB"
-                                      Hint="Más pecho (positivo), como un locutor de radio, o menos (negativo)." />
-                <controls:ParamSlider Label="Nasal" Minimum="0" Maximum="12" Step="0.5" DefaultValue="0"
-                                      Value="{Binding NasalDb}" Format="{}{0:+0.#;-0.#;0} dB" OffText="apagado"
-                                      Hint="Realza una banda estrecha en 1,1 kHz: voz de duende o con la nariz tapada." />
+                                      Hint="{l:T 'Más pecho (positivo), como un locutor de radio, o menos (negativo).'}" />
+                <controls:ParamSlider Label="{l:T 'Nasal'}" Minimum="0" Maximum="12" Step="0.5" DefaultValue="0"
+                                      Value="{Binding NasalDb}" Format="{}{0:+0.#;-0.#;0} dB" OffText="{l:T 'apagado'}"
+                                      Hint="{l:T 'Realza una banda estrecha en 1,1 kHz: voz de duende o con la nariz tapada.'}" />
 
-                <TextBlock Text="Transmisión" Style="{StaticResource SubHeader}" />
+                <TextBlock Text="{l:T 'Transmisión'}" Style="{StaticResource SubHeader}" />
                 <Grid Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="118" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Estilo" VerticalAlignment="Center" />
+                    <TextBlock Text="{l:T 'Estilo'}" VerticalAlignment="Center" />
                     <ComboBox Grid.Column="1" Margin="6,0,0,0" ItemsSource="{Binding Transmissions}" DisplayMemberPath="Name"
                               SelectedValuePath="Value" SelectedValue="{Binding Transmission}"
-                              ToolTip="Ruido de radio mientras hablas y pitidos al empezar y al acabar. En silencio no suena nada." />
+                              ToolTip="{l:T 'Ruido de radio mientras hablas y pitidos al empezar y al acabar. En silencio no suena nada.'}" />
                 </Grid>
-                <controls:ParamSlider Label="Ruido y pitidos" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0.6"
+                <controls:ParamSlider Label="{l:T 'Ruido y pitidos'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0.6"
                                       Value="{Binding TransmissionNoise}" Format="{}{0:P0}" IsEnabled="{Binding TransmissionEnabled}" />
 
-                <TextBlock Text="Espacio" Style="{StaticResource SubHeader}" />
-                <controls:ParamSlider Label="Eco (retardo)" Minimum="0" Maximum="1000" Step="10" DefaultValue="250"
-                                      Value="{Binding EchoMs}" Format="{}{0:0} ms" OffText="apagado" />
-                <controls:ParamSlider Label="Eco (repeticiones)" Minimum="0" Maximum="0.9" Step="0.01" DefaultValue="0.3"
+                <TextBlock Text="{l:T 'Espacio'}" Style="{StaticResource SubHeader}" />
+                <controls:ParamSlider Label="{l:T 'Eco (retardo)'}" Minimum="0" Maximum="1000" Step="10" DefaultValue="250"
+                                      Value="{Binding EchoMs}" Format="{}{0:0} ms" OffText="{l:T 'apagado'}" />
+                <controls:ParamSlider Label="{l:T 'Eco (repeticiones)'}" Minimum="0" Maximum="0.9" Step="0.01" DefaultValue="0.3"
                                       Value="{Binding EchoFeedback}" Format="{}{0:P0}"
-                                      Hint="Realimentación: cuánto se repite el eco." />
-                <controls:ParamSlider Label="Eco (mezcla)" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding EchoMix}" Format="{}{0:P0}" OffText="apagado" />
-                <controls:ParamSlider Label="Reverb (mezcla)" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
-                                      Value="{Binding ReverbMix}" Format="{}{0:P0}" OffText="apagada" />
-                <controls:ParamSlider Label="Reverb (tamaño)" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0.5"
+                                      Hint="{l:T 'Realimentación: cuánto se repite el eco.'}" />
+                <controls:ParamSlider Label="{l:T 'Eco (mezcla)'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding EchoMix}" Format="{}{0:P0}" OffText="{l:T 'apagado'}" />
+                <controls:ParamSlider Label="{l:T 'Reverb (mezcla)'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0"
+                                      Value="{Binding ReverbMix}" Format="{}{0:P0}" OffText="{l:T 'apagada'}" />
+                <controls:ParamSlider Label="{l:T 'Reverb (tamaño)'}" Minimum="0" Maximum="1" Step="0.01" DefaultValue="0.5"
                                       Value="{Binding ReverbSize}" Format="{}{0:P0}"
-                                      Hint="De habitación pequeña a catedral." />
+                                      Hint="{l:T 'De habitación pequeña a catedral.'}" />
 
-                <TextBlock Text="Salida" Style="{StaticResource SubHeader}" />
-                <controls:ParamSlider Label="Ganancia" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
+                <TextBlock Text="{l:T 'Salida'}" Style="{StaticResource SubHeader}" />
+                <controls:ParamSlider Label="{l:T 'Ganancia'}" Minimum="-12" Maximum="12" Step="0.5" DefaultValue="0"
                                       Value="{Binding OutputGainDb}" Format="{}{0:+0.#;-0.#;0} dB"
-                                      Hint="Volumen final de esta voz." />
+                                      Hint="{l:T 'Volumen final de esta voz.'}" />
             </StackPanel>
         </ScrollViewer>
     </DockPanel>

@@ -35,6 +35,9 @@ public sealed class SettingsService
 
     public AppSettings Current { get; }
 
+    /// <summary>No había ajustes guardados: es la primera vez que se abre la app.</summary>
+    public bool IsNew { get; private init; }
+
     /// <summary>Carga los ajustes. Si el archivo no existe o está roto, empieza con los valores por defecto.</summary>
     public static SettingsService Load()
     {
@@ -58,9 +61,10 @@ public sealed class SettingsService
             }
         }
 
+        bool isNew = settings is null && !File.Exists(path);
         settings ??= new AppSettings();
         settings.Normalize();
-        return new SettingsService(settings);
+        return new SettingsService(settings) { IsNew = isNew };
     }
 
     public void ScheduleSave()

@@ -25,8 +25,8 @@ public sealed record StreamInfo(
 
     public string ModeDescription => Mode switch
     {
-        StreamMode.SharedLowLatency => "compartido baja latencia",
-        StreamMode.Exclusive => "exclusivo",
-        _ => "compartido",
+        StreamMode.SharedLowLatency => AudioText.T("compartido baja latencia"),
+        StreamMode.Exclusive => AudioText.T("exclusivo"),
+        _ => AudioText.T("compartido"),
     };
 }

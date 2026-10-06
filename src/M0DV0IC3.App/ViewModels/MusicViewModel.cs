@@ -2,11 +2,12 @@ using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Services;
-using M0DV0IC3.Audio;
 using M0DV0IC3.Audio.AppAudio;
-using M0DV0IC3.Dsp;
+using M0DV0IC3.Audio;
 using M0DV0IC3.Dsp.Presets;
+using M0DV0IC3.Dsp;
 
 namespace M0DV0IC3.App.ViewModels;
 
@@ -144,7 +145,7 @@ public sealed partial class MusicViewModel : ObservableObject
         var app = Apps.FirstOrDefault(a => a.ExeName.Equals(exeName, StringComparison.OrdinalIgnoreCase));
         if (app is null)
         {
-            Message = $"{exeName} no está abierto.";
+            Message = Loc.F("{0} no está abierto.", exeName);
             return false;
         }
         if (IsStreaming && string.Equals(_streamer.Current?.ExeName, exeName, StringComparison.OrdinalIgnoreCase)) return true;
@@ -196,7 +197,7 @@ public sealed partial class MusicViewModel : ObservableObject
         }
 
         if (!IsStreaming)
-            Message = Apps.Count == 0 ? "No hay ninguna app con audio. Abre Spotify (o pon algo en el navegador) y pulsa «Actualizar»." : null;
+            Message = Apps.Count == 0 ? Loc.T("No hay ninguna app con audio. Abre Spotify (o pon algo en el navegador) y pulsa «Actualizar».") : null;
     }
 
     /// <summary>Lo llama el temporizador de medidores de la ventana (~30 veces por segundo).</summary>
@@ -267,13 +268,13 @@ public sealed partial class MusicViewModel : ObservableObject
         {
             if (KaraokeActive)
             {
-                Message = "Apaga primero el karaoke: quitar la voz y cambiársela al cantante no van a la vez.";
+                Message = Loc.T("Apaga primero el karaoke: quitar la voz y cambiársela al cantante no van a la vez.");
                 SongVoiceOn = false;
                 return;
             }
             if (SelectedApp is not { } app)
             {
-                Message = "Elige primero la app que suena.";
+                Message = Loc.T("Elige primero la app que suena.");
                 SongVoiceOn = false;
                 return;
             }
@@ -335,7 +336,7 @@ public sealed partial class MusicViewModel : ObservableObject
         if (SelectedApp is not { } selected)
         {
             SetStreaming(false);
-            Message = "Elige primero la app que quieres transmitir.";
+            Message = Loc.T("Elige primero la app que quieres transmitir.");
             return;
         }
 
@@ -379,7 +380,7 @@ public sealed partial class MusicViewModel : ObservableObject
         if (SelectedApp is not { } selected) return;
 
         if (AudioAppFinder.FindByExe(selected.ExeName) is not null) _ = StartAsync();
-        else Message = $"{selected.DisplayName} está cerrada: en cuanto la abras, se volverá a transmitir.";
+        else Message = Loc.F("{0} está cerrada: en cuanto la abras, se volverá a transmitir.", selected.DisplayName);
     }
 
     private void OnStreamerFaulted(Exception error)

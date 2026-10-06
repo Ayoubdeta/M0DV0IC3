@@ -6,8 +6,10 @@ using System.Runtime;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Markup;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.App.ViewModels;
+using M0DV0IC3.Audio;
 
 namespace M0DV0IC3.App;
 
@@ -49,21 +51,24 @@ public partial class App : Application
         Log.Rotate();
         RegisterExceptionHandlers();
 
+        // El idioma va lo primero: hasta el aviso de "ya está abierto" sale en el idioma elegido.
+        _settings = SettingsService.Load();
+        InitializeLanguage(_settings);
+
         if (!AcquireSingleInstance(waitForPrevious: e.Args.Contains(RestartArgument)))
         {
             Shutdown();
             return;
         }
 
-        Log.Info($"Inicio de M0DV0IC3 {typeof(App).Assembly.GetName().Version} (administrador: {(Elevation.IsElevated ? "sí" : "no")})");
+        Log.Info($"Inicio de M0DV0IC3 {typeof(App).Assembly.GetName().Version} (administrador: {(Elevation.IsElevated ? "sí" : "no")}, idioma: {Loc.Code(Loc.Language)})");
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
-        // Los bindings formatean con la cultura del sistema (coma decimal), no con en-US.
+        // Los bindings formatean con la cultura del idioma de la app ("1,5" en español), no siempre con en-US.
         FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement),
             new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
         try
         {
-            _settings = SettingsService.Load();
             _audio = new AudioService();
             _window = new MainWindow();
             MainWindow = _window;
@@ -71,7 +76,7 @@ public partial class App : Application
             // El HWND existe desde ya (aunque se inicie minimizado) y sobrevive a Hide(): ahí van los atajos.
             IntPtr hwnd = new WindowInteropHelper(_window).EnsureHandle();
             _hotkeys = new HotkeyService(hwnd);
-            _viewModel = new MainViewModel(_settings, _audio, _hotkeys, RestartAsAdministrator);
+            _viewModel = new MainViewModel(_settings, _audio, _hotkeys, RestartAsAdministrator, Restart);
             _window.DataContext = _viewModel;
 
             _tray = new TrayService(_viewModel, nameof(MainViewModel.VoiceEnabled), ShowMainWindow, ExitApplication);
@@ -86,7 +91,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             Log.Error("No se pudo iniciar la app", ex);
-            MessageBox.Show($"M0DV0IC3 no ha podido arrancar:\n\n{ex.Message}\n\nMás detalles en {AppPaths.LogFile}",
+            MessageBox.Show(Loc.F("M0DV0IC3 no ha podido arrancar:\n\n{0}\n\nMás detalles en {1}", ex.Message, AppPaths.LogFile),
                 "M0DV0IC3", MessageBoxButton.OK, MessageBoxImage.Error);
             ExitApplication();
             return;
@@ -135,8 +140,8 @@ public partial class App : Application
         _window?.Hide();
         if (!_settings.Current.TrayTipShown)
         {
-            _tray?.ShowTip("M0DV0IC3 sigue funcionando",
-                "Tu voz y los atajos siguen activos. Doble clic en este icono para abrir la ventana; clic derecho → Salir para cerrarla.");
+            _tray?.ShowTip(Loc.T("M0DV0IC3 sigue funcionando"),
+                Loc.T("Tu voz y los atajos siguen activos. Doble clic en este icono para abrir la ventana; clic derecho → Salir para cerrarla."));
             _settings.Current.TrayTipShown = true;
             _settings.ScheduleSave();
         }
@@ -173,6 +178,43 @@ public partial class App : Application
         Shutdown();
     }
 
+    /// <summary>
+    /// La primera vez, el idioma de Windows; si ya había ajustes de una versión sin idioma, español (era el único).
+    /// </summary>
+    private static void InitializeLanguage(SettingsService settings)
+    {
+        var current = settings.Current;
+        if (current.Language is null)
+        {
+            current.Language = Loc.Code(settings.IsNew ? Loc.FromWindows() : AppLanguage.Spanish);
+            settings.ScheduleSave();
+        }
+        Loc.Initialize(Loc.Parse(current.Language));
+        AudioText.Translate = Loc.T;
+        // El tema (App.xaml) se carga antes de saber el idioma: sus textos se cambian aquí.
+        Current.Resources["VoiceOnText"] = Loc.T("VOZ ON");
+        Current.Resources["VoiceOffText"] = Loc.T("VOZ OFF");
+    }
+
+    /// <summary>Cierra y vuelve a abrir la app (para cambiar de idioma).</summary>
+    private void Restart()
+    {
+        string? exe = Environment.ProcessPath;
+        if (exe is null) return;
+        try
+        {
+            _settings?.SaveNow();
+            Process.Start(new ProcessStartInfo(exe, RestartArgument) { UseShellExecute = false });
+        }
+        catch (Win32Exception ex)
+        {
+            Log.Warn("No se pudo reiniciar la app", ex);
+            Dialogs.Error(Loc.F("No se pudo reiniciar M0DV0IC3:\n{0}", ex.Message));
+            return;
+        }
+        ExitApplication();
+    }
+
     private void RestartAsAdministrator()
     {
         string? exe = Environment.ProcessPath;
@@ -188,7 +230,7 @@ public partial class App : Application
         catch (Win32Exception ex)
         {
             Log.Warn("No se pudo reiniciar como administrador", ex);
-            Dialogs.Error($"No se pudo reiniciar como administrador:\n{ex.Message}");
+            Dialogs.Error(Loc.F("No se pudo reiniciar como administrador:\n{0}", ex.Message));
             return;
         }
         ExitApplication();
@@ -238,7 +280,7 @@ public partial class App : Application
         {
             // No se puede avisar a la otra instancia (p. ej. es de administrador); basta con el mensaje.
         }
-        MessageBox.Show("M0DV0IC3 ya está abierto.\n\nBúscalo en la bandeja del sistema, junto al reloj.",
+        MessageBox.Show(Loc.T("M0DV0IC3 ya está abierto.\n\nBúscalo en la bandeja del sistema, junto al reloj."),
             "M0DV0IC3", MessageBoxButton.OK, MessageBoxImage.Information);
         return false;
     }
@@ -271,9 +313,9 @@ public partial class App : Application
         try
         {
             string intro = fatal
-                ? "Ha ocurrido un error grave y M0DV0IC3 tiene que cerrarse."
-                : "Ha ocurrido un error inesperado. M0DV0IC3 intentará seguir funcionando.";
-            MessageBox.Show($"{intro}\n\n{error?.Message}\n\nLos detalles están en:\n{AppPaths.LogFile}",
+                ? Loc.T("Ha ocurrido un error grave y M0DV0IC3 tiene que cerrarse.")
+                : Loc.T("Ha ocurrido un error inesperado. M0DV0IC3 intentará seguir funcionando.");
+            MessageBox.Show(intro + "\n\n" + error?.Message + "\n\n" + Loc.F("Los detalles están en:\n{0}", AppPaths.LogFile),
                 "M0DV0IC3", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch

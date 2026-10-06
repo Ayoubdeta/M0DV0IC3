@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.Audio.AppAudio;
 using M0DV0IC3.Audio.Karaoke;
@@ -142,7 +143,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
         }
     }
 
-    public string LyricsOffsetText => LyricsOffset == 0 ? "0 s" : $"{LyricsOffset:+0.00;-0.00} s";
+    public string LyricsOffsetText => LyricsOffset == 0 ? "0 s" : string.Format(System.Globalization.CultureInfo.CurrentCulture, "{0:+0.00;-0.00} s", LyricsOffset);
 
     /// <summary>La pestaña está a la vista: hace falta la letra aunque el karaoke esté apagado.</summary>
     public void SetPageVisible(bool visible)
@@ -185,7 +186,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
             var app = AudioAppFinder.FindByExe(SpotifyExe);
             if (app is null)
             {
-                Status = "Abre Spotify y pon una canción para usar el karaoke.";
+                Status = Loc.T("Abre Spotify y pon una canción para usar el karaoke.");
                 IsOn = false;
                 return;
             }
@@ -199,7 +200,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
             _audio.Pipeline.AppAudioToMonitor = true;
             if (!wasStreamingSpotify && !await _music.StreamAppAsync(SpotifyExe))
             {
-                Status = _music.Message ?? "No se pudo capturar Spotify.";
+                Status = _music.Message ?? Loc.T("No se pudo capturar Spotify.");
                 ResetAudio();
                 IsOn = false;
                 return;
@@ -283,8 +284,8 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
         if (song is null)
         {
             Status = AudioAppFinder.FindByExe(SpotifyExe) is null
-                ? "Abre Spotify y pon una canción."
-                : "Pon una canción en Spotify.";
+                ? Loc.T("Abre Spotify y pon una canción.")
+                : Loc.T("Pon una canción en Spotify.");
             return;
         }
         if ((IsOn || _pageVisible) && !song.IsSameSong(_lyricsSong)) await LoadLyricsAsync(song);
@@ -299,7 +300,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
         Lines.Clear();
         CurrentIndex = -1;
         IsSynced = false;
-        Status = "Buscando la letra…";
+        Status = Loc.T("Buscando la letra…");
         try
         {
             var lyrics = await _lyricsClient.FindAsync(song.Artist, song.Title, song.Album, song.Duration, cancellation.Token);
@@ -307,17 +308,17 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
             _lyrics = lyrics;
             if (lyrics is null)
             {
-                Status = "No he encontrado la letra de esta canción.";
+                Status = Loc.T("No he encontrado la letra de esta canción.");
                 return;
             }
             if (lyrics.IsInstrumental)
             {
-                Status = "Esta canción es instrumental: no tiene letra.";
+                Status = Loc.T("Esta canción es instrumental: no tiene letra.");
                 return;
             }
             foreach (var line in lyrics.Lines) Lines.Add(new LyricLineViewModel(line));
             IsSynced = lyrics.IsSynced;
-            Status = lyrics.IsSynced ? "" : "Letra sin sincronizar: síguela tú.";
+            Status = lyrics.IsSynced ? "" : Loc.T("Letra sin sincronizar: síguela tú.");
             UpdateCurrentLine();
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
@@ -327,7 +328,7 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
         {
             Log.Warn("No se pudo descargar la letra", ex);
             _lyricsSong = null; // se reintenta en la siguiente consulta
-            Status = "No se ha podido buscar la letra (¿hay conexión a internet?). Lo vuelvo a intentar en un momento.";
+            Status = Loc.T("No se ha podido buscar la letra (¿hay conexión a internet?). Lo vuelvo a intentar en un momento.");
         }
     }
 

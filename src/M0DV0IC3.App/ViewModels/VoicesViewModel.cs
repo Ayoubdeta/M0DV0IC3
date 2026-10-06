@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.Dsp.Presets;
@@ -137,11 +138,11 @@ public sealed partial class VoicesViewModel : ObservableObject
 
     public IReadOnlyList<RandomIntervalOption> RandomIntervals { get; } =
     [
-        new(2, "cada 2 s"),
-        new(5, "cada 5 s"),
-        new(10, "cada 10 s"),
-        new(30, "cada 30 s"),
-        new(0, "al azar (2-10 s)"),
+        new(2, Loc.T("cada 2 s")),
+        new(5, Loc.T("cada 5 s")),
+        new(10, Loc.T("cada 10 s")),
+        new(30, Loc.T("cada 30 s")),
+        new(0, Loc.T("al azar (2-10 s)")),
     ];
 
     /// <summary>Segundos entre cambios de la voz aleatoria (0 = al azar entre 2 y 10 s).</summary>
@@ -178,8 +179,8 @@ public sealed partial class VoicesViewModel : ObservableObject
     public IReadOnlyList<VoiceCardViewModel> HoldVoiceChoices => AllCards.ToList();
 
     public string HoldKeyText => _hotkeys.Find(HotkeyActions.HoldVoice)?.Gesture is { } gesture
-        ? $"Al mantener {gesture.DisplayText}:"
-        : "Al mantener (sin atajo):";
+        ? Loc.F("Al mantener {0}:", gesture.DisplayText)
+        : Loc.T("Al mantener (sin atajo):");
 
     public void ActivateIndex(int index)
     {
@@ -296,7 +297,7 @@ public sealed partial class VoicesViewModel : ObservableObject
     [RelayCommand]
     private void NewVoice()
     {
-        var preset = VoicePreset.Neutral with { Id = NewId(), Name = UniqueName("Mi voz"), Icon = CustomIcon, IsBuiltIn = false };
+        var preset = VoicePreset.Neutral with { Id = NewId(), Name = UniqueName(Loc.T("Mi voz")), Icon = CustomIcon, IsBuiltIn = false };
         AddCustomAndEdit(preset);
     }
 
@@ -312,7 +313,7 @@ public sealed partial class VoicesViewModel : ObservableObject
     private void Duplicate()
     {
         if (Selected is not { } card) return;
-        var preset = card.Preset with { Id = NewId(), Name = UniqueName($"{card.Name} (copia)"), IsBuiltIn = false };
+        var preset = card.Preset with { Id = NewId(), Name = UniqueName(Loc.F("{0} (copia)", card.Name)), IsBuiltIn = false };
         AddCustomAndEdit(preset);
     }
 
@@ -320,7 +321,7 @@ public sealed partial class VoicesViewModel : ObservableObject
     private void Delete()
     {
         if (Selected is not { IsBuiltIn: false } card) return;
-        if (!Dialogs.Confirm($"¿Borrar la voz «{card.Name}»? No se puede deshacer.")) return;
+        if (!Dialogs.Confirm(Loc.F("¿Borrar la voz «{0}»? No se puede deshacer.", card.Name))) return;
 
         if (Editor?.Card == card) CloseEditor();
         int index = Custom.IndexOf(card);
@@ -398,7 +399,7 @@ public sealed partial class VoicesViewModel : ObservableObject
             var card = n <= cards.Count ? cards[n - 1] : null;
             binding.VoiceIcon = card?.Icon;
             binding.VoiceName = card?.Name;
-            binding.Detail = card is null ? "Todavía no hay ninguna voz en esa posición" : null;
+            binding.Detail = card is null ? Loc.T("Todavía no hay ninguna voz en esa posición") : null;
         }
         UpdateHoldDetail();
     }
@@ -407,7 +408,7 @@ public sealed partial class VoicesViewModel : ObservableObject
     {
         if (_hotkeys.Find(HotkeyActions.HoldVoice) is not { } binding) return;
         var card = HoldVoice;
-        binding.Detail = card is null ? "Elige en la pestaña Voces qué voz suena («Al mantener»)" : "Mientras lo mantienes suena";
+        binding.Detail = card is null ? Loc.T("Elige en la pestaña Voces qué voz suena («Al mantener»)") : Loc.T("Mientras lo mantienes suena");
         binding.VoiceIcon = card?.Icon;
         binding.VoiceName = card?.Name;
     }

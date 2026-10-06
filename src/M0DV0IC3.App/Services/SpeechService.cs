@@ -1,4 +1,5 @@
 using System.IO;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.Audio.Soundboard;
 using M0DV0IC3.Audio.Speech;
 using NAudio.Wave;
@@ -30,7 +31,7 @@ public static class SpeechService
         {
             return SpeechSynthesizer.AllVoices
                 .Select(v => new SpeechVoiceInfo(v.Id, v.DisplayName.Replace("Microsoft ", ""), v.Language,
-                    v.Gender == VoiceGender.Female ? "mujer" : "hombre"))
+                    v.Gender == VoiceGender.Female ? Loc.T("mujer") : Loc.T("hombre")))
                 .OrderBy(v => v.Language.StartsWith("es", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
                 .ThenBy(v => v.Name, StringComparer.CurrentCulture)
                 .ToList();

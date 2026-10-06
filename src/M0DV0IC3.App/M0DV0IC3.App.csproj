@@ -21,6 +21,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Textos en inglés (la clave es el texto en español): ver Localization\Loc.cs -->
+    <EmbeddedResource Include="Localization\en.json" LogicalName="M0DV0IC3.App.Localization.en.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Generados desde branding\m0dv0ic3-icon-rounded-1024.png -->
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\logo.png" />

@@ -89,7 +89,7 @@ public sealed class AudioEngine : IDisposable, ICaptureSink
                 _cableReader = new DriftCompensatedReader(_cableRing, safety);
                 _cableOut = new WasapiRenderStream(options.OutputDeviceId, _cableReader, safety, options.Exclusive, options.PreferLowLatency);
                 _cableOut.Faulted += OnStreamFaulted;
-                StartStream(_cableOut, "la salida (micrófono virtual)");
+                StartStream(_cableOut, AudioText.T("la salida (micrófono virtual)"));
 
                 if (!string.IsNullOrEmpty(options.MonitorDeviceId) && options.MonitorDeviceId != options.OutputDeviceId)
                 {
@@ -98,12 +98,12 @@ public sealed class AudioEngine : IDisposable, ICaptureSink
                     // El monitor va siempre en compartido: los auriculares suelen usarse a la vez para el juego o Discord.
                     _monitorOut = new WasapiRenderStream(options.MonitorDeviceId, _monitorReader, safety, exclusive: false, options.PreferLowLatency);
                     _monitorOut.Faulted += OnStreamFaulted;
-                    StartStream(_monitorOut, "los auriculares");
+                    StartStream(_monitorOut, AudioText.T("los auriculares"));
                 }
 
                 _capture = new WasapiCaptureStream(options.InputDeviceId, this, options.Exclusive, options.PreferLowLatency);
                 _capture.Faulted += OnStreamFaulted;
-                StartStream(_capture, "el micrófono");
+                StartStream(_capture, AudioText.T("el micrófono"));
             }
             catch
             {
@@ -157,7 +157,7 @@ public sealed class AudioEngine : IDisposable, ICaptureSink
         }
         catch (Exception ex)
         {
-            throw new AudioDeviceException($"No se pudo abrir {what}: {ex.Message}", ex);
+            throw new AudioDeviceException(AudioText.F("No se pudo abrir {0}: {1}", what, ex.Message), ex);
         }
     }
 
@@ -168,7 +168,7 @@ public sealed class AudioEngine : IDisposable, ICaptureSink
         ThreadPool.QueueUserWorkItem(_ =>
         {
             Stop();
-            Faulted?.Invoke(this, new AudioDeviceException($"Se perdió el dispositivo \"{stream.Info?.DeviceName}\": {error.Message}", error));
+            Faulted?.Invoke(this, new AudioDeviceException(AudioText.F("Se perdió el dispositivo «{0}»: {1}", stream.Info?.DeviceName, error.Message), error));
         });
     }
 

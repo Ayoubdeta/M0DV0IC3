@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.Audio.Soundboard;
@@ -89,7 +90,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
 
     public void Delete(SoundItemViewModel item)
     {
-        if (!Dialogs.Confirm($"¿Quitar el sonido «{item.Name}» del soundboard?")) return;
+        if (!Dialogs.Confirm(Loc.F("¿Quitar el sonido «{0}» del soundboard?", item.Name))) return;
         Stop(item);
         RemoveItem(item, deleteFile: true);
         _settings.Current.Sounds.Remove(item.Entry);
@@ -104,8 +105,8 @@ public sealed partial class SoundboardViewModel : ObservableObject
         string patterns = string.Join(";", SoundLoader.SupportedExtensions.Select(e => "*" + e));
         var dialog = new OpenFileDialog
         {
-            Title = "Añadir sonidos al soundboard",
-            Filter = $"Archivos de audio ({patterns})|{patterns}|Todos los archivos (*.*)|*.*",
+            Title = Loc.T("Añadir sonidos al soundboard"),
+            Filter = Loc.F("Archivos de audio ({0})|{0}|Todos los archivos (*.*)|*.*", patterns),
             Multiselect = true,
         };
         if (dialog.ShowDialog() == true) await AddFilesAsync(dialog.FileNames);
@@ -123,7 +124,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
             string fileName = Path.GetFileName(source);
             if (!File.Exists(source) || !SoundLoader.IsSupported(source))
             {
-                failed.Add($"{fileName} (formato no admitido)");
+                failed.Add(Loc.F("{0} (formato no admitido)", fileName));
                 continue;
             }
 
@@ -149,7 +150,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
             {
                 Log.Warn($"No se pudo copiar {source}", ex);
                 RemoveItem(item, deleteFile: false);
-                failed.Add($"{fileName} (no se pudo copiar: {ex.Message})");
+                failed.Add(Loc.F("{0} (no se pudo copiar: {1})", fileName, ex.Message));
                 continue;
             }
 
@@ -161,14 +162,14 @@ public sealed partial class SoundboardViewModel : ObservableObject
             else
             {
                 RemoveItem(item, deleteFile: true);
-                failed.Add($"{fileName} (no se pudo leer el audio)");
+                failed.Add(Loc.F("{0} (no se pudo leer el audio)", fileName));
             }
         }
 
         if (failed.Count > 0)
         {
-            Dialogs.Warning("No se han podido añadir estos archivos:\n\n• " + string.Join("\n• ", failed)
-                + $"\n\nFormatos admitidos: {SupportedFormatsText}.");
+            Dialogs.Warning(Loc.T("No se han podido añadir estos archivos:") + "\n\n• " + string.Join("\n• ", failed)
+                + "\n\n" + Loc.F("Formatos admitidos: {0}.", SupportedFormatsText));
         }
     }
 
@@ -209,7 +210,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
         if (!File.Exists(path))
         {
             Log.Warn($"Falta el archivo del sonido «{item.Name}»: {path}");
-            item.LoadError = "Falta el archivo";
+            item.LoadError = Loc.T("Falta el archivo");
             item.IsLoading = false;
             return false;
         }
@@ -223,7 +224,7 @@ public sealed partial class SoundboardViewModel : ObservableObject
         catch (Exception ex)
         {
             Log.Warn($"No se pudo cargar el sonido {path}", ex);
-            item.LoadError = "No se pudo leer el audio";
+            item.LoadError = Loc.T("No se pudo leer el audio");
             return false;
         }
         finally

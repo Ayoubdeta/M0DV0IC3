@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 using M0DV0IC3.App.Services;
 
@@ -62,12 +63,12 @@ public sealed partial class HotkeysViewModel : ObservableObject
 
         Groups =
         [
-            new(HotkeyGroup.Voice, "Voz", ""),
-            new(HotkeyGroup.Sounds, "Sonidos", "", "Añade sonidos en la pestaña Soundboard y ponles un atajo desde aquí o desde su engranaje."),
-            new(HotkeyGroup.Phrases, "Frases de texto a voz", "", "Guarda frases en la pestaña Texto a voz y ponles un atajo para decirlas en mitad de una partida."),
-            new(HotkeyGroup.Mic, "Micro y auriculares", ""),
-            new(HotkeyGroup.Music, "Música, karaoke y grabación", ""),
-            new(HotkeyGroup.PickVoice, "Elegir una voz", ""),
+            new(HotkeyGroup.Voice, Loc.T("Voz"), ""),
+            new(HotkeyGroup.Sounds, Loc.T("Sonidos"), "", Loc.T("Añade sonidos en la pestaña Soundboard y ponles un atajo desde aquí o desde su engranaje.")),
+            new(HotkeyGroup.Phrases, Loc.T("Frases de texto a voz"), "", Loc.T("Guarda frases en la pestaña Texto a voz y ponles un atajo para decirlas en mitad de una partida.")),
+            new(HotkeyGroup.Mic, Loc.T("Micro y auriculares"), ""),
+            new(HotkeyGroup.Music, Loc.T("Música, karaoke y grabación"), ""),
+            new(HotkeyGroup.PickVoice, Loc.T("Elegir una voz"), ""),
         ];
         _groups = Groups.ToDictionary(g => g.Group);
 
@@ -107,8 +108,8 @@ public sealed partial class HotkeysViewModel : ObservableObject
     public bool IsElevated => Elevation.IsElevated;
 
     public string ElevationText => IsElevated
-        ? "M0DV0IC3 se está ejecutando como administrador: los atajos también funcionan dentro de juegos abiertos como administrador."
-        : "Si un juego se ejecuta como administrador, abre M0DV0IC3 también como administrador para que los atajos funcionen dentro.";
+        ? Loc.T("M0DV0IC3 se está ejecutando como administrador: los atajos también funcionan dentro de juegos abiertos como administrador.")
+        : Loc.T("Si un juego se ejecuta como administrador, abre M0DV0IC3 también como administrador para que los atajos funcionen dentro.");
 
     public IEnumerable<HotkeyBindingViewModel> AllBindings => Actions.Concat(SoundBindings).Concat(PhraseBindings);
 
@@ -163,7 +164,7 @@ public sealed partial class HotkeysViewModel : ObservableObject
         if (HotkeyGesture.IsModifierKey(key)) return true;
         if (modifiers == ModifierKeys.None && !HotkeyGesture.AllowsNoModifier(key))
         {
-            binding.Error = "Añade Ctrl, Alt, Mayús o Win: esa tecla sola dejaría de funcionar en las demás aplicaciones.";
+            binding.Error = Loc.T("Añade Ctrl, Alt, Mayús o Win: esa tecla sola dejaría de funcionar en las demás aplicaciones.");
             return true;
         }
 
@@ -172,7 +173,7 @@ public sealed partial class HotkeysViewModel : ObservableObject
         FinishCapture();
         if (other is not null)
         {
-            binding.Error = $"{gesture.DisplayText} ya lo usa {other.ConflictName}. Quítaselo primero o elige otra combinación.";
+            binding.Error = Loc.F("{0} ya lo usa {1}. Quítaselo primero o elige otra combinación.", gesture.DisplayText, other.ConflictName);
             return true;
         }
 
@@ -181,7 +182,7 @@ public sealed partial class HotkeysViewModel : ObservableObject
         {
             // Windows no lo deja registrar (lo usa otra app): se vuelve a la combinación anterior.
             SetGesture(binding, _beforeCapture);
-            binding.Error = _beforeCapture is null ? error : $"{error} Se mantiene {_beforeCapture.Value.DisplayText}.";
+            binding.Error = _beforeCapture is null ? error : error + " " + Loc.F("Se mantiene {0}.", _beforeCapture.Value.DisplayText);
         }
         return true;
     }
@@ -200,7 +201,7 @@ public sealed partial class HotkeysViewModel : ObservableObject
     [RelayCommand]
     private void ResetDefaults()
     {
-        if (!Dialogs.Confirm("¿Volver a poner los atajos de serie? Los atajos de los sonidos y de las frases no se tocan.")) return;
+        if (!Dialogs.Confirm(Loc.T("¿Volver a poner los atajos de serie? Los atajos de los sonidos y de las frases no se tocan."))) return;
         FinishCapture();
         foreach (var binding in Actions)
         {

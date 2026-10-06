@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.Audio.Soundboard;
@@ -88,7 +89,7 @@ public sealed partial class SoundItemViewModel : ObservableObject
     public bool IsTrimmed => FullClip is not null && (TrimStart > 0.005 || TrimEnd < FullDuration - 0.005);
 
     public string TrimText => FullClip is null ? ""
-        : $"Suena de {TrimStart:0.00} s a {TrimEnd:0.00} s: {TrimEnd - TrimStart:0.00} s de {FullDuration:0.00} s";
+        : Loc.F("Suena de {0:0.00} s a {1:0.00} s: {2:0.00} s de {3:0.00} s", TrimStart, TrimEnd, TrimEnd - TrimStart, FullDuration);
 
     /// <summary>Recibe el sonido entero recién leído y aplica el recorte guardado.</summary>
     public void SetFullClip(SoundClip full)
@@ -194,7 +195,7 @@ public sealed partial class SoundItemViewModel : ObservableObject
         if (Clip is null) return;
         var dialog = new SaveFileDialog
         {
-            Title = "Guardar el sonido recortado",
+            Title = Loc.T("Guardar el sonido recortado"),
             Filter = "Audio WAV (*.wav)|*.wav",
             FileName = string.Concat(Name.Split(Path.GetInvalidFileNameChars())) + ".wav",
         };
@@ -206,13 +207,13 @@ public sealed partial class SoundItemViewModel : ObservableObject
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Dialogs.Error($"No se pudo guardar el archivo:\n{ex.Message}");
+            Dialogs.Error(Loc.F("No se pudo guardar el archivo:\n{0}", ex.Message));
         }
     }
 
     /// <summary>Segunda línea del botón: cargando, error, atajo o duración.</summary>
     public string StatusText =>
-        IsLoading ? "Cargando…"
+        IsLoading ? Loc.T("Cargando…")
         : LoadError ?? (Hotkey.HasGesture ? Hotkey.GestureText : DurationText);
 
     partial void OnNameChanged(string value)

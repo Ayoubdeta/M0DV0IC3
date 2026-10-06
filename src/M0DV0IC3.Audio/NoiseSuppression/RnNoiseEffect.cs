@@ -50,7 +50,7 @@ public sealed unsafe class RnNoiseEffect : IAudioEffect, IDisposable
             IntPtr state = RnNoiseNative.Create(IntPtr.Zero);
             if (state == IntPtr.Zero)
             {
-                error = "rnnoise_create devolvió null.";
+                error = AudioText.T("rnnoise_create devolvió null.");
                 return null;
             }
             error = null;
@@ -58,7 +58,7 @@ public sealed unsafe class RnNoiseEffect : IAudioEffect, IDisposable
         }
         catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException or BadImageFormatException)
         {
-            error = $"No se pudo cargar rnnoise.dll: {ex.Message}";
+            error = AudioText.F("No se pudo cargar rnnoise.dll: {0}", ex.Message);
             return null;
         }
     }

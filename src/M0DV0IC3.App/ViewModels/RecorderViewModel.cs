@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.Audio.Recording;
 
@@ -66,7 +67,7 @@ public sealed partial class RecorderViewModel : ObservableObject
         }
     }
 
-    public string ButtonText => IsRecording ? $"Grabando {ElapsedText}" : "Grabar";
+    public string ButtonText => IsRecording ? Loc.F("Grabando {0}", ElapsedText) : Loc.T("Grabar");
 
     /// <summary>Se puede empezar con el audio en marcha, y parar siempre.</summary>
     public bool CanToggle => IsRecording || EngineRunning;
@@ -100,7 +101,7 @@ public sealed partial class RecorderViewModel : ObservableObject
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
         {
             Log.Warn($"No se pudo empezar a grabar en {path}", ex);
-            Error = $"No se pudo empezar a grabar: {ex.Message}";
+            Error = Loc.F("No se pudo empezar a grabar: {0}", ex.Message);
             OnPropertyChanged(nameof(Recording));
             return;
         }
@@ -121,11 +122,11 @@ public sealed partial class RecorderViewModel : ObservableObject
         _wavPath = null;
         if (wav is null) return;
 
-        if (_recorder.Failure is { } failure) Error = $"La grabación se cortó: {failure}";
+        if (_recorder.Failure is { } failure) Error = Loc.F("La grabación se cortó: {0}", failure);
         if (length < TimeSpan.FromSeconds(0.3))
         {
             TryDelete(wav);
-            Error ??= "No se ha grabado nada: ¿está el audio en marcha?";
+            Error ??= Loc.T("No se ha grabado nada: ¿está el audio en marcha?");
             return;
         }
         if (_recorder.SamplesDropped > 0) Log.Warn($"La grabación perdió {_recorder.SamplesDropped} muestras (disco lento)");

@@ -53,7 +53,7 @@ internal readonly record struct SampleLayout(SampleEncoding Encoding, int Channe
     }
 
     public static SampleLayout From(WaveFormat format) =>
-        TryFrom(format, out var layout) ? layout : throw new NotSupportedException($"Formato de audio no soportado: {format}");
+        TryFrom(format, out var layout) ? layout : throw new NotSupportedException(AudioText.F("Formato de audio no soportado: {0}", format));
 
     public override string ToString()
     {

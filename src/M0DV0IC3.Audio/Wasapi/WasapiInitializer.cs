@@ -101,7 +101,7 @@ internal static class WasapiInitializer
                 }
                 if (chosen is not null) break;
             }
-            if (chosen is null) throw new NotSupportedException("El dispositivo no admite 48 kHz en modo exclusivo.");
+            if (chosen is null) throw new NotSupportedException(AudioText.T("El dispositivo no admite 48 kHz en modo exclusivo."));
 
             long period = client.MinimumDevicePeriod;
             try

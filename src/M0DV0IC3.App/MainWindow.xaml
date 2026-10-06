@@ -1,6 +1,7 @@
 ﻿<Window x:Class="M0DV0IC3.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:M0DV0IC3.App.Localization"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
@@ -45,7 +46,7 @@
                                    FontSize="12.5" Margin="20,6,0,0" />
                         <TextBlock Text="{Binding UnderrunsText}" Foreground="{StaticResource WarningBrush}" FontSize="12" Margin="20,2,0,0"
                                    Visibility="{Binding UnderrunsText, Converter={StaticResource NullToCollapsed}}"
-                                   ToolTip="Veces que el audio se ha quedado sin datos (se oye un chasquido). Si suben, aumenta el margen anti-cortes en Ajustes." />
+                                   ToolTip="{l:T 'Veces que el audio se ha quedado sin datos (se oye un chasquido). Si suben, aumenta el margen anti-cortes en Ajustes.'}" />
                         <TextBlock Foreground="{StaticResource LimeBrush}" FontSize="12" Margin="20,6,0,0" TextTrimming="CharacterEllipsis"
                                    Visibility="{Binding Music.StreamingName, Converter={StaticResource NullToCollapsed}}">
                             <Run Text="🎵" FontFamily="{StaticResource EmojiFont}" />
@@ -54,20 +55,20 @@
                         <TextBlock Foreground="{StaticResource AccentTextBrush}" FontSize="12" Margin="20,4,0,0"
                                    Visibility="{Binding Voices.RandomEnabled, Converter={StaticResource BoolToVisible}}">
                             <Run Text="🎲" FontFamily="{StaticResource EmojiFont}" />
-                            <Run Text="Voz aleatoria" />
+                            <Run Text="{l:T 'Voz aleatoria'}" />
                         </TextBlock>
                     </StackPanel>
                 </Border>
 
                 <ListBox x:Name="Nav" Style="{StaticResource NavList}" SelectedIndex="{Binding SelectedPage}">
-                    <ListBoxItem Tag="&#xE720;" Content="Voces" />
-                    <ListBoxItem Tag="&#xE767;" Content="Soundboard" />
-                    <ListBoxItem Tag="&#xE8F2;" Content="Texto a voz" />
-                    <ListBoxItem Tag="&#xEC4F;" Content="Música" />
-                    <ListBoxItem Tag="&#xE8D6;" Content="Karaoke" />
-                    <ListBoxItem Tag="&#xE765;" Content="Atajos" />
-                    <ListBoxItem Tag="&#xE713;" Content="Ajustes" />
-                    <ListBoxItem Tag="&#xE897;" Content="Ayuda" />
+                    <ListBoxItem Tag="&#xE720;" Content="{l:T 'Voces'}" />
+                    <ListBoxItem Tag="&#xE767;" Content="{l:T 'Soundboard'}" />
+                    <ListBoxItem Tag="&#xE8F2;" Content="{l:T 'Texto a voz'}" />
+                    <ListBoxItem Tag="&#xEC4F;" Content="{l:T 'Música'}" />
+                    <ListBoxItem Tag="&#xE8D6;" Content="{l:T 'Karaoke'}" />
+                    <ListBoxItem Tag="&#xE765;" Content="{l:T 'Atajos'}" />
+                    <ListBoxItem Tag="&#xE713;" Content="{l:T 'Ajustes'}" />
+                    <ListBoxItem Tag="&#xE897;" Content="{l:T 'Ayuda'}" />
                 </ListBox>
             </DockPanel>
         </Border>
@@ -79,9 +80,9 @@
                 <controls:GlitchText Text="{Binding SelectedItem.Content, ElementName=Nav}" FontFamily="{StaticResource HeadingFont}"
                                      FontSize="27" VerticalAlignment="Center" Margin="26,4,0,0" HorizontalAlignment="Left" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="OnMinimizeClick" ToolTip="Minimizar" AutomationProperties.Name="Minimizar" />
-                    <Button x:Name="MaximizeButton" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="OnMaximizeClick" ToolTip="Maximizar" AutomationProperties.Name="Maximizar" />
-                    <Button Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;" Click="OnCloseClick" ToolTip="Cerrar" AutomationProperties.Name="Cerrar" />
+                    <Button Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="OnMinimizeClick" ToolTip="{l:T 'Minimizar'}" AutomationProperties.Name="{l:T 'Minimizar'}" />
+                    <Button x:Name="MaximizeButton" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="OnMaximizeClick" ToolTip="{l:T 'Maximizar'}" AutomationProperties.Name="{l:T 'Maximizar'}" />
+                    <Button Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;" Click="OnCloseClick" ToolTip="{l:T 'Cerrar'}" AutomationProperties.Name="{l:T 'Cerrar'}" />
                 </StackPanel>
             </Grid>
 
@@ -99,27 +100,27 @@
 
                     <UniformGrid Columns="3" VerticalAlignment="Center">
                         <StackPanel Margin="0,0,12,0">
-                            <TextBlock Text="MICRÓFONO" Style="{StaticResource FieldLabel}" />
+                            <TextBlock Text="{l:T 'MICRÓFONO'}" Style="{StaticResource FieldLabel}" />
                             <ComboBox ItemsSource="{Binding InputDevices}" SelectedItem="{Binding SelectedInput}"
-                                      DisplayMemberPath="Display" ToolTip="Tu micrófono real" />
+                                      DisplayMemberPath="Display" ToolTip="{l:T 'Tu micrófono real'}" />
                         </StackPanel>
                         <StackPanel Margin="0,0,12,0">
-                            <TextBlock Text="SALIDA · MICRÓFONO VIRTUAL" Style="{StaticResource FieldLabel}" />
+                            <TextBlock Text="{l:T 'SALIDA · MICRÓFONO VIRTUAL'}" Style="{StaticResource FieldLabel}" />
                             <ComboBox ItemsSource="{Binding OutputDevices}" SelectedItem="{Binding SelectedOutput}"
                                       DisplayMemberPath="Display"
-                                      ToolTip="Adónde va tu voz modificada. Debe ser «CABLE Input (VB-Audio Virtual Cable)»; en Discord eliges «CABLE Output» como micrófono." />
+                                      ToolTip="{l:T 'Adónde va tu voz modificada. Debe ser «CABLE Input (VB-Audio Virtual Cable)»; en Discord eliges «CABLE Output» como micrófono.'}" />
                         </StackPanel>
                         <StackPanel Margin="0,0,12,0">
-                            <TextBlock Text="AURICULARES · ESCUCHARME" Style="{StaticResource FieldLabel}" />
+                            <TextBlock Text="{l:T 'AURICULARES · ESCUCHARME'}" Style="{StaticResource FieldLabel}" />
                             <ComboBox ItemsSource="{Binding MonitorDevices}" SelectedItem="{Binding SelectedMonitor}"
                                       DisplayMemberPath="Display"
-                                      ToolTip="Opcional: tus auriculares, para oírte con la voz cambiada y oír los sonidos del soundboard." />
+                                      ToolTip="{l:T 'Opcional: tus auriculares, para oírte con la voz cambiada y oír los sonidos del soundboard.'}" />
                         </StackPanel>
                     </UniformGrid>
 
-                    <ToggleButton Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource VoiceToggle}" Margin="14,0,4,0" AutomationProperties.Name="Voz activada"
+                    <ToggleButton Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource VoiceToggle}" Margin="14,0,4,0" AutomationProperties.Name="{l:T 'Voz activada'}"
                                   VerticalAlignment="Center" IsChecked="{Binding VoiceEnabled}"
-                                  ToolTip="Activa o desactiva el cambio de voz (Ctrl+Alt+V por defecto)">
+                                  ToolTip="{l:T 'Activa o desactiva el cambio de voz (Ctrl+Alt+V por defecto)'}">
                         <TextBlock TextTrimming="CharacterEllipsis">
                             <Run Text="{Binding Voices.Selected.Icon, Mode=OneWay}" FontFamily="{StaticResource EmojiFont}" />
                             <Run Text="{Binding Voices.Selected.Name, Mode=OneWay}" />
@@ -129,7 +130,7 @@
                     <StackPanel Grid.Row="1" Margin="2,12,0,0">
                         <WrapPanel>
                             <TextBlock Text="{Binding StatusText}" Style="{StaticResource StatusText}" VerticalAlignment="Center" FontWeight="SemiBold" />
-                            <Button Content="Cómo instalar VB-Cable" Margin="12,0,0,0" Padding="10,3" FontSize="12"
+                            <Button Content="{l:T 'Cómo instalar VB-Cable'}" Margin="12,0,0,0" Padding="10,3" FontSize="12"
                                     Command="{Binding ShowCableHelpCommand}"
                                     Visibility="{Binding CableInstalled, Converter={StaticResource BoolToCollapsed}}" />
                         </WrapPanel>
@@ -159,36 +160,36 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock Text="ENTRADA" Style="{StaticResource FieldLabel}" Margin="0" VerticalAlignment="Center" />
+                        <TextBlock Text="{l:T 'ENTRADA'}" Style="{StaticResource FieldLabel}" Margin="0" VerticalAlignment="Center" />
                         <controls:LevelMeter Grid.Column="1" Level="{Binding InputLevel}" VerticalAlignment="Center"
-                                             ToolTip="Nivel de tu micrófono (de -60 a 0 dB)" />
-                        <TextBlock Grid.Row="1" Text="SALIDA" Style="{StaticResource FieldLabel}" Margin="0,12,0,0" VerticalAlignment="Center" />
+                                             ToolTip="{l:T 'Nivel de tu micrófono (de -60 a 0 dB)'}" />
+                        <TextBlock Grid.Row="1" Text="{l:T 'SALIDA'}" Style="{StaticResource FieldLabel}" Margin="0,12,0,0" VerticalAlignment="Center" />
                         <controls:LevelMeter Grid.Row="1" Grid.Column="1" Level="{Binding OutputLevel}" VerticalAlignment="Center" Margin="0,12,0,0"
-                                             ToolTip="Nivel de lo que recibe el micrófono virtual (voz, sonidos y música)" />
+                                             ToolTip="{l:T 'Nivel de lo que recibe el micrófono virtual (voz, sonidos y música)'}" />
                     </Grid>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <WrapPanel>
-                            <ToggleButton Style="{StaticResource DangerChip}" Tag="&#xE74F;" Content="Silenciar" IsChecked="{Binding Muted}"
-                                          ToolTip="Corta tu voz, los sonidos y la música hacia Discord y los auriculares, al instante (Ctrl+Alt+X por defecto). Úsalo también si oyes acople." />
+                            <ToggleButton Style="{StaticResource DangerChip}" Tag="&#xE74F;" Content="{l:T 'Silenciar'}" IsChecked="{Binding Muted}"
+                                          ToolTip="{l:T 'Corta tu voz, los sonidos y la música hacia Discord y los auriculares, al instante (Ctrl+Alt+X por defecto). Úsalo también si oyes acople.'}" />
                             <ToggleButton Style="{StaticResource DangerChip}" Tag="&#xE7C8;" Content="{Binding Recorder.ButtonText}"
                                           IsChecked="{Binding Recorder.Recording}" IsEnabled="{Binding Recorder.CanToggle}" ToolTipService.ShowOnDisabled="True"
-                                          AutomationProperties.Name="Grabar"
-                                          ToolTip="Graba lo que sale por el micro (tu voz con su efecto, los sonidos, las frases y la música del karaoke) y lo guarda en MP3 en Música\M0DV0IC3 (Ctrl+Alt+G por defecto)." />
-                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE7F6;" Content="Escucharme" IsChecked="{Binding MonitorVoice}"
+                                          AutomationProperties.Name="{l:T 'Grabar'}"
+                                          ToolTip="{l:T 'Graba lo que sale por el micro (tu voz con su efecto, los sonidos, las frases y la música del karaoke) y lo guarda en MP3 en Música\\M0DV0IC3 (Ctrl+Alt+G por defecto).'}" />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE7F6;" Content="{l:T 'Escucharme'}" IsChecked="{Binding MonitorVoice}"
                                           IsEnabled="{Binding HasMonitor}" ToolTipService.ShowOnDisabled="True"
-                                          ToolTip="Oír tu voz modificada en los auriculares. Primero elige tus auriculares arriba." />
-                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE767;" Content="Sonidos en mis auriculares" IsChecked="{Binding MonitorSounds}"
+                                          ToolTip="{l:T 'Oír tu voz modificada en los auriculares. Primero elige tus auriculares arriba.'}" />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE767;" Content="{l:T 'Sonidos en mis auriculares'}" IsChecked="{Binding MonitorSounds}"
                                           IsEnabled="{Binding HasMonitor}" ToolTipService.ShowOnDisabled="True"
-                                          ToolTip="Oír también los sonidos del soundboard en tus auriculares." />
-                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE9E9;" Content="Supresión de ruido" IsChecked="{Binding NoiseSuppression}"
+                                          ToolTip="{l:T 'Oír también los sonidos del soundboard en tus auriculares.'}" />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE9E9;" Content="{l:T 'Supresión de ruido'}" IsChecked="{Binding NoiseSuppression}"
                                           IsEnabled="{Binding NoiseSuppressionAvailable}" ToolTipService.ShowOnDisabled="True"
                                           ToolTip="{Binding NoiseSuppressionToolTip}" />
-                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xEC4F;" Content="Música por el micro" IsChecked="{Binding Music.IsStreaming}"
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xEC4F;" Content="{l:T 'Música por el micro'}" IsChecked="{Binding Music.IsStreaming}"
                                           IsEnabled="{Binding Music.IsSupported}" ToolTipService.ShowOnDisabled="True"
-                                          ToolTip="Transmite lo que suena en Spotify (u otra app que elijas en Música) mezclado con tu voz (Ctrl+Alt+P por defecto)." />
-                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE8B1;" Content="Voz aleatoria" IsChecked="{Binding Voices.RandomEnabled}"
-                                          ToolTip="Va cambiando sola de voz cada pocos segundos (Ctrl+Alt+R por defecto). El intervalo se elige en Voces." />
+                                          ToolTip="{l:T 'Transmite lo que suena en Spotify (u otra app que elijas en Música) mezclado con tu voz (Ctrl+Alt+P por defecto).'}" />
+                            <ToggleButton Style="{StaticResource Chip}" Tag="&#xE8B1;" Content="{l:T 'Voz aleatoria'}" IsChecked="{Binding Voices.RandomEnabled}"
+                                          ToolTip="{l:T 'Va cambiando sola de voz cada pocos segundos (Ctrl+Alt+R por defecto). El intervalo se elige en Voces.'}" />
                         </WrapPanel>
                         <Grid Margin="0,2,0,0">
                             <Grid.ColumnDefinitions>
@@ -197,35 +198,35 @@
                                 <ColumnDefinition Width="72" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="PUERTA DE RUIDO" Style="{StaticResource FieldLabel}" Margin="0,0,12,0" VerticalAlignment="Center"
-                                       ToolTip="Silencia el micro cuando no hablas. Súbela hasta que deje de entrar el ruido de fondo." />
+                            <TextBlock Text="{l:T 'PUERTA DE RUIDO'}" Style="{StaticResource FieldLabel}" Margin="0,0,12,0" VerticalAlignment="Center"
+                                       ToolTip="{l:T 'Silencia el micro cuando no hablas. Súbela hasta que deje de entrar el ruido de fondo.'}" />
                             <Slider Grid.Column="1" Minimum="-90" Maximum="-20" TickFrequency="1" IsSnapToTickEnabled="True"
                                     SmallChange="1" LargeChange="5" Value="{Binding GateThresholdDb}" VerticalAlignment="Center"
-                                    ToolTip="Del todo a la izquierda = apagada" />
+                                    ToolTip="{l:T 'Del todo a la izquierda = apagada'}" />
                             <TextBlock Grid.Column="2" Text="{Binding GateText}" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="10,0,0,0" />
                             <TextBlock Grid.Column="3" Text="{Binding GateWarning}" Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold"
                                        VerticalAlignment="Center" Margin="4,0,0,0" TextTrimming="CharacterEllipsis"
                                        Visibility="{Binding GateWarning, Converter={StaticResource NullToCollapsed}}"
-                                       ToolTip="La puerta de ruido solo deja pasar el sonido más fuerte que su umbral, y tu micro no llega. Muévela a la izquierda hasta que la barra «Salida» se mueva al hablar, o déjala en «apagada»." />
+                                       ToolTip="{l:T 'La puerta de ruido solo deja pasar el sonido más fuerte que su umbral, y tu micro no llega. Muévela a la izquierda hasta que la barra «Salida» se mueva al hablar, o déjala en «apagada».'}" />
                         </Grid>
                         <!-- Resultado de la última grabación -->
                         <WrapPanel Margin="0,8,0,0" Visibility="{Binding Recorder.ShowResult, Converter={StaticResource BoolToVisible}}">
-                            <TextBlock Text="Guardando la grabación…" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,12,0"
+                            <TextBlock Text="{l:T 'Guardando la grabación…'}" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,12,0"
                                        Visibility="{Binding Recorder.IsSaving, Converter={StaticResource BoolToVisible}}" />
                             <TextBlock Foreground="{StaticResource LimeBrush}" VerticalAlignment="Center" Margin="0,0,12,0" TextTrimming="CharacterEllipsis"
                                        MaxWidth="420" Visibility="{Binding Recorder.SavedName, Converter={StaticResource NullToCollapsed}}">
-                                <Run Text="✔ Grabación guardada:" />
+                                <Run Text="{l:T '✔ Grabación guardada:'}" />
                                 <Run Text="{Binding Recorder.SavedName, Mode=OneWay}" FontWeight="SemiBold" />
                             </TextBlock>
                             <TextBlock Text="{Binding Recorder.Error}" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Center" Margin="0,0,12,0"
                                        TextWrapping="Wrap" MaxWidth="520" Visibility="{Binding Recorder.Error, Converter={StaticResource NullToCollapsed}}" />
-                            <Button Content="Abrir carpeta" Command="{Binding Recorder.OpenFolderCommand}" Padding="10,3" FontSize="12" Margin="0,0,6,0"
+                            <Button Content="{l:T 'Abrir carpeta'}" Command="{Binding Recorder.OpenFolderCommand}" Padding="10,3" FontSize="12" Margin="0,0,6,0"
                                     Visibility="{Binding Recorder.SavedName, Converter={StaticResource NullToCollapsed}}" />
-                            <Button Content="Añadir al soundboard" Command="{Binding Recorder.AddToSoundboardCommand}" Padding="10,3" FontSize="12" Margin="0,0,6,0"
+                            <Button Content="{l:T 'Añadir al soundboard'}" Command="{Binding Recorder.AddToSoundboardCommand}" Padding="10,3" FontSize="12" Margin="0,0,6,0"
                                     Visibility="{Binding Recorder.SavedName, Converter={StaticResource NullToCollapsed}}"
-                                    ToolTip="Lo añade como un sonido más (el soundboard usa como mucho los 2 primeros minutos)" />
+                                    ToolTip="{l:T 'Lo añade como un sonido más (el soundboard usa como mucho los 2 primeros minutos)'}" />
                             <Button Style="{StaticResource IconButton}" Content="&#xE711;" Command="{Binding Recorder.DismissCommand}" Width="24" Height="24"
-                                    FontSize="10" ToolTip="Cerrar" AutomationProperties.Name="Cerrar el aviso de la grabación" />
+                                    FontSize="10" ToolTip="{l:T 'Cerrar'}" AutomationProperties.Name="{l:T 'Cerrar el aviso de la grabación'}" />
                         </WrapPanel>
                     </StackPanel>
                 </Grid>

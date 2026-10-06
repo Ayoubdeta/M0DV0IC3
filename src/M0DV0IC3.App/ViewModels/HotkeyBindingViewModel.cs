@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 
 namespace M0DV0IC3.App.ViewModels;
@@ -63,15 +64,15 @@ public sealed partial class HotkeyBindingViewModel : ObservableObject
 
     public bool HasDetail => Detail is not null || VoiceName is not null;
 
-    public string GestureText => IsCapturing ? "Pulsa la combinación…" : Gesture?.DisplayText ?? "(sin atajo)";
+    public string GestureText => IsCapturing ? Loc.T("Pulsa la combinación…") : Gesture?.DisplayText ?? Loc.T("(sin atajo)");
 
     /// <summary>Las teclas de la combinación, para dibujarlas una a una.</summary>
     public IReadOnlyList<string> KeyParts => Gesture?.DisplayParts ?? [];
 
     /// <summary>Cómo se nombra en el aviso de "ya está asignado a…".</summary>
     public string ConflictName =>
-        ActionId.StartsWith(HotkeyActions.SoundPrefix, StringComparison.Ordinal) ? $"el sonido «{Label}»"
-        : ActionId.StartsWith(HotkeyActions.PhrasePrefix, StringComparison.Ordinal) ? $"la frase «{Label}»"
+        ActionId.StartsWith(HotkeyActions.SoundPrefix, StringComparison.Ordinal) ? Loc.F("el sonido «{0}»", Label)
+        : ActionId.StartsWith(HotkeyActions.PhrasePrefix, StringComparison.Ordinal) ? Loc.F("la frase «{0}»", Label)
         : $"«{Label}»";
 
     /// <summary>¿Aparece al buscar <paramref name="query"/> (ya pasado por <see cref="Normalize"/>)?</summary>

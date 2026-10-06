@@ -1,3 +1,5 @@
+using M0DV0IC3.App.Localization;
+
 namespace M0DV0IC3.App.Models;
 
 /// <summary>Grupos de la pestaña Atajos, en el orden en que se muestran.</summary>
@@ -58,24 +60,24 @@ public static class HotkeyActions
     {
         var list = new List<HotkeyActionInfo>
         {
-            new(ToggleVoice, "Activar / desactivar la voz", "Ctrl+Alt+V", HotkeyGroup.Voice, "El interruptor VOZ ON de arriba"),
+            new(ToggleVoice, Loc.T("Activar / desactivar la voz"), "Ctrl+Alt+V", HotkeyGroup.Voice, Loc.T("El interruptor VOZ ON de arriba")),
             // El - del teclado numérico, sin Ctrl ni Alt: se mantiene pulsado con un dedo en mitad de una partida.
-            new(HoldVoice, "Mantener pulsado para cambiar de voz", "Subtract", HotkeyGroup.Voice),
-            new(PrevVoice, "Voz anterior", "Ctrl+Alt+Left", HotkeyGroup.Voice, "Con el filtro de favoritas, solo entre ellas"),
-            new(NextVoice, "Voz siguiente", "Ctrl+Alt+Right", HotkeyGroup.Voice, "Con el filtro de favoritas, solo entre ellas"),
-            new(ToggleRandomVoice, "Voz aleatoria", "Ctrl+Alt+R", HotkeyGroup.Voice, "Cambia sola de voz cada pocos segundos"),
+            new(HoldVoice, Loc.T("Mantener pulsado para cambiar de voz"), "Subtract", HotkeyGroup.Voice),
+            new(PrevVoice, Loc.T("Voz anterior"), "Ctrl+Alt+Left", HotkeyGroup.Voice, Loc.T("Con el filtro de favoritas, solo entre ellas")),
+            new(NextVoice, Loc.T("Voz siguiente"), "Ctrl+Alt+Right", HotkeyGroup.Voice, Loc.T("Con el filtro de favoritas, solo entre ellas")),
+            new(ToggleRandomVoice, Loc.T("Voz aleatoria"), "Ctrl+Alt+R", HotkeyGroup.Voice, Loc.T("Cambia sola de voz cada pocos segundos")),
             // El + del teclado numérico, sin Ctrl ni Alt: así se para un sonido largo con una sola tecla. El + del teclado
             // principal no se puede usar solo, porque dejaría de escribirse "+" en todas las apps.
-            new(StopSounds, "Parar sonidos y frases", "Add", HotkeyGroup.Sounds, "Corta todo lo que esté sonando"),
-            new(ToggleMute, "Silenciar el micro", "Ctrl+Alt+X", HotkeyGroup.Mic, "Nadie te oye: ni tu voz, ni los sonidos, ni la música"),
-            new(ToggleMonitor, "Escucharme", "Ctrl+Alt+M", HotkeyGroup.Mic, "Oír tu voz cambiada en los cascos"),
-            new(ToggleNoise, "Supresión de ruido", "Ctrl+Alt+N", HotkeyGroup.Mic, "Quita el ruido de fondo (teclado, ventilador)"),
-            new(ToggleAppAudio, "Música por el micro", "Ctrl+Alt+P", HotkeyGroup.Music, "Lo que suena en Spotify llega a Discord con tu voz"),
-            new(ToggleKaraoke, "Modo karaoke", "Ctrl+Alt+K", HotkeyGroup.Music, "Quita la voz de la canción y muestra la letra"),
-            new(ToggleRecording, "Grabar", "Ctrl+Alt+G", HotkeyGroup.Music, "Lo que sale por el micro, en MP3 en Música\\M0DV0IC3"),
+            new(StopSounds, Loc.T("Parar sonidos y frases"), "Add", HotkeyGroup.Sounds, Loc.T("Corta todo lo que esté sonando")),
+            new(ToggleMute, Loc.T("Silenciar el micro"), "Ctrl+Alt+X", HotkeyGroup.Mic, Loc.T("Nadie te oye: ni tu voz, ni los sonidos, ni la música")),
+            new(ToggleMonitor, Loc.T("Escucharme"), "Ctrl+Alt+M", HotkeyGroup.Mic, Loc.T("Oír tu voz cambiada en los cascos")),
+            new(ToggleNoise, Loc.T("Supresión de ruido"), "Ctrl+Alt+N", HotkeyGroup.Mic, Loc.T("Quita el ruido de fondo (teclado, ventilador)")),
+            new(ToggleAppAudio, Loc.T("Música por el micro"), "Ctrl+Alt+P", HotkeyGroup.Music, Loc.T("Lo que suena en Spotify llega a Discord con tu voz")),
+            new(ToggleKaraoke, Loc.T("Modo karaoke"), "Ctrl+Alt+K", HotkeyGroup.Music, Loc.T("Quita la voz de la canción y muestra la letra")),
+            new(ToggleRecording, Loc.T("Grabar"), "Ctrl+Alt+G", HotkeyGroup.Music, Loc.T("Lo que sale por el micro, en MP3 en Música\\M0DV0IC3")),
         };
         for (int n = 1; n <= 9; n++)
-            list.Add(new(VoiceAction(n), $"Voz {n}", $"Ctrl+Alt+{n}", HotkeyGroup.PickVoice));
+            list.Add(new(VoiceAction(n), Loc.F("Voz {0}", n), $"Ctrl+Alt+{n}", HotkeyGroup.PickVoice));
         return list;
     }
 }

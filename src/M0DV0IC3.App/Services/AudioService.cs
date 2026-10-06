@@ -1,6 +1,7 @@
 using System.Windows.Threading;
-using M0DV0IC3.Audio;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.Audio.AppAudio;
+using M0DV0IC3.Audio;
 
 namespace M0DV0IC3.App.Services;
 
@@ -180,7 +181,7 @@ public sealed class AudioService : IDisposable
         catch (Exception ex)
         {
             Log.Error("Error inesperado al arrancar el audio", ex);
-            return $"No se pudo arrancar el audio: {ex.Message}";
+            return Loc.F("No se pudo arrancar el audio: {0}", ex.Message);
         }
     }
 

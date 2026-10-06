@@ -1,6 +1,7 @@
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows;
+using M0DV0IC3.App.Localization;
 
 namespace M0DV0IC3.App.Controls;
 
@@ -33,7 +34,7 @@ public sealed class WaveformView : FrameworkElement
     {
         Cursor = Cursors.SizeWE;
         Focusable = false;
-        ToolTip = "Arrastra las marcas para elegir dónde empieza y dónde acaba el sonido";
+        ToolTip = Loc.T("Arrastra las marcas para elegir dónde empieza y dónde acaba el sonido");
     }
 
     public float[]? Peaks

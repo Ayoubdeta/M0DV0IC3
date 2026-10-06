@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.Audio;
@@ -25,6 +26,9 @@ public enum StatusKind
 
 public sealed record SafetyMarginOption(double Ms, string Label);
 
+/// <summary>Un idioma de la interfaz, con su nombre en ese idioma ("Español", "English").</summary>
+public sealed record LanguageOption(string Code, string Name);
+
 /// <summary>
 /// Ventana principal: dispositivos, estado del motor, medidores, opciones de la barra inferior y de Ajustes.
 /// Los ajustes guardados son la fuente de verdad de las opciones; cada cambio se aplica al pipeline,
@@ -41,10 +45,11 @@ public sealed partial class MainViewModel : ObservableObject
     private const double SpeechPeakDb = -45;
     private const double RecentPeakFallDbPerTick = 0.02;
 
-    private static readonly DeviceItem NoMonitor = new(null, "(ninguno)", false);
+    private static readonly DeviceItem NoMonitor = new(null, Loc.T("(ninguno)"), false);
 
     private readonly SettingsService _settings;
     private readonly AudioService _audio;
+    private readonly Action _restart;
     private readonly DispatcherTimer _meterTimer;
     private readonly DispatcherTimer _holdTimer;
     private readonly AppDucking _ducking;
@@ -67,17 +72,17 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _showCableSetup;
     [ObservableProperty] private string? _cableCheckMessage;
     [ObservableProperty] private string? _outputWarning;
-    [ObservableProperty] private string _statusText = "Arrancando…";
+    [ObservableProperty] private string _statusText = Loc.T("Arrancando…");
     [ObservableProperty] private string _learnedPitchText = "";
     [ObservableProperty] private StatusKind _statusKind = StatusKind.Neutral;
 
     /// <summary>Etiqueta corta de la tarjeta de estado de la barra lateral: EN VIVO, SILENCIADO, PARADO...</summary>
-    [ObservableProperty] private string _liveLabel = "PARADO";
+    [ObservableProperty] private string _liveLabel = Loc.T("PARADO");
     [ObservableProperty] private bool _isRunning;
     [ObservableProperty] private double _inputLevel;
     [ObservableProperty] private double _outputLevel;
-    [ObservableProperty] private string _latencyText = "Latencia: —";
-    [ObservableProperty] private string _latencyToolTip = "El audio está parado.";
+    [ObservableProperty] private string _latencyText = Loc.T("Latencia: —");
+    [ObservableProperty] private string _latencyToolTip = Loc.T("El audio está parado.");
     [ObservableProperty] private string? _underrunsText;
     [ObservableProperty] private string? _gateWarning;
     [ObservableProperty] private string _trayToolTip = "M0DV0IC3";
@@ -85,10 +90,11 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>No se guarda: al abrir la app nunca debe empezar silenciada sin que lo sepas.</summary>
     [ObservableProperty] private bool _muted;
 
-    public MainViewModel(SettingsService settings, AudioService audio, HotkeyService hotkeys, Action restartAsAdmin)
+    public MainViewModel(SettingsService settings, AudioService audio, HotkeyService hotkeys, Action restartAsAdmin, Action restart)
     {
         _settings = settings;
         _audio = audio;
+        _restart = restart;
         var s = settings.Current;
 
         Hotkeys = new HotkeysViewModel(hotkeys, settings, restartAsAdmin);
@@ -177,11 +183,11 @@ public sealed partial class MainViewModel : ObservableObject
 
     public IReadOnlyList<SafetyMarginOption> SafetyMarginOptions { get; } =
     [
-        new(1, "1 ms (mínimo)"),
-        new(2, "2 ms (recomendado)"),
+        new(1, Loc.T("1 ms (mínimo)")),
+        new(2, Loc.T("2 ms (recomendado)")),
         new(3, "3 ms"),
         new(5, "5 ms"),
-        new(10, "10 ms (máxima estabilidad)"),
+        new(10, Loc.T("10 ms (máxima estabilidad)")),
     ];
 
     public string DataFolder => AppPaths.DataFolder;
@@ -277,8 +283,8 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     public string NoiseSuppressionToolTip => NoiseSuppressionAvailable
-        ? "Quita el ruido de fondo (teclado, ventilador, calle) con RNNoise. Añade +10 ms de latencia."
-        : $"No disponible: {_audio.Pipeline.NoiseSuppressionError}";
+        ? Loc.T("Quita el ruido de fondo (teclado, ventilador, calle) con RNNoise. Añade +10 ms de latencia.")
+        : Loc.F("No disponible: {0}", _audio.Pipeline.NoiseSuppressionError);
 
     public double GateThresholdDb
     {
@@ -293,7 +299,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    public string GateText => GateThresholdDb <= GateOffThreshold ? "apagada" : $"{GateThresholdDb:0} dB";
+    public string GateText => GateThresholdDb <= GateOffThreshold ? Loc.T("apagada") : $"{GateThresholdDb:0} dB";
 
     // ---- Ajustes ----
 
@@ -350,6 +356,32 @@ public sealed partial class MainViewModel : ObservableObject
             if (Set(S.SafetyMarginMs, value, v => S.SafetyMarginMs = v)) RestartEngine();
         }
     }
+
+    public IReadOnlyList<LanguageOption> Languages { get; } = [new("es", "Español"), new("en", "English")];
+
+    /// <summary>
+    /// Idioma de la interfaz. Se aplica al reiniciar: la app pregunta si reiniciar ya (en los dos idiomas, porque el que
+    /// acabas de elegir no es el que ves).
+    /// </summary>
+    public string LanguageCode
+    {
+        get => S.Language ?? Loc.Code(Loc.Language);
+        set
+        {
+            if (!Set(S.Language, value, v => S.Language = v)) return;
+            _settings.SaveNow();
+            OnPropertyChanged(nameof(LanguageRestartPending));
+            if (!LanguageRestartPending) return;
+            if (Dialogs.Confirm("Hay que reiniciar M0DV0IC3 para cambiar el idioma. ¿Reiniciar ahora?\n\n"
+                + "M0DV0IC3 needs to restart to change the language. Restart now?")) _restart();
+        }
+    }
+
+    /// <summary>Se ha elegido otro idioma pero aún no se ha reiniciado.</summary>
+    public bool LanguageRestartPending => Loc.Parse(S.Language) != Loc.Language;
+
+    [RelayCommand]
+    private void RestartNow() => _restart();
 
     public bool MinimizeToTray
     {
@@ -420,7 +452,7 @@ public sealed partial class MainViewModel : ObservableObject
         RefreshDevices();
         CableCheckMessage = CableInstalled
             ? null
-            : "Todavía no se detecta VB-Cable. Si acabas de instalarlo y no aparece, reinicia el PC.";
+            : Loc.T("Todavía no se detecta VB-Cable. Si acabas de instalarlo y no aparece, reinicia el PC.");
     }
 
     [RelayCommand]
@@ -491,10 +523,10 @@ public sealed partial class MainViewModel : ObservableObject
         _refreshingDevices = true;
         try
         {
-            Replace(InputDevices, inputs.Select(d => new DeviceItem(d.Id, d.IsDefault ? $"{d.Name} (predeterminado)" : d.Name, d.IsVirtualCable)));
-            Replace(OutputDevices, outputs.Select(d => new DeviceItem(d.Id, d.Id == cable?.Id ? $"★ {d.Name} — micrófono virtual" : d.Name, d.IsVirtualCable)));
+            Replace(InputDevices, inputs.Select(d => new DeviceItem(d.Id, d.IsDefault ? Loc.F("{0} (predeterminado)", d.Name) : d.Name, d.IsVirtualCable)));
+            Replace(OutputDevices, outputs.Select(d => new DeviceItem(d.Id, d.Id == cable?.Id ? Loc.F("★ {0} — micrófono virtual", d.Name) : d.Name, d.IsVirtualCable)));
             Replace(MonitorDevices, outputs.Where(d => !d.IsVirtualCable)
-                .Select(d => new DeviceItem(d.Id, d.IsDefault ? $"{d.Name} (predeterminado)" : d.Name, false))
+                .Select(d => new DeviceItem(d.Id, d.IsDefault ? Loc.F("{0} (predeterminado)", d.Name) : d.Name, false))
                 .Prepend(NoMonitor));
 
             SelectedInput = InputDevices.FirstOrDefault(d => d.Id == S.InputDeviceId)
@@ -547,7 +579,7 @@ public sealed partial class MainViewModel : ObservableObject
     private void UpdateOutputWarning()
     {
         OutputWarning = SelectedOutput is { IsVirtualCable: false }
-            ? "⚠ Esta salida no es VB-Cable: Discord y los juegos no recibirán tu voz por aquí, y si son altavoces puede haber acople (pitido)."
+            ? Loc.T("⚠ Esta salida no es VB-Cable: Discord y los juegos no recibirán tu voz por aquí, y si son altavoces puede haber acople (pitido).")
             : null;
     }
 
@@ -561,47 +593,47 @@ public sealed partial class MainViewModel : ObservableObject
 
         if (SelectedInput is null)
         {
-            SetStatus("No hay ningún micrófono conectado.", StatusKind.Warning);
+            SetStatus(Loc.T("No hay ningún micrófono conectado."), StatusKind.Warning);
         }
         else if (SelectedOutput is null && S.OutputDeviceId is not null)
         {
             // La salida que eligió el usuario existe en los ajustes pero no en Windows: se ha desconectado.
-            SetStatus("La salida elegida no está conectada. Vuelve a conectarla (el audio seguirá solo) o elige otra.", StatusKind.Warning);
+            SetStatus(Loc.T("La salida elegida no está conectada. Vuelve a conectarla (el audio seguirá solo) o elige otra."), StatusKind.Warning);
         }
         else if (SelectedOutput is null)
         {
             SetStatus(CableInstalled
-                ? "Elige la salida (micrófono virtual) para empezar."
-                : "Falta VB-Cable: instálalo para usar tu voz en Discord y juegos.", StatusKind.Warning);
+                ? Loc.T("Elige la salida (micrófono virtual) para empezar.")
+                : Loc.T("Falta VB-Cable: instálalo para usar tu voz en Discord y juegos."), StatusKind.Warning);
         }
         else
         {
             switch (state)
             {
                 case EngineState.Running when Muted:
-                    SetStatus("● Funcionando, pero SILENCIADO: nadie te oye", StatusKind.Warning);
+                    SetStatus(Loc.T("● Funcionando, pero SILENCIADO: nadie te oye"), StatusKind.Warning);
                     break;
                 case EngineState.Running:
-                    SetStatus(Music.StreamingName is { } music ? $"● Funcionando · 🎵 {music} por el micro" : "● Funcionando", StatusKind.Ok);
+                    SetStatus(Music.StreamingName is { } music ? Loc.F("● Funcionando · 🎵 {0} por el micro", music) : Loc.T("● Funcionando"), StatusKind.Ok);
                     break;
                 case EngineState.Error:
                     SetStatus($"⚠ {_audio.Error}", StatusKind.Error);
                     break;
                 case EngineState.Starting:
-                    SetStatus("Arrancando el audio…", StatusKind.Neutral);
+                    SetStatus(Loc.T("Arrancando el audio…"), StatusKind.Neutral);
                     break;
                 default:
-                    SetStatus(_audio.RequestedOptions is null ? "Parado" : "Arrancando el audio…", StatusKind.Neutral);
+                    SetStatus(_audio.RequestedOptions is null ? Loc.T("Parado") : Loc.T("Arrancando el audio…"), StatusKind.Neutral);
                     break;
             }
         }
         LiveLabel = state switch
         {
-            EngineState.Running when Muted => "SILENCIADO",
-            EngineState.Running => "EN VIVO",
-            EngineState.Error => "ERROR",
-            EngineState.Starting => "ARRANCANDO",
-            _ => "PARADO",
+            EngineState.Running when Muted => Loc.T("SILENCIADO"),
+            EngineState.Running => Loc.T("EN VIVO"),
+            EngineState.Error => Loc.T("ERROR"),
+            EngineState.Starting => Loc.T("ARRANCANDO"),
+            _ => Loc.T("PARADO"),
         };
         UpdateLatency();
         UpdateTrayToolTip();
@@ -615,9 +647,11 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void UpdateTrayToolTip()
     {
-        string voice = VoiceEnabled && Voices.Selected is { } card ? $"Voz: {card.Name}{(Voices.RandomEnabled ? " (aleatoria)" : "")}" : "Voz desactivada";
-        string music = Music.StreamingName is { } name ? $" · {name} por el micro" : "";
-        string audio = !IsRunning ? " (audio parado)" : Muted ? " (silenciado)" : "";
+        string voice = VoiceEnabled && Voices.Selected is { } card
+            ? (Voices.RandomEnabled ? Loc.F("Voz: {0} (aleatoria)", card.Name) : Loc.F("Voz: {0}", card.Name))
+            : Loc.T("Voz desactivada");
+        string music = Music.StreamingName is { } name ? Loc.F(" · {0} por el micro", name) : "";
+        string audio = !IsRunning ? Loc.T(" (audio parado)") : Muted ? Loc.T(" (silenciado)") : "";
         TrayToolTip = $"M0DV0IC3 — {voice}{music}{audio}";
     }
 
@@ -649,17 +683,17 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var profile = _audio.Pipeline.Voice.Profile;
         LearnedPitchText = !profile.IsLearned
-            ? "Tu tono medio: todavía no lo sé. Habla un poco con una voz como Mujer, Grave o Niño y lo aprenderé."
-            : $"Tu tono medio: {profile.CenterHz:0} Hz ({DescribePitch(profile.CenterHz)}). Voces como Mujer, Niño o Grave lo usan para saber cuánto cambiar tu tono.";
+            ? Loc.T("Tu tono medio: todavía no lo sé. Habla un poco con una voz como Mujer, Grave o Niño y lo aprenderé.")
+            : Loc.F("Tu tono medio: {0:0} Hz ({1}). Voces como Mujer, Niño o Grave lo usan para saber cuánto cambiar tu tono.", profile.CenterHz, DescribePitch(profile.CenterHz));
     }
 
     private static string DescribePitch(double hz) => hz switch
     {
-        < 105 => "voz de hombre grave",
-        < 150 => "voz de hombre",
-        < 190 => "voz aguda de hombre o grave de mujer",
-        < 260 => "voz de mujer",
-        _ => "voz muy aguda",
+        < 105 => Loc.T("voz de hombre grave"),
+        < 150 => Loc.T("voz de hombre"),
+        < 190 => Loc.T("voz aguda de hombre o grave de mujer"),
+        < 260 => Loc.T("voz de mujer"),
+        _ => Loc.T("voz muy aguda"),
     };
 
     /// <summary>Sube al instante y cae unos 24 dB/s, como un vúmetro.</summary>
@@ -676,7 +710,7 @@ public sealed partial class MainViewModel : ObservableObject
         bool blocking = threshold > GateOffThreshold && IsRunning
             && _recentInputPeakDb > SpeechPeakDb && _recentInputPeakDb < threshold - 1;
         GateWarning = blocking
-            ? $"⚠ Corta tu voz (llega a {_recentInputPeakDb:0} dB): bájala"
+            ? Loc.F("⚠ Corta tu voz (llega a {0:0} dB): bájala", _recentInputPeakDb)
             : null;
     }
 
@@ -685,31 +719,31 @@ public sealed partial class MainViewModel : ObservableObject
         var engine = _audio.Engine;
         if (!engine.IsRunning)
         {
-            LatencyText = "Latencia: —";
-            LatencyToolTip = "El audio está parado.";
+            LatencyText = Loc.T("Latencia: —");
+            LatencyToolTip = Loc.T("El audio está parado.");
             UnderrunsText = null;
             return;
         }
 
         var report = engine.GetLatency();
-        LatencyText = $"Latencia ≈ {report.TotalMs:0} ms";
+        LatencyText = Loc.F("Latencia ≈ {0:0} ms", report.TotalMs);
 
         var text = new StringBuilder();
-        text.AppendLine("Latencia que añade M0DV0IC3 (sin contar Discord ni la red):");
-        text.AppendLine($"• Captura: {report.CaptureMs:0.0} ms{Describe(engine.CaptureInfo)}");
-        text.AppendLine($"• Procesado: {report.ProcessingMs:0.0} ms{(NoiseSuppression ? " (incluye 10 ms de la supresión de ruido)" : "")}");
-        text.AppendLine($"• Buffer: {report.BufferMs:0.0} ms");
-        text.Append($"• Salida: {report.OutputMs:0.0} ms{Describe(engine.OutputInfo)}");
+        text.AppendLine(Loc.T("Latencia que añade M0DV0IC3 (sin contar Discord ni la red):"));
+        text.AppendLine(Loc.F("• Captura: {0:0.0} ms{1}", report.CaptureMs, Describe(engine.CaptureInfo)));
+        text.AppendLine(Loc.F("• Procesado: {0:0.0} ms{1}", report.ProcessingMs, NoiseSuppression ? Loc.T(" (incluye 10 ms de la supresión de ruido)") : ""));
+        text.AppendLine(Loc.F("• Buffer: {0:0.0} ms", report.BufferMs));
+        text.Append(Loc.F("• Salida: {0:0.0} ms{1}", report.OutputMs, Describe(engine.OutputInfo)));
         if (engine.MonitorInfo is { } monitor)
-            text.Append($"\nAuriculares: {monitor.DeviceName} ({monitor.ModeDescription}, periodo {monitor.PeriodMs:0.0} ms)");
+            text.Append("\n" + Loc.F("Auriculares: {0} ({1}, periodo {2:0.0} ms)", monitor.DeviceName, monitor.ModeDescription, monitor.PeriodMs));
         LatencyToolTip = text.ToString();
 
         int underruns = engine.Underruns;
-        UnderrunsText = underruns > 0 ? $"cortes: {underruns}" : null;
+        UnderrunsText = underruns > 0 ? Loc.F("cortes: {0}", underruns) : null;
     }
 
     private static string Describe(Audio.Wasapi.StreamInfo? info) =>
-        info is null ? "" : $" — {info.ModeDescription}, periodo {info.PeriodMs:0.0} ms";
+        info is null ? "" : Loc.F(" — {0}, periodo {1:0.0} ms", info.ModeDescription, info.PeriodMs);
 
     // ---- Atajos ----
 
@@ -811,7 +845,7 @@ public sealed partial class MainViewModel : ObservableObject
         catch (Exception ex) when (ex is Win32Exception or InvalidOperationException)
         {
             Log.Warn($"No se pudo abrir {target}", ex);
-            Dialogs.Error($"No se pudo abrir {target}:\n{ex.Message}");
+            Dialogs.Error(Loc.F("No se pudo abrir {0}:\n{1}", target, ex.Message));
         }
     }
 }

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.App.ViewModels;
 
@@ -47,7 +48,7 @@ public partial class MainWindow : Window
         bool maximized = WindowState == WindowState.Maximized;
         Root.Margin = maximized ? SystemParameters.WindowResizeBorderThickness : new Thickness(0);
         MaximizeButton.Content = maximized ? "\uE923" : "\uE922";
-        MaximizeButton.ToolTip = maximized ? "Restaurar" : "Maximizar";
+        MaximizeButton.ToolTip = maximized ? Loc.T("Restaurar") : Loc.T("Maximizar");
     }
 
     private void OnMinimizeClick(object sender, RoutedEventArgs e) => SystemCommands.MinimizeWindow(this);

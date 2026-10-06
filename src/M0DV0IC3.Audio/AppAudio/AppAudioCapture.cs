@@ -67,7 +67,7 @@ internal sealed class AppAudioCapture : IDisposable
         {
             _stopRequested = true;
             _thread = null;
-            throw new TimeoutException("Windows no responde: la captura lleva más de 5 s sin abrirse.");
+            throw new TimeoutException(AudioText.T("Windows no responde: la captura lleva más de 5 s sin abrirse."));
         }
         if (_initError is not null)
         {
@@ -94,7 +94,7 @@ internal sealed class AppAudioCapture : IDisposable
         try
         {
             if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041))
-                throw new PlatformNotSupportedException("Hace falta Windows 10 versión 2004 o posterior.");
+                throw new PlatformNotSupportedException(AudioText.T("Hace falta Windows 10 versión 2004 o posterior."));
 
             client = AudioClient.ActivateProcessLoopbackAsync(_processId, ProcessLoopbackMode.IncludeTargetProcessTree).GetAwaiter().GetResult();
             var format = WaveFormat.CreateIeeeFloatWaveFormat(WasapiInitializer.SampleRate, 2);

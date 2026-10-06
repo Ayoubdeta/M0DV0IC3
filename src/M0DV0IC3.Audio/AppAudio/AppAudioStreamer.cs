@@ -104,7 +104,7 @@ public sealed class AppAudioStreamer : IDisposable
             catch (Exception ex)
             {
                 capture.Dispose();
-                throw new AudioDeviceException($"No se pudo capturar el audio de {app.DisplayName}: {ex.Message}", ex);
+                throw new AudioDeviceException(AudioText.F("No se pudo capturar el audio de {0}: {1}", app.DisplayName, ex.Message), ex);
             }
             Volatile.Write(ref _capture, capture);
             Current = app;
@@ -139,7 +139,7 @@ public sealed class AppAudioStreamer : IDisposable
                 name = Current?.DisplayName;
                 StopCore();
             }
-            Faulted?.Invoke(this, new AudioDeviceException($"Se dejó de capturar {name}: {error.Message}", error));
+            Faulted?.Invoke(this, new AudioDeviceException(AudioText.F("Se dejó de capturar {0}: {1}", name, error.Message), error));
         });
     }
 }

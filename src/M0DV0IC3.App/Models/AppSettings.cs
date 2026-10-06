@@ -7,6 +7,9 @@ namespace M0DV0IC3.App.Models;
 /// <summary>Todo lo que se guarda en settings.json.</summary>
 public sealed class AppSettings
 {
+    /// <summary>Idioma de la interfaz: "es" o "en" (null = aún no se ha elegido).</summary>
+    public string? Language { get; set; }
+
     public string? InputDeviceId { get; set; }
 
     /// <summary>Solo se guarda cuando el usuario la elige a mano (o es VB-Cable).</summary>

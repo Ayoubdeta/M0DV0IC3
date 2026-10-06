@@ -1,6 +1,7 @@
 <UserControl x:Class="M0DV0IC3.App.Views.MusicView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:M0DV0IC3.App.Localization"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
@@ -11,14 +12,14 @@
         <StackPanel Margin="6,0,12,16" MaxWidth="820" HorizontalAlignment="Left">
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Música por el micro" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Text="{l:T 'Música por el micro'}" Style="{StaticResource SectionHeader}" />
                     <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,12" TextWrapping="Wrap"
-                               Text="Lo que suene en la app que elijas (Spotify, el navegador…) llega a Discord y a los juegos mezclado con tu voz, como si sonara en tu micro. Solo se captura esa app: ni Discord ni el resto del ordenador, así que nadie se oye a sí mismo. Tú la sigues oyendo como siempre." />
+                               Text="{l:T 'Lo que suene en la app que elijas (Spotify, el navegador…) llega a Discord y a los juegos mezclado con tu voz, como si sonara en tu micro. Solo se captura esa app: ni Discord ni el resto del ordenador, así que nadie se oye a sí mismo. Tú la sigues oyendo como siempre.'}" />
 
                     <Border Style="{StaticResource WarningBox}" Margin="0,0,0,12"
                             Visibility="{Binding IsSupported, Converter={StaticResource BoolToCollapsed}}">
                         <TextBlock TextWrapping="Wrap" Foreground="{StaticResource WarningBrush}"
-                                   Text="Tu versión de Windows no permite capturar el audio de una sola app. Hace falta Windows 10 versión 2004 o posterior." />
+                                   Text="{l:T 'Tu versión de Windows no permite capturar el audio de una sola app. Hace falta Windows 10 versión 2004 o posterior.'}" />
                     </Border>
 
                     <Grid Margin="0,0,0,10" IsEnabled="{Binding IsSupported}">
@@ -27,24 +28,24 @@
                             <ColumnDefinition Width="320" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="App" VerticalAlignment="Center" />
+                        <TextBlock Text="{l:T 'App'}" VerticalAlignment="Center" />
                         <ComboBox Grid.Column="1" ItemsSource="{Binding Apps}" SelectedItem="{Binding SelectedApp}"
-                                  DisplayMemberPath="Display" ToolTip="La app cuyo sonido quieres transmitir" />
-                        <Button Grid.Column="2" Margin="8,0,0,0" Command="{Binding RefreshCommand}" AutomationProperties.Name="Actualizar"
-                                ToolTip="Vuelve a buscar las apps con audio (por ejemplo, si acabas de abrir Spotify)">
+                                  DisplayMemberPath="Display" ToolTip="{l:T 'La app cuyo sonido quieres transmitir'}" />
+                        <Button Grid.Column="2" Margin="8,0,0,0" Command="{Binding RefreshCommand}" AutomationProperties.Name="{l:T 'Actualizar'}"
+                                ToolTip="{l:T 'Vuelve a buscar las apps con audio (por ejemplo, si acabas de abrir Spotify)'}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE72C;" FontFamily="{StaticResource IconFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                                <TextBlock Text="Actualizar" />
+                                <TextBlock Text="{l:T 'Actualizar'}" />
                             </StackPanel>
                         </Button>
                     </Grid>
 
-                    <ToggleButton Style="{StaticResource OnAirToggle}" HorizontalAlignment="Left" Margin="4,8,0,16" AutomationProperties.Name="Transmitir por el micro"
+                    <ToggleButton Style="{StaticResource OnAirToggle}" HorizontalAlignment="Left" Margin="4,8,0,16" AutomationProperties.Name="{l:T 'Transmitir por el micro'}"
                                   IsChecked="{Binding IsStreaming}" IsEnabled="{Binding IsSupported}"
-                                  ToolTip="Empieza o deja de transmitir la app por tu micro (Ctrl+Alt+P por defecto)">
+                                  ToolTip="{l:T 'Empieza o deja de transmitir la app por tu micro (Ctrl+Alt+P por defecto)'}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🎵" FontFamily="{StaticResource EmojiFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                            <TextBlock Text="Transmitir por el micro" VerticalAlignment="Center" />
+                            <TextBlock Text="{l:T 'Transmitir por el micro'}" VerticalAlignment="Center" />
                         </StackPanel>
                     </ToggleButton>
 
@@ -54,8 +55,8 @@
                             <ColumnDefinition Width="320" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Volumen" VerticalAlignment="Center"
-                                   ToolTip="Volumen de la música para los demás. No cambia lo que oyes tú." />
+                        <TextBlock Text="{l:T 'Volumen'}" VerticalAlignment="Center"
+                                   ToolTip="{l:T 'Volumen de la música para los demás. No cambia lo que oyes tú.'}" />
                         <Slider Grid.Column="1" Minimum="-40" Maximum="6" TickFrequency="1" IsSnapToTickEnabled="True"
                                 SmallChange="1" LargeChange="3" Value="{Binding VolumeDb}" VerticalAlignment="Center" />
                         <TextBlock Grid.Column="2" Text="{Binding VolumeText}" Style="{StaticResource MutedText}"
@@ -66,9 +67,9 @@
                             <ColumnDefinition Width="90" />
                             <ColumnDefinition Width="320" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Nivel" VerticalAlignment="Center" Style="{StaticResource MutedText}" />
+                        <TextBlock Text="{l:T 'Nivel'}" VerticalAlignment="Center" Style="{StaticResource MutedText}" />
                         <controls:LevelMeter Grid.Column="1" Level="{Binding Level}" VerticalAlignment="Center"
-                                             ToolTip="Lo que llega de la app al micro (ya con el volumen)" />
+                                             ToolTip="{l:T 'Lo que llega de la app al micro (ya con el volumen)'}" />
                     </Grid>
 
                     <Border Style="{StaticResource WarningBox}" Margin="0,10,0,0" HorizontalAlignment="Left"
@@ -78,28 +79,28 @@
                     <Border Style="{StaticResource WarningBox}" Margin="0,10,0,0" HorizontalAlignment="Left"
                             Visibility="{Binding DataContext.IsRunning, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToCollapsed}}">
                         <TextBlock TextWrapping="Wrap" Foreground="{StaticResource WarningBrush}"
-                                   Text="El audio está parado: la música no llegará al micro hasta que funcione (mira el estado arriba)." />
+                                   Text="{l:T 'El audio está parado: la música no llegará al micro hasta que funcione (mira el estado arriba).'}" />
                     </Border>
 
                     <TextBlock Style="{StaticResource MutedText}" FontSize="12" Margin="0,14,0,0" TextWrapping="Wrap"
-                               Text="Consejos: baja el volumen hasta que se te entienda bien al hablar. Si en Discord la música se corta o suena a lata, desactiva su supresión de ruido (Krisp) y su cancelación de eco, y pon la sensibilidad de entrada en manual." />
+                               Text="{l:T 'Consejos: baja el volumen hasta que se te entienda bien al hablar. Si en Discord la música se corta o suena a lata, desactiva su supresión de ruido (Krisp) y su cancelación de eco, y pon la sensibilidad de entrada en manual.'}" />
                 </StackPanel>
             </Border>
 
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Voz del cantante" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Text="{l:T 'Voz del cantante'}" Style="{StaticResource SectionHeader}" />
                     <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,12" TextWrapping="Wrap"
-                               Text="Cambia la voz de quien canta en la canción que suena: Ardilla, Demonio, Robot… La música sigue igual. La canción cambiada suena en tus cascos y en Discord, y mientras tanto la app se baja en Windows para que no la oigas dos veces." />
+                               Text="{l:T 'Cambia la voz de quien canta en la canción que suena: Ardilla, Demonio, Robot… La música sigue igual. La canción cambiada suena en tus cascos y en Discord, y mientras tanto la app se baja en Windows para que no la oigas dos veces.'}" />
 
                     <Grid Margin="0,0,0,10" IsEnabled="{Binding CanChangeSongVoice}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="90" />
                             <ColumnDefinition Width="320" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Voz" VerticalAlignment="Center" />
+                        <TextBlock Text="{l:T 'Voz'}" VerticalAlignment="Center" />
                         <ComboBox Grid.Column="1" ItemsSource="{Binding SongVoiceChoices}" SelectedItem="{Binding SongVoice}"
-                                  AutomationProperties.Name="Voz del cantante" ToolTip="La voz que se le pone al cantante (se puede cambiar mientras suena)">
+                                  AutomationProperties.Name="{l:T 'Voz del cantante'}" ToolTip="{l:T 'La voz que se le pone al cantante (se puede cambiar mientras suena)'}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:VoiceCardViewModel}">
                                     <TextBlock>
@@ -111,25 +112,25 @@
                         </ComboBox>
                     </Grid>
 
-                    <ToggleButton Style="{StaticResource OnAirToggle}" HorizontalAlignment="Left" Margin="4,8,0,12" AutomationProperties.Name="Cambiar la voz del cantante"
+                    <ToggleButton Style="{StaticResource OnAirToggle}" HorizontalAlignment="Left" Margin="4,8,0,12" AutomationProperties.Name="{l:T 'Cambiar la voz del cantante'}"
                                   IsChecked="{Binding SongVoiceOn}" IsEnabled="{Binding CanChangeSongVoice}" ToolTipService.ShowOnDisabled="True"
-                                  ToolTip="Separa la voz del cantante de la app elegida arriba, le pone la voz que elijas y la vuelve a mezclar con la música">
+                                  ToolTip="{l:T 'Separa la voz del cantante de la app elegida arriba, le pone la voz que elijas y la vuelve a mezclar con la música'}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🎭" FontFamily="{StaticResource EmojiFont}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                            <TextBlock Text="Cambiar la voz del cantante" VerticalAlignment="Center" />
+                            <TextBlock Text="{l:T 'Cambiar la voz del cantante'}" VerticalAlignment="Center" />
                         </StackPanel>
                     </ToggleButton>
 
                     <Border Style="{StaticResource WarningBox}" Margin="0,0,0,8" HorizontalAlignment="Left"
                             Visibility="{Binding ShowMonitorWarning, Converter={StaticResource BoolToVisible}}">
                         <TextBlock TextWrapping="Wrap" Foreground="{StaticResource WarningBrush}"
-                                   Text="Para oír la canción cambiada, elige tus cascos arriba, en «AURICULARES · ESCUCHARME»." />
+                                   Text="{l:T 'Para oír la canción cambiada, elige tus cascos arriba, en «AURICULARES · ESCUCHARME».'}" />
                     </Border>
                     <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,8" TextWrapping="Wrap"
                                Visibility="{Binding KaraokeActive, Converter={StaticResource BoolToVisible}}"
-                               Text="Con el karaoke puesto no se puede: el karaoke quita la voz del cantante. Apágalo para cambiársela." />
+                               Text="{l:T 'Con el karaoke puesto no se puede: el karaoke quita la voz del cantante. Apágalo para cambiársela.'}" />
                     <TextBlock Style="{StaticResource MutedText}" FontSize="12" TextWrapping="Wrap"
-                               Text="La voz se separa con el mismo filtro que el karaoke, así que algo de la música del centro también coge el efecto y queda un poco de la voz original de fondo. Funciona mejor con canciones donde la voz va sola en el centro." />
+                               Text="{l:T 'La voz se separa con el mismo filtro que el karaoke, así que algo de la música del centro también coge el efecto y queda un poco de la voz original de fondo. Funciona mejor con canciones donde la voz va sola en el centro.'}" />
                 </StackPanel>
             </Border>
         </StackPanel>

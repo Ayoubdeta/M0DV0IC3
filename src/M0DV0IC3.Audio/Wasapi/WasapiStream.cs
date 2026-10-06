@@ -54,7 +54,7 @@ public abstract class WasapiStream : IDisposable
             // Un driver colgado no debe bloquear la app: el hilo saldrá solo en cuanto vuelva y vea la parada.
             _stopRequested = true;
             _thread = null;
-            throw new TimeoutException("El dispositivo no responde: lleva más de 5 s sin abrirse.");
+            throw new TimeoutException(AudioText.T("El dispositivo no responde: lleva más de 5 s sin abrirse."));
         }
         if (_initError is not null)
         {

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.Dsp.Effects;
 using M0DV0IC3.Dsp.Pitch;
 using M0DV0IC3.Dsp.Presets;
@@ -18,26 +19,26 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
 {
     private static readonly IReadOnlyList<EditorOption<AutotuneScale>> ScaleOptions =
     [
-        new(AutotuneScale.Off, "Apagado"),
-        new(AutotuneScale.Chromatic, "Cromática (todas las notas)"),
-        new(AutotuneScale.Major, "Mayor"),
-        new(AutotuneScale.Minor, "Menor"),
-        new(AutotuneScale.HarmonicMinor, "Menor armónica"),
-        new(AutotuneScale.MinorPentatonic, "Pentatónica menor"),
+        new(AutotuneScale.Off, Loc.T("Apagado")),
+        new(AutotuneScale.Chromatic, Loc.T("Cromática (todas las notas)")),
+        new(AutotuneScale.Major, Loc.T("Mayor")),
+        new(AutotuneScale.Minor, Loc.T("Menor")),
+        new(AutotuneScale.HarmonicMinor, Loc.T("Menor armónica")),
+        new(AutotuneScale.MinorPentatonic, Loc.T("Pentatónica menor")),
     ];
 
     private static readonly IReadOnlyList<EditorOption<TransmissionStyle>> TransmissionOptions =
     [
-        new(TransmissionStyle.Off, "Apagada"),
-        new(TransmissionStyle.Walkie, "Walkie-talkie (chasquido y pitido de fin)"),
-        new(TransmissionStyle.Space, "Astronauta (pitidos de la NASA)"),
+        new(TransmissionStyle.Off, Loc.T("Apagada")),
+        new(TransmissionStyle.Walkie, Loc.T("Walkie-talkie (chasquido y pitido de fin)")),
+        new(TransmissionStyle.Space, Loc.T("Astronauta (pitidos de la NASA)")),
     ];
 
     private static readonly IReadOnlyList<EditorOption<HarmonyStyle>> HarmonyOptions =
     [
-        new(HarmonyStyle.Choir, "Coro (octava abajo, quinta y octava arriba)"),
-        new(HarmonyStyle.Angelic, "Celestial (octavas arriba y abajo)"),
-        new(HarmonyStyle.Demonic, "Demoníaco (voces graves debajo)"),
+        new(HarmonyStyle.Choir, Loc.T("Coro (octava abajo, quinta y octava arriba)")),
+        new(HarmonyStyle.Angelic, Loc.T("Celestial (octavas arriba y abajo)")),
+        new(HarmonyStyle.Demonic, Loc.T("Demoníaco (voces graves debajo)")),
     ];
 
     private const string DefaultIcon = "🎭";
@@ -114,7 +115,10 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
 
     public IReadOnlyList<EditorOption<AutotuneScale>> Scales => ScaleOptions;
 
-    public IReadOnlyList<string> Keys => AutotuneNames.Notes;
+    public IReadOnlyList<string> Keys { get; } = AutotuneNames.Notes.Select(Loc.T).ToList();
+
+    /// <summary>Formato del tono ("+3 semitonos"): con llaves no se puede traducir dentro del XAML.</summary>
+    public string SemitoneFormat { get; } = Loc.T("{0:+0.#;-0.#;0} semitonos");
 
     public IReadOnlyList<EditorOption<TransmissionStyle>> Transmissions => TransmissionOptions;
 
@@ -223,7 +227,7 @@ public sealed partial class VoiceEditorViewModel : ObservableObject
         // Se redondea al paso de cada slider: así un 0,0001 no activa PSOLA ni cambia la latencia.
         var preset = _current with
         {
-            Name = string.IsNullOrWhiteSpace(Name) ? "Sin nombre" : Name.Trim(),
+            Name = string.IsNullOrWhiteSpace(Name) ? Loc.T("Sin nombre") : Name.Trim(),
             Icon = string.IsNullOrWhiteSpace(Icon) ? DefaultIcon : Icon.Trim(),
             IsBuiltIn = false,
             PitchSemitones = Math.Round(Pitch * 2) / 2,

@@ -50,7 +50,7 @@ public sealed class VoicePipeline : IDisposable
         }
         else
         {
-            NoiseSuppressionError = "Desactivada.";
+            NoiseSuppressionError = AudioText.T("Desactivada.");
         }
     }
 

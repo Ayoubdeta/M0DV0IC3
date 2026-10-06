@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 
 namespace M0DV0IC3.App.Services;
@@ -38,8 +39,8 @@ public sealed class HotkeyService : IDisposable
         {
             int code = Marshal.GetLastPInvokeError();
             error = code == NativeMethods.ErrorHotkeyAlreadyRegistered
-                ? $"{gesture.DisplayText} ya lo usa otra aplicación (o Windows). Elige otra combinación."
-                : $"No se pudo registrar {gesture.DisplayText} (error {code}).";
+                ? Loc.F("{0} ya lo usa otra aplicación (o Windows). Elige otra combinación.", gesture.DisplayText)
+                : Loc.F("No se pudo registrar {0} (error {1}).", gesture.DisplayText, code);
             return false;
         }
 

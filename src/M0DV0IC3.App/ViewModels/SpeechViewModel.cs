@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 using M0DV0IC3.App.Services;
 using M0DV0IC3.Audio.Speech;
@@ -146,7 +147,7 @@ public sealed partial class SpeechViewModel : ObservableObject
         if (text.Length == 0) return;
         if (Phrases.Any(p => p.Text == text))
         {
-            Error = "Esa frase ya está guardada.";
+            Error = Loc.T("Esa frase ya está guardada.");
             return;
         }
         var entry = new PhraseEntry { Text = text };
@@ -171,7 +172,7 @@ public sealed partial class SpeechViewModel : ObservableObject
         if (text.Length == 0) return;
         if (!HasVoices)
         {
-            Error = "Este Windows no tiene voces de texto a voz.";
+            Error = Loc.T("Este Windows no tiene voces de texto a voz.");
             return;
         }
 
@@ -187,7 +188,7 @@ public sealed partial class SpeechViewModel : ObservableObject
         catch (Exception ex)
         {
             Log.Warn($"No se pudo sintetizar «{text}»", ex);
-            Error = $"No se pudo decir la frase: {ex.Message}";
+            Error = Loc.F("No se pudo decir la frase: {0}", ex.Message);
         }
         finally
         {
@@ -207,7 +208,7 @@ public sealed partial class SpeechViewModel : ObservableObject
 
     public void Delete(PhraseItemViewModel item)
     {
-        if (!Dialogs.Confirm($"¿Borrar la frase «{item.Text}»?")) return;
+        if (!Dialogs.Confirm(Loc.F("¿Borrar la frase «{0}»?", item.Text))) return;
         _hotkeys.RemovePhraseBinding(item.Hotkey);
         Phrases.Remove(item);
         S.Phrases.Remove(item.Entry);

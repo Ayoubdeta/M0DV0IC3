@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using M0DV0IC3.App.Localization;
 using M0DV0IC3.App.Models;
 using M0DV0IC3.Dsp.Presets;
 
@@ -35,7 +36,7 @@ public sealed partial class VoiceCardViewModel : ObservableObject
 
     public string Id => Preset.Id;
 
-    public string Name => Preset.Name;
+    public string Name => Preset.IsBuiltIn ? Loc.T(Preset.Name) : Preset.Name;
 
     public string Icon => Preset.Icon;
 

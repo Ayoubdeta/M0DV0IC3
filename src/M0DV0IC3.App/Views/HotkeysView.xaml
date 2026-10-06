@@ -1,6 +1,7 @@
 <UserControl x:Class="M0DV0IC3.App.Views.HotkeysView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:M0DV0IC3.App.Localization"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:M0DV0IC3.App.ViewModels"
@@ -57,16 +58,16 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
-                        <TextBlock x:Name="NoKey" Text="sin atajo" Foreground="{StaticResource FaintTextBrush}" FontStyle="Italic" VerticalAlignment="Center"
+                        <TextBlock x:Name="NoKey" Text="{l:T 'sin atajo'}" Foreground="{StaticResource FaintTextBrush}" FontStyle="Italic" VerticalAlignment="Center"
                                    Visibility="{Binding HasGesture, Converter={StaticResource BoolToCollapsed}}" />
-                        <TextBlock x:Name="Capture" Text="Pulsa la combinación… (Esc cancela)" Foreground="{StaticResource AccentTextBrush}"
+                        <TextBlock x:Name="Capture" Text="{l:T 'Pulsa la combinación… (Esc cancela)'}" Foreground="{StaticResource AccentTextBrush}"
                                    FontWeight="SemiBold" VerticalAlignment="Center" Visibility="Collapsed" />
                     </Grid>
 
-                    <Button Grid.Column="2" Content="Cambiar" Command="{Binding ChangeCommand}" Margin="8,0,0,0" MinWidth="84"
-                            ToolTip="Pulsa y luego la combinación (Esc cancela, Retroceso quita el atajo)" />
+                    <Button Grid.Column="2" Content="{l:T 'Cambiar'}" Command="{Binding ChangeCommand}" Margin="8,0,0,0" MinWidth="84"
+                            ToolTip="{l:T 'Pulsa y luego la combinación (Esc cancela, Retroceso quita el atajo)'}" />
                     <Button Grid.Column="3" Style="{StaticResource ClearKeyButton}" Content="&#xE711;" Command="{Binding ClearCommand}" Margin="4,0,0,0"
-                            IsEnabled="{Binding HasGesture}" ToolTip="Quitar el atajo" AutomationProperties.Name="Quitar el atajo" />
+                            IsEnabled="{Binding HasGesture}" ToolTip="{l:T 'Quitar el atajo'}" AutomationProperties.Name="{l:T 'Quitar el atajo'}" />
 
                     <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Text="{Binding Error}" Foreground="{StaticResource ErrorBrush}"
                                TextWrapping="Wrap" Margin="0,6,0,0"
@@ -88,19 +89,19 @@
         <!-- Cabecera fija: qué son, buscador y el aviso de administrador -->
         <StackPanel DockPanel.Dock="Top">
             <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,10"
-                       Text="Funcionan aunque M0DV0IC3 esté minimizado o estés dentro de un juego. Pulsa «Cambiar» y luego la combinación: Esc cancela y Retroceso quita el atajo." />
+                       Text="{l:T 'Funcionan aunque M0DV0IC3 esté minimizado o estés dentro de un juego. Pulsa «Cambiar» y luego la combinación: Esc cancela y Retroceso quita el atajo.'}" />
 
             <Grid Margin="0,0,0,10">
                 <TextBox x:Name="SearchBox" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Padding="34,7,34,7" FontSize="14"
                          TextChanged="OnSearchChanged"
-                         AutomationProperties.Name="Buscar atajos" />
+                         AutomationProperties.Name="{l:T 'Buscar atajos'}" />
                 <TextBlock Text="&#xE721;" FontFamily="{StaticResource IconFont}" Foreground="{StaticResource MutedTextBrush}"
                            VerticalAlignment="Center" Margin="12,0,0,0" IsHitTestVisible="False" />
-                <TextBlock Text="Buscar un atajo, un sonido, una frase o una tecla…" Foreground="{StaticResource FaintTextBrush}"
+                <TextBlock Text="{l:T 'Buscar un atajo, un sonido, una frase o una tecla…'}" Foreground="{StaticResource FaintTextBrush}"
                            VerticalAlignment="Center" Margin="36,0,0,0" IsHitTestVisible="False"
                            Visibility="{Binding IsSearching, Converter={StaticResource BoolToCollapsed}}" />
                 <Button Style="{StaticResource IconButton}" Content="&#xE711;" HorizontalAlignment="Right" Margin="0,0,4,0" Width="26" Height="26"
-                        FontSize="10" Command="{Binding ClearSearchCommand}" ToolTip="Borrar la búsqueda" AutomationProperties.Name="Borrar la búsqueda"
+                        FontSize="10" Command="{Binding ClearSearchCommand}" ToolTip="{l:T 'Borrar la búsqueda'}" AutomationProperties.Name="{l:T 'Borrar la búsqueda'}"
                         Visibility="{Binding IsSearching, Converter={StaticResource BoolToVisible}}" />
             </Grid>
 
@@ -111,7 +112,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding ElevationText}" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12.5" />
-                    <Button Grid.Column="1" Content="Reiniciar como administrador" Command="{Binding RestartAsAdminCommand}" Margin="12,0,0,0"
+                    <Button Grid.Column="1" Content="{l:T 'Reiniciar como administrador'}" Command="{Binding RestartAsAdminCommand}" Margin="12,0,0,0"
                             Padding="10,4" FontSize="12" VerticalAlignment="Center"
                             Visibility="{Binding IsElevated, Converter={StaticResource BoolToCollapsed}}" />
                 </Grid>
@@ -142,12 +143,12 @@
 
                 <TextBlock Style="{StaticResource MutedText}" Margin="4,4,0,12"
                            Visibility="{Binding HasNoResults, Converter={StaticResource BoolToVisible}}">
-                    <Run Text="No hay ningún atajo que coincida con" />
+                    <Run Text="{l:T 'No hay ningún atajo que coincida con'}" />
                     <Run Text="{Binding Search, Mode=OneWay}" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" /><Run Text="." />
                 </TextBlock>
 
-                <Button Content="Restablecer los atajos de serie" Command="{Binding ResetDefaultsCommand}" HorizontalAlignment="Left" Margin="0,4,0,0"
-                        ToolTip="Vuelve a poner las combinaciones de serie. Los atajos de los sonidos y de las frases no se tocan." />
+                <Button Content="{l:T 'Restablecer los atajos de serie'}" Command="{Binding ResetDefaultsCommand}" HorizontalAlignment="Left" Margin="0,4,0,0"
+                        ToolTip="{l:T 'Vuelve a poner las combinaciones de serie. Los atajos de los sonidos y de las frases no se tocan.'}" />
             </StackPanel>
         </ScrollViewer>
     </DockPanel>

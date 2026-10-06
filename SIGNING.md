@@ -1,6 +1,6 @@
 # Firma de código
 
-Las versiones de M0DV0IC3 se publican **sin firma digital**. Por eso, al abrir el programa descargado, Windows puede avisar con **«Windows protegió su PC»** (SmartScreen), aunque sea completamente seguro. Cómo evitar el aviso está en el [README](README.md#descargar).
+Las versiones de M0DV0IC3 se publican **sin firma digital**. Por eso, al abrir el programa descargado, Windows puede avisar con **«Windows protegió su PC»** (SmartScreen), aunque sea completamente seguro. Cómo evitar el aviso está en el [README](README.es.md#descargar).
 
 ## Si algún día se quiere firmar
 

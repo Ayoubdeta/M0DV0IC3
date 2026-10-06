@@ -1,195 +1,248 @@
 # M0DV0IC3
 
+**English** · [Español](README.es.md)
+
 <img src="branding/m0dv0ic3-icon-rounded-512.png" width="96" alt="M0DV0IC3" />
 
 [![CI](https://github.com/Ayoubdeta/M0DV0IC3/actions/workflows/ci.yml/badge.svg)](https://github.com/Ayoubdeta/M0DV0IC3/actions/workflows/ci.yml)
-[![Última versión](https://img.shields.io/github/v/release/Ayoubdeta/M0DV0IC3?label=descargar)](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)
-[![Licencia MIT](https://img.shields.io/badge/licencia-MIT-a145f5)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/Ayoubdeta/M0DV0IC3?label=download)](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)
+[![MIT license](https://img.shields.io/badge/license-MIT-a145f5)](LICENSE)
 
-> **English:** M0DV0IC3 is a free, open-source real-time voice changer for Windows, similar to Voicemod. It works as a microphone in Discord, games and call apps through VB-Audio Virtual Cable. It includes 64 voices (among them a hard-tune autotune, and female, child or deep voices that adapt to your own pitch), a hold-to-switch voice key, a random voice mode, a karaoke mode for Spotify (vocal removal and synced lyrics), text-to-speech through the microphone with Windows voices, recording of what goes out through the microphone, a soundboard, noise suppression and streaming another app's audio (such as Spotify) through the microphone. Download the ZIP from [Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest), extract it and run `M0DV0IC3.exe`. The interface is in English or Spanish: choose it in Settings → Idioma · Language (the first time, it follows your Windows language).
+A free, open-source real-time voice changer for Windows, similar to Voicemod. It changes your voice on the fly (autotune, deep, woman, robot, helium, ghost…) and offers it as a microphone to Discord, games and any calling app.
 
-Modulador de voz en tiempo real para Windows: cambia tu voz al vuelo (autotune, grave, mujer, robot, helio, fantasma…) y la ofrece como micrófono a Discord, juegos y cualquier app de llamadas. Incluye voz aleatoria, una tecla para cambiar de voz mientras la mantienes, karaoke con Spotify, texto a voz por el micro, grabación, música de Spotify (u otra app) por el micro, soundboard, supresión de ruido (RNNoise), atajos globales, botón de silencio y la opción de escucharte.
+It also includes:
+- A random voice mode, and a key you hold to switch voice.
+- A karaoke mode for Spotify, with vocal removal and synced lyrics.
+- *Singer's voice*: it changes the voice of whoever sings in the song that's playing.
+- Text-to-speech through the mic.
+- Recording, a soundboard and noise suppression (RNNoise).
+- Spotify (or any other app) through the mic.
+- Global shortcuts, a mute button and the option to hear yourself.
 
-La interfaz sigue el logo: barra lateral, fondo morado oscuro, violeta para lo que eliges, lima para lo que está activo y el efecto glitch (copias desplazadas lima y violeta) en los títulos, la voz elegida y el interruptor VOZ ON.
+The interface is in English or Spanish.
 
-![M0DV0IC3](docs/captura.png)
+The look follows the logo:
+- A sidebar on a dark purple background.
+- Violet for what you select and lime for what is active.
+- A glitch effect (offset lime and violet copies) on the titles, the selected voice and the VOICE ON switch.
 
-## Descargar
+![M0DV0IC3](docs/screenshot.png)
 
-1. En **[Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)**, descarga `M0DV0IC3-vX.Y.Z-win-x64.zip`.
-2. Clic derecho → **Extraer todo…**, y abre **M0DV0IC3.exe** dentro de la carpeta. No hace falta instalar .NET.
-3. Sigue la *Puesta en marcha* de aquí abajo para usarlo en Discord y juegos.
+## Download
 
-Requisitos: Windows 10 (versión 2004 o posterior) u 11, de 64 bits.
+1. In **[Releases](https://github.com/Ayoubdeta/M0DV0IC3/releases/latest)**, download `M0DV0IC3-vX.Y.Z-win-x64.zip`.
+2. Right-click it → **Extract All…**, and open **M0DV0IC3.exe** inside the folder. You don't need to install .NET.
+3. Follow *Getting started* below to use it on Discord and in games.
 
-**¿Sale «Windows protegió su PC»?** Es el filtro SmartScreen. Sale con los programas que no tienen firma digital, como este, o que aún tienen pocas descargas, aunque sean completamente seguros:
-- **Para que no salga:** antes de descomprimir, clic derecho en el ZIP → **Propiedades** → marca **Desbloquear** → **Aceptar**.
-- **Si ya ha salido:** pulsa **Más información → Ejecutar de todas formas**. Solo pasa la primera vez.
+Requirements: 64-bit Windows 10 (version 2004 or later) or 11.
 
-Si un antivirus marca la descarga, es un falso positivo: [cómo avisar para que lo corrijan](SIGNING.md#si-un-antivirus-marca-la-descarga).
+**Does “Windows protected your PC” show up?** That's the SmartScreen filter. It appears for programs that have no digital signature, like this one, or that don't have many downloads yet, even if they're completely safe:
+- **To prevent it:** before extracting, right-click the ZIP → **Properties** → tick **Unblock** → **OK**.
+- **If it has already appeared:** click **More info → Run anyway**. It only happens the first time.
 
-Cada versión la compila GitHub Actions directamente desde este código fuente, sin pasar por ningún ordenador personal. Junto al ZIP se publican su huella SHA-256 y una atestación de procedencia, que prueba de qué repositorio y commit sale. Se puede verificar con `gh attestation verify M0DV0IC3-vX.Y.Z-win-x64.zip --repo Ayoubdeta/M0DV0IC3`.
+If an antivirus flags the download, it's a false positive: [how to report it so they fix it](SIGNING.md#si-un-antivirus-marca-la-descarga) (in Spanish).
 
-La app solo se conecta a internet en el modo karaoke, para buscar la letra en lrclib.net (envía el artista, el título y la duración de la canción). El texto a voz usa las voces de Windows, sin internet, y las grabaciones se quedan en tu PC. No pide permisos de administrador y solo usa tu micrófono y, si lo activas, el sonido de la app que elijas para «Música por el micro» o el karaoke.
+Every release is built by GitHub Actions straight from this source code, without going through anyone's computer. The ZIP is published together with:
+- its SHA-256 fingerprint;
+- a provenance attestation, which proves which repository and commit it comes from.
 
-## Puesta en marcha
+You can check the attestation with `gh attestation verify M0DV0IC3-vX.Y.Z-win-x64.zip --repo Ayoubdeta/M0DV0IC3`.
 
-1. **Instala VB-Audio Virtual Cable** (gratuito): <https://vb-audio.com/Cable/>. Descomprime el zip, ejecuta `VBCABLE_Setup_x64.exe` como administrador y reinicia si te lo pide.
-2. En *Panel de sonido* pon **CABLE Input** y **CABLE Output** a **48000 Hz** (Propiedades → Opciones avanzadas). Así Windows no tiene que remuestrear.
-3. Abre M0DV0IC3, elige tu **micrófono** y, como salida, **CABLE Input (VB-Audio Virtual Cable)**.
-4. En la app donde vayas a hablar, elige **CABLE Output (VB-Audio Virtual Cable)** como micrófono.
-   - **Discord** (Ajustes → Voz y vídeo):
-     - Dispositivo de entrada: CABLE Output.
-     - Desactiva *Krisp* / supresión de ruido y la cancelación de eco de Discord, porque deforman los efectos.
-     - Si quieres quitar ruido, usa la supresión de ruido de M0DV0IC3.
-   - **Juegos y otras apps:** elige CABLE Output en sus ajustes de micrófono.
+**Privacy:**
+- The app only connects to the internet in karaoke mode, to look up the lyrics on lrclib.net. It sends the song's artist, title and length.
+- Text-to-speech uses the Windows voices, offline, and recordings stay on your PC.
+- It doesn't ask for administrator rights.
+- It only uses your microphone and, if you turn them on, the sound of the app you choose for “Music through the mic”, karaoke or the singer's voice.
 
-## En el móvil
+## Getting started
 
-¿Quieres usar las voces en las llamadas del móvil (WhatsApp, Instagram, Azar…)? Se puede con un cable de audio, sin instalar nada en el móvil: **[Cómo conectarlo al móvil](docs/movil.md)**.
+1. **Install VB-Audio Virtual Cable** (free): <https://vb-audio.com/Cable/>. Unzip it, run `VBCABLE_Setup_x64.exe` as administrator and restart if it asks you to.
+2. In the *Sound control panel*, set **CABLE Input** and **CABLE Output** to **48000 Hz** (Properties → Advanced). That way Windows doesn't have to resample.
+3. Open M0DV0IC3, choose your **microphone** and, as the output, **CABLE Input (VB-Audio Virtual Cable)**.
+4. In the app where you're going to talk, choose **CABLE Output (VB-Audio Virtual Cable)** as the microphone.
+   - **Discord** (User Settings → Voice & Video):
+     - Input device: CABLE Output.
+     - Turn off *Krisp* / noise suppression and Discord's echo cancellation, because they distort the effects.
+     - If you want to remove noise, use M0DV0IC3's noise suppression.
+   - **Games and other apps:** choose CABLE Output in their microphone settings.
 
-## Voces incluidas
+To switch the interface language, go to **Settings → Idioma · Language** (English or Spanish). The first time, it follows your Windows language, and when you change it the app restarts by itself.
 
-| Grupo | Voces |
+## On your phone
+
+Want to use the voices in phone calls (WhatsApp, Instagram, Azar…)? You can, with an audio cable and without installing anything on the phone: **[How to connect it to your phone](docs/movil.md)** (in Spanish).
+
+## Built-in voices
+
+| Group | Voices |
 |---|---|
-| Autotune | **Autotune**, **Autotune mujer**, **Autotune cantar** |
-| Personajes | Grave, Hombre, Mujer, Mujer 2, Niño, Pito / Ardilla, Helio, Robot, Demonio, Alien, Fantasma, Borracho, Bebé, Abuelo, Abuela, Gigante, Duende, Chica anime, Locutor de radio, Villano espacial, Zombi, Pato, Hada, Bruja, Ogro, Vampiro, Poseído, Voz divina, Insecto, Cíborg, Robot gigante, Androide, Payaso, Hombre lobo |
-| Efectos | Susurro, Invertida (al revés), Bajo el agua, Espacial, Radio, Teléfono, Megáfono, Distorsión, Coro, Vocoder, Walkie-talkie, Astronauta, 8 bits, Disco antiguo, Dentro de una lata, Con mascarilla |
-| Ambientes | Lejana, Cueva / Eco, Reverb, Delay, Chorus, Flanger, Estadio, Ducha, Catedral, Megafonía |
+| Autotune | **Autotune**, **Autotune female**, **Autotune singing** |
+| Characters | Deep, Man, Woman, Woman 2, Child, Squeaky / Chipmunk, Helium, Robot, Demon, Alien, Ghost, Drunk, Baby, Grandpa, Grandma, Giant, Goblin, Anime girl, Radio host, Space villain, Zombie, Duck, Fairy, Witch, Ogre, Vampire, Possessed, Divine voice, Insect, Cyborg, Giant robot, Android, Clown, Werewolf |
+| Effects | Whisper, Reversed (backwards), Underwater, Space, Radio, Telephone, Megaphone, Distortion, Choir, Vocoder, Walkie-talkie, Astronaut, 8-bit, Old record, Inside a tin can, With a face mask |
+| Ambience | Far away, Cave / Echo, Reverb, Delay, Chorus, Flanger, Stadium, Shower, Cathedral, PA system |
 
-Ctrl+Alt+1…9 eligen las nueve primeras voces de la lista, en este orden.
+Ctrl+Alt+1…9 pick the first nine voices in the list, in this order.
 
-Las voces incluidas no se editan: pulsa **Duplicar** y ajusta tu copia en el editor; los cambios se oyen al momento.
+The built-in voices can't be edited: click **Duplicate** and tweak your copy in the editor. Changes are heard instantly.
 
-**Favoritas.** Pasa el ratón por una voz y pulsa su estrella. El botón **Favoritas** deja ver solo esas, y entonces la voz aleatoria y voz anterior / siguiente eligen solo entre ellas.
+**Favorites.** Hover over a voice and click its star. The **Favorites** button shows only those, and then the random voice and previous / next voice choose only among them.
 
-**Voces que se adaptan a tu voz.** Mujer, Niño, Bebé, Chica anime, Grave, Gigante y las demás voces de otra edad o de otro sexo tienen un **tono objetivo** (por ejemplo, ~215 Hz para Mujer). La app aprende tu tono medio mientras hablas (lo ves en *Ajustes* y se guarda para la próxima vez) y calcula cuánto subir o bajar. Así suenan igual con una voz grave que con una aguda: con un cambio fijo de +5 semitonos, una voz de hombre grave (~90 Hz) se quedaba en ~120 Hz y seguía sonando a hombre.
+**Voices that adapt to your voice.** Woman, Child, Baby, Anime girl, Deep, Giant and the other voices of another age or sex have a **target pitch** (for example, ~215 Hz for Woman).
+- The app learns your average pitch while you talk. You can see it in *Settings*, and it's saved for next time.
+- From it, the app works out how much to raise or lower your voice. That way the voices sound the same with a deep voice as with a high one.
+- Before, a fixed change of +5 semitones left a deep male voice (~90 Hz) at ~120 Hz, and it still sounded like a man.
 
-**Coro, Vocoder y Walkie-talkie.** El coro suma a tu voz copias una octava abajo, una quinta y una octava arriba. El vocoder convierte tu voz en un acorde de sintetizador. El walkie-talkie y el astronauta añaden ruido de radio mientras hablas y pitidos al empezar y al acabar; en silencio no suenan.
+**Choir, Vocoder and Walkie-talkie.**
+- The choir adds copies of your voice an octave below, a fifth above and an octave above.
+- The vocoder turns your voice into a synth chord.
+- The walkie-talkie and the astronaut add radio noise while you talk and beeps when you start and finish. In silence they make no sound.
 
-**Autotune.** Es el autotune exagerado de los cantantes de reggaetón y trap:
-- La corrección es instantánea: la voz salta de nota en nota sin pasar por las intermedias, y el vibrato desaparece.
-- Al hablar, las subidas y bajadas de tu voz se amplían 2,2× antes de afinar, así que recorres muchas más notas y suena cantado.
-- No toca los formantes: la voz sigue siendo la tuya, sin efecto ardilla.
+**Autotune.** It's the exaggerated autotune that reggaeton and trap singers use:
+- The correction is instant: the voice jumps from note to note without the in-between ones, and vibrato disappears.
+- When you talk, the ups and downs of your voice are widened 2.2× before tuning, so you go through many more notes and it sounds sung.
+- It doesn't touch the formants: the voice is still yours, with no chipmunk effect.
 
-Hay tres versiones:
-- **Autotune**, en La menor.
-- **Autotune mujer**, que sube primero la voz 8 semitonos, como Mujer 2.
-- **Autotune cantar**, para cantar encima de una canción: escala cromática (vale para cualquier canción) y sin ampliar tu melodía.
+There are three versions:
+- **Autotune**, in A minor.
+- **Autotune female**, which first raises the voice 8 semitones, like Woman 2.
+- **Autotune singing**, for singing over a song. It uses the chromatic scale (it works for any song) and doesn't widen your melody.
 
-En el editor puedes elegir:
-- **Escala:** cromática, mayor, menor, menor armónica o pentatónica menor.
-- **Tonalidad:** la de serie es La menor, que usa las notas blancas del piano. Si cantas encima de una canción, pon la suya.
-- **Velocidad:** instantánea para el efecto robótico; de 50 a 200 ms para una corrección natural.
-- **Exagerar melodía:** de 0 (tu melodía tal cual) a 2,5×.
+In the editor you can choose:
+- **Scale:** chromatic, major, minor, harmonic minor or minor pentatonic.
+- **Key:** the default is A minor, which uses the white keys of the piano. If you're singing over a song, set its key.
+- **Speed:** instant for the robotic effect; 50 to 200 ms for a natural correction.
+- **Exaggerate melody:** from 0 (your melody as it is) to 2.5×.
 
-**🎲 Voz aleatoria** (pestaña Voces, o Ctrl+Alt+R): cambia sola de voz cada 2, 5, 10 o 30 s, o a intervalos al azar. Se salta la voz invertida, porque su retardo dejaría un hueco en cada cambio.
+**🎲 Random voice** (Voices tab, or Ctrl+Alt+R): it switches voice on its own every 2, 5, 10 or 30 s, or at random intervals. It skips the reversed voice, because its delay would leave a gap at every switch.
 
-**Mantener pulsado para cambiar la voz** (el **-** del teclado numérico): mientras lo mantienes suena la voz que elijas en la pestaña Voces («Al mantener Num -», Demonio de serie), y al soltarlo vuelve la que tenías, o tu voz normal si estaba apagada. Sirve para soltar una broma en mitad de una partida sin tocar la app.
+**Hold to switch voice** (the **-** on the numeric keypad):
+- While you hold it, the voice you choose in the Voices tab plays (“While holding Num -”, Demon by default).
+- When you let go, the voice you had comes back, or your normal voice if it was off.
+- It's handy for dropping a joke in the middle of a match without touching the app.
 
-**Música por el micro** (pestaña Música, o Ctrl+Alt+P): lo que suena en Spotify (u otra app que elijas) llega a Discord mezclado con tu voz, con su propio volumen.
-- Solo se captura esa app (process loopback de Windows 10 2004 o posterior): ni Discord ni el resto del sistema, así que nadie se oye a sí mismo.
-- Tú la sigues oyendo como siempre.
-- Si la app se cierra o se reinicia, se vuelve a enganchar sola.
+**Music through the mic** (Music tab, or Ctrl+Alt+P): whatever plays in Spotify (or another app you choose) reaches Discord mixed with your voice, at its own volume.
+- Only that app is captured (Windows 10 2004+ process loopback): not Discord or the rest of the system, so nobody hears themselves.
+- You keep hearing it as usual.
+- If the app closes or restarts, it hooks back on by itself.
 
-**Voz del cantante** (pestaña Música): cambia la voz de quien canta en la canción que suena (Ardilla, Demonio, Robot, Mujer…) y deja la música como está.
-- La voz se separa con el mismo filtro que el karaoke, pasa por su propia cadena de voz y se vuelve a mezclar. Medido con 140 canciones, ~80 % de la voz del cantante coge la voz nueva; la música del centro que va con ella también, y queda algo de la voz original de fondo, ~4,5 dB por debajo de la música.
-- La canción cambiada suena en tus cascos y en Discord, y la app (Spotify) se baja en Windows mientras tanto para que no la oigas dos veces.
-- Es una voz aparte de la tuya: puedes hablar con tu voz normal mientras el cantante suena como una ardilla. No va a la vez que el karaoke.
-- Va afinada con la canción. El tono del cantante solo cambia en octavas: Ardilla lo sube una octava en vez de 8 semitonos, que pasarían la melodía a otra tonalidad y desafinaría con la música. El autotune sigue todas las notas (no las de La menor) y el robot canta la melodía en vez de una nota fija. Medido con una canción real: con +8 semitonos ninguna nota quedaba en la tonalidad; en octavas, el 74 % (la canción original da el 81 % con la misma medida). Tu voz del micro no cambia.
+**Singer's voice** (Music tab): it changes the voice of whoever sings in the song that's playing (Chipmunk, Demon, Robot, Woman…) and leaves the music as it is.
+- How it works: the voice is separated with the same filter as karaoke, goes through its own voice chain and is mixed back in.
+- What's left over, measured on 140 songs:
+  - ~80 % of the singer's voice gets the new voice.
+  - The music in the center goes along with it and gets the effect too.
+  - Some of the original voice stays in the background, ~4.5 dB below the music.
+- The changed song plays in your headphones and on Discord. Meanwhile, the app (Spotify) is turned down in Windows so you don't hear it twice.
+- It's a separate voice from yours: you can talk with your normal voice while the singer sounds like a chipmunk. It can't be used at the same time as karaoke.
+- It stays in tune with the song. The singer's pitch only changes in whole octaves: Chipmunk raises it one octave instead of 8 semitones, which would move the melody to another key and clash with the music. The autotune follows every note (not just those of A minor), and the robot sings the melody instead of a single note.
+- Measured on a real song: with +8 semitones no note stayed in key; with octaves, 74 % did. The original song scores 81 % with the same measurement.
+- Your mic voice doesn't change.
 
-**Modo karaoke** (pestaña Karaoke, o Ctrl+Alt+K): pon una canción en Spotify y actívalo.
-- La app reconoce la canción (título, artista y por dónde va, con los controles multimedia de Windows) y busca su letra en [LRCLIB](https://lrclib.net). Si está sincronizada, la línea que toca se ilumina y la letra avanza sola; «Antes» y «Después» la ajustan si va desfasada.
-- La voz se quita con un filtro que atenúa lo que suena en el centro de la mezcla, solo en la zona de la voz: el bajo y la batería no se tocan, y la canción recupera poco a poco el volumen que pierde al quitar la voz. Medido con 140 canciones con las pistas separadas, la voz baja unos 12 dB y la música pierde 1,6 dB. Se oye mucho menos, pero puede quedar algo de fondo: el eco de la voz y los coros abiertos a los lados.
-- La canción sin voz suena en tus cascos (elígelos en «AURICULARES · ESCUCHARME») y en Discord, junto con tu voz. Para que no la oigas dos veces, Spotify se baja al mínimo en Windows mientras tanto y recupera su volumen al apagarlo.
-- «Cantar con autotune» elige la voz Autotune cantar.
+**Karaoke mode** (Karaoke tab, or Ctrl+Alt+K): play a song in Spotify and turn it on.
+- The app recognizes the song (title, artist and position, through the Windows media controls) and looks up its lyrics on [LRCLIB](https://lrclib.net). If they're synced, the current line lights up and the lyrics scroll by themselves; “Earlier” and “Later” adjust them if they're out of step.
+- The voice is removed with a filter that turns down what sounds in the center of the mix, only in the voice range. The bass and drums are left alone, and the song gradually gets back the volume it loses when the voice is removed.
+- Measured on 140 songs with separate tracks, the voice drops by about 12 dB and the music loses 1.6 dB. It's much quieter, but some of it can remain in the background: the voice's echo and backing vocals spread to the sides.
+- The song without the voice plays in your headphones (choose them in “HEADPHONES · HEAR MYSELF”) and on Discord, together with your voice. So you don't hear it twice, Spotify is turned all the way down in Windows meanwhile and gets its volume back when you turn karaoke off.
+- “Sing with autotune” picks the Autotune singing voice.
 
-**Soundboard** (pestaña Soundboard): arrastra tus sonidos (WAV, MP3, OGG, FLAC…) o pulsa «Añadir sonido». Con el engranaje de cada sonido le pones nombre, volumen, atajo y lo **recortas**: arrastra las marcas de inicio y fin sobre la forma de onda, o pulsa «Quitar silencios». El archivo original no se toca y «Sonido entero» lo deshace; «Exportar WAV…» guarda el trozo como archivo nuevo. El **+ del teclado numérico** para todos los sonidos y frases que estén sonando.
+**Soundboard** (Soundboard tab): drag in your sounds (WAV, MP3, OGG, FLAC…) or click “Add sound”.
+- With each sound's cog you set its name, volume and shortcut.
+- You can also **trim** it: drag the start and end markers over the waveform, or click “Trim silences”. The original file isn't touched and “Whole sound” undoes it; “Export WAV…” saves the trimmed part as a new file.
+- The **+ on the numeric keypad** stops every sound and phrase that is playing.
 
-**Texto a voz** (pestaña Texto a voz): escribe una frase y pulsa Intro. La dice una voz de Windows (en un Windows en español, Helena, Laura o Pablo) y suena por el micro en Discord o en el juego, con la voz que tengas puesta: Robot, Demonio, Mujer… Funciona sin internet y una frase tarda ~0,1 s en prepararse. Las frases guardadas pueden tener su propio atajo, y entonces suenan al instante en mitad de una partida.
+**Text to speech** (Text to speech tab): type a phrase and press Enter.
+- A Windows voice says it and it plays through the mic on Discord or in the game, with your current voice: Robot, Demon, Woman…
+- It works offline, and a phrase takes ~0.1 s to get ready.
+- Saved phrases can have their own shortcut, and then they play instantly in the middle of a match.
 
-**Grabar** (botón de la barra inferior, o Ctrl+Alt+G): graba lo que sale por el micro, tal y como lo oyen los demás: tu voz con su efecto, los sonidos, las frases y la música del karaoke. Se guarda en MP3 en *Música\M0DV0IC3*; al acabar puedes abrir la carpeta o añadir la grabación al soundboard.
+**Record** (button in the bottom bar, or Ctrl+Alt+G): it records what goes out through the mic, just as others hear it: your voice with its effect, the sounds, the phrases and the karaoke music. It's saved as MP3 in *Music\M0DV0IC3*. When it finishes, you can open the folder or add the recording to the soundboard.
 
-**Idioma** (Ajustes → Idioma · Language): español o inglés. La primera vez sigue el idioma de Windows; al cambiarlo, la app se reinicia sola.
+**Language** (Settings → Idioma · Language): English or Spanish. The first time, it follows your Windows language; when you change it, the app restarts by itself.
 
-**Atajos** (pestaña Atajos): todos los atajos de teclado globales, agrupados (Voz, Sonidos, Frases, Micro y auriculares, Música, karaoke y grabación, Elegir una voz) y con un buscador que encuentra acciones, sonidos, frases o teclas. Cada fila dice qué hace; las de «Voz 1…9» y «Mantener pulsado» muestran la voz a la que llevan. Funcionan dentro de los juegos; si un juego se ejecuta como administrador, abre M0DV0IC3 también como administrador.
+**Shortcuts** (Shortcuts tab): every global keyboard shortcut.
+- They're grouped (Voice, Sounds, Phrases, Mic and headphones, Music, karaoke and recording, Pick a voice), with a search box that finds actions, sounds, phrases or keys.
+- Each row says what it does; “Voice 1…9” and “Hold to switch voice” show the voice they lead to.
+- They work inside games. If a game runs as administrator, open M0DV0IC3 as administrator too.
 
-## Latencia
+## Latency
 
-Medida con el motor completo en el PC de desarrollo (`m0dv0ic3-cli engine`, auriculares USB Logitech):
+Measured with the full engine on the development PC (`m0dv0ic3-cli engine`, Logitech USB headset):
 
-| Tramo | Modo compartido | Modo exclusivo |
+| Stage | Shared mode | Exclusive mode |
 |---|---|---|
-| Captura del micro | 10 ms | 3 ms |
-| Espera en el buffer entre micro y salida (medida muestra a muestra) | ~6 ms | ~4,6 ms |
-| Salida | 12 ms | 3 ms |
-| **Total con voces sin cambio de tono** (radio, teléfono, eco, megáfono) | **~28 ms** | **~11 ms** |
-| + voces con cambio de tono (PSOLA): ~2,4 periodos de tu voz | +11 ms (voz aguda) · +19 ms (voz media) · +27 ms (voz muy grave) | igual |
-| + supresión de ruido (RNNoise) | +10 ms | +10 ms |
-| + voz invertida (hay que esperar a que acabe cada trozo) | +200 ms | +200 ms |
+| Mic capture | 10 ms | 3 ms |
+| Wait in the buffer between mic and output (measured sample by sample) | ~6 ms | ~4.6 ms |
+| Output | 12 ms | 3 ms |
+| **Total with voices that don't change pitch** (radio, telephone, echo, megaphone) | **~28 ms** | **~11 ms** |
+| + voices that change pitch (PSOLA): ~2.4 periods of your voice | +11 ms (high voice) · +19 ms (medium voice) · +27 ms (very deep voice) | same |
+| + noise suppression (RNNoise) | +10 ms | +10 ms |
+| + reversed voice (it has to wait for each chunk to end) | +200 ms | +200 ms |
 
-La app muestra en cada momento su latencia, con el desglose en el tooltip. VB-Cable y Discord añaden la suya propia, que no se cuenta aquí.
+The app always shows its latency, with the breakdown in the tooltip. VB-Cable and Discord add their own, which isn't counted here.
 
-- **Para bajar la latencia**, activa el **modo exclusivo** en *Ajustes*. Muchos drivers no ofrecen periodos cortos en el modo compartido de baja latencia (IAudioClient3), y entonces se queda en 10 ms. En modo exclusivo ninguna otra app puede usar ese micrófono directamente. Discord no se ve afectado, porque escucha CABLE Output.
-- **Si oyes chasquidos**, sube el *margen anti-cortes*.
+- **To lower the latency**, turn on **exclusive mode** in *Settings*.
+  - Many drivers don't offer short periods in low-latency shared mode (IAudioClient3), and then it stays at 10 ms.
+  - In exclusive mode no other app can use that microphone directly. Discord isn't affected, because it listens to CABLE Output.
+- **If you hear clicks**, raise the *anti-dropout margin*.
 
-## Compilar
+## Building
 
-Requisitos: .NET 10 SDK. Los paquetes se descargan de nuget.org (lo fija `nuget.config`).
+Requirements: .NET 10 SDK. Packages come from nuget.org (set in `nuget.config`).
 
 ```powershell
 dotnet build M0DV0IC3.slnx
 dotnet test tests/M0DV0IC3.Tests
 dotnet run --project src/M0DV0IC3.App
-.\publish.ps1        # pasa los tests y genera publish\M0DV0IC3\ (la app) y el ZIP de descarga con su SHA-256
+.\publish.ps1        # runs the tests and creates publish\M0DV0IC3\ (the app) and the download ZIP with its SHA-256
 ```
 
-La app se publica como carpeta (autocontenida y precompilada con ReadyToRun) y no como un único .exe comprimido. Un ejecutable que se descomprime solo y suelta DLL en la carpeta temporal es lo que más falsos positivos da en los antivirus.
+The app is published as a folder (self-contained and precompiled with ReadyToRun), not as a single compressed .exe. An executable that unpacks itself and drops DLLs in the temp folder is what triggers the most antivirus false positives.
 
-## Publicar una versión
+The interface texts are written in Spanish, and `src/M0DV0IC3.App/Localization/en.json` holds the English translation (the key is the Spanish text). A test checks that every text has its translation.
+
+## Publishing a release
 
 ```powershell
 git tag v1.0.1
 git push origin v1.0.1
 ```
 
-El workflow [`release.yml`](.github/workflows/release.yml) compila en GitHub, pasa los tests y crea la release con el ZIP, su SHA-256 y la atestación de procedencia.
+The [`release.yml`](.github/workflows/release.yml) workflow builds on GitHub, runs the tests and creates the release with the ZIP, its SHA-256 and the provenance attestation.
 
-## Herramienta de línea de comandos
+## Command-line tool
 
-`tools/M0DV0IC3.Cli` sirve para ajustar voces y diagnosticar dispositivos sin abrir la app:
+`tools/M0DV0IC3.Cli` lets you tune voices and diagnose devices without opening the app:
 
 ```powershell
 dotnet build tools/M0DV0IC3.Cli -c Release
 $cli = "tools\M0DV0IC3.Cli\bin\Release\net10.0-windows\m0dv0ic3-cli.exe"
-& $cli voices                                   # voces incluidas
-& $cli devices                                  # dispositivos, formatos y periodos admitidos
-& $cli process mi_voz.wav salida.wav --voice mujer [--denoise]
-& $cli analyze salida.wav                       # tono (f0), nivel y brillo
-& $cli bench                                    # CPU, latencia y nivel de cada voz
-& $cli probe --seconds 3 [--exclusive]          # abre el micro y mide sus callbacks (no graba nada)
-& $cli engine --voice mujer [--exclusive]       # motor completo con tus dispositivos, silenciado: latencia y cortes
-& $cli apps                                     # apps con audio que se pueden mandar por el micro
-& $cli engine --app spotify                     # lo mismo, mezclando la música de una app y midiendo su nivel
+& $cli voices                                   # built-in voices
+& $cli devices                                  # devices, supported formats and periods
+& $cli process my_voice.wav output.wav --voice mujer [--denoise]
+& $cli analyze output.wav                       # pitch (f0), level and brightness
+& $cli bench                                    # CPU, latency and level of each voice
+& $cli probe --seconds 3 [--exclusive]          # opens the mic and measures its callbacks (records nothing)
+& $cli engine --voice mujer [--exclusive]       # full engine with your devices, muted: latency and dropouts
+& $cli apps                                     # apps with audio that can be sent through the mic
+& $cli engine --app spotify                     # the same, mixing an app's music and measuring its level
 ```
 
-## Cómo está hecho
+## How it's built
 
 ```
-micro (WASAPI) → RNNoise → puerta de ruido → voz (PSOLA + efectos) → + soundboard + frases + música de una app → limitador → CABLE Input → grabación
-                                                       └→ (voz si "Escucharme") + sonidos y frases → limitador → auriculares
+mic (WASAPI) → RNNoise → noise gate → voice (PSOLA + effects) → + soundboard + phrases + an app's music → limiter → CABLE Input → recording
+                                                    └→ (voice if "Hear myself") + sounds and phrases → limiter → headphones
 ```
 
-| Ruta | Contenido |
+| Path | Contents |
 |---|---|
-| `src/M0DV0IC3.Dsp` | DSP puro en C#: YIN, TD-PSOLA de baja latencia con autotune y vibrato en los granos, susurro por LPC, voz invertida, biquads, ring mod, comb, distorsión, bitcrusher, chorus de 3 voces, flanger, eco, Freeverb, puerta de ruido, limitador; voces y crossfade sin clics. |
-| `src/M0DV0IC3.Audio` | WASAPI propio sobre NAudio 3: exclusivo, compartido de baja latencia o compartido con conversión automática. Hilos MMCSS "Pro Audio", ring buffers sin bloqueos con compensación de deriva de reloj, RNNoise por P/Invoke, mezclador del soundboard. **El hilo de audio no reserva memoria** (lo comprueba un test). |
-| `src/M0DV0IC3.App` | Interfaz WPF (MVVM): barra lateral, barra de título propia, voces por grupos, editor de voz, soundboard, texto a voz (voces de Windows), música por el micro, karaoke, grabación, atajos globales y bandeja del sistema. El tema (`Themes/Theme.xaml`) no usa animaciones continuas: una sola animación infinita con brillo costaba un 10 % de un núcleo de CPU. |
-| `tools/M0DV0IC3.Cli` | Herramientas offline y de diagnóstico. |
-| `tests/M0DV0IC3.Tests` | Tono medido tras PSOLA y tras el autotune, latencia real frente a la reportada, cero asignaciones, rendimiento, deriva de reloj, RNNoise, soundboard. |
+| `src/M0DV0IC3.Dsp` | Pure C# DSP: YIN, low-latency TD-PSOLA with autotune and vibrato in the grains, LPC whisper, reversed voice, biquads, ring mod, comb, distortion, bitcrusher, 3-voice chorus, flanger, echo, Freeverb, noise gate, limiter, vocal remover and separator; voices and click-free crossfades. |
+| `src/M0DV0IC3.Audio` | Custom WASAPI on top of NAudio 3: exclusive, low-latency shared or shared with automatic conversion. MMCSS "Pro Audio" threads, lock-free ring buffers with clock-drift compensation, RNNoise via P/Invoke, soundboard mixer, per-app capture, singer's voice, text to speech and recording. **The audio thread doesn't allocate memory** (a test checks it). |
+| `src/M0DV0IC3.App` | WPF interface (MVVM): sidebar, custom title bar, voices by group, voice editor, soundboard, text to speech (Windows voices), music through the mic, karaoke, recording, global shortcuts, system tray, English and Spanish. The theme (`Themes/Theme.xaml`) uses no continuous animations: a single infinite glow animation cost 10 % of a CPU core. |
+| `tools/M0DV0IC3.Cli` | Offline and diagnostic tools. |
+| `tests/M0DV0IC3.Tests` | Pitch measured after PSOLA and autotune, real versus reported latency, zero allocations, performance, clock drift, RNNoise, soundboard, vocal removal, singer's voice in tune, translations. |
 
-## Licencia
+## License
 
 [MIT](LICENSE) © 2026 Ayoub.
 
-Software de terceros incluido en la descarga, con sus licencias: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Incluye NAudio, RNNoise, RNNoise.Net, CommunityToolkit.Mvvm, H.NotifyIcon y el runtime de .NET. VB-Audio Virtual Cable es donationware de VB-Audio: se instala aparte y no se redistribuye.
+Third-party software included in the download, with their licenses: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). It includes NAudio, RNNoise, RNNoise.Net, CommunityToolkit.Mvvm, H.NotifyIcon and the .NET runtime. VB-Audio Virtual Cable is donationware by VB-Audio: it's installed separately and isn't redistributed.

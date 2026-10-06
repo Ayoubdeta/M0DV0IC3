@@ -38,8 +38,10 @@ public sealed partial class KaraokeViewModel : ObservableObject, IDisposable
 {
     private const string SpotifyExe = "Spotify";
 
-    // La música llega a tus oídos unos 80 ms después de la posición que dice Spotify (captura, filtro y salida).
-    private static readonly TimeSpan AudioDelay = TimeSpan.FromMilliseconds(80);
+    // La música llega a tus oídos unos 150 ms después de la posición que dice Spotify: captura (20 ms), margen
+    // anti-cortes (12 ms), quitar la voz (43 ms), motor y salida a los cascos. La posición que da Spotify es fiable:
+    // la actualiza cada ~4,5 s y, entre medias, contando el tiempo transcurrido no se desvía ni 10 ms.
+    private static readonly TimeSpan AudioDelay = TimeSpan.FromMilliseconds(150);
 
     private readonly SettingsService _settings;
     private readonly AudioService _audio;
